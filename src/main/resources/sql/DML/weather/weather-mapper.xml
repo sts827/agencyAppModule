@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.wayplus.travel.mapper.weather.WeatherMapper">
+	<!-- nx, ny로 관측지 정보 가져오기 -->
+	<select id="selectCityInfo" parameterType="HashMap" resultType="HashMap">
+		SELECT
+			cityId, '제주도' province, city, dong, nx, ny, legalCode, logoImageNm, description
+		FROM public_weather.cityforultrasrtncst
+		WHERE nx = #{nx} AND ny = #{ny} LIMIT 0,1
+	</select>
+	<!-- nx, ny가 있는 지 확인 후 관측지 정보 ID, 관측지명, 변환된 nx, ny 정보 가져오기 -->
+	<select id="selectConversionNxNyIntoByOldNxNy" parameterType="HashMap" resultType="HashMap">
+		SELECT
+			A.city_id, '제주도' province, B.city, B.dong, A.conversion_nx AS nx, A.conversion_ny AS ny
+		FROM public_weather.nxny_conversion A
+		JOIN public_weather.cityforultrasrtncst B ON A.city_id = B.cityId
+		WHERE old_nx = #{old_nx} AND old_ny = #{old_ny}
+		ORDER BY idx ASC
+		LIMIT 0,1
+	</select>
+
+	<!-- 변환된 nx, ny값 등록 -->
+	<insert id="insertConversionNxNy" parameterType="HashMap">
+		<selectKey keyProperty="count_idx" resultType="int" order="BEFORE">
+	        select count(idx) from public_weather.nxny_conversion WHERE old_nx = #{old_nx} AND old_ny = #{old_ny}
+	    </selectKey>
+	    <if test="count_idx == 0">
+			INSERT INTO public_weather.nxny_conversion (
+				old_nx, old_ny, url, city_id, conversion_nx, conversion_ny
+			) VALUES (
+				#{old_nx}, #{old_ny}, #{url}, #{city_id}, #{nx}, #{ny}
+	 		)
+ 		</if>
+	</insert>
+	<!-- nx, ny로 현재 시각 단기예보 정보 가져오기  -->
+	<select id="selectCurrentWeatherVilageFcstInfoIntoByNxNy" parameterType="HashMap" resultType="WeatherVilageFcstVO">
+		SELECT
+			A.cityId, A.city, A.dong, A.nx, A.ny, A.logoImageNm,
+			B.ultraSrtFcstId, B.baseDate, B.baseTime, B.fcstDate, B.fcstTime,
+    		B.POP, B.PTY, B.PCP, B.REH, B.SNO, B.SKY, B.TMP, B.TMN, B.TMX, B.UUU, B.VVV, B.WAV, B.VEC, B.WSD
+		FROM public_weather.cityforultrasrtncst A
+		LEFT OUTER JOIN public_weather.villagefcst B ON A.cityId = B.cityId
+		LEFT OUTER JOIN public_weather.nxny_conversion C ON A.cityId = C.city_Id
+
+		WHERE
+			C.conversion_nx = #{nx} AND C.conversion_ny = #{ny}
+			AND B.baseDate = #{baseDate} AND B.baseTime = #{baseTime}
+			AND fcstDate = #{fcstDate} AND fcstTime = #{fcstTime}
+		ORDER BY ultraSrtFcstId DESC LIMIT 0,1
+	</select>
+
+	<!-- nx, ny로 전체 단기예보 정보 가져오기 -->
+	<select id="selectWeatherVilageFcstInfoListIntoByNxNy" parameterType="HashMap" resultType="WeatherVilageFcstVO">
+		SELECT
+		A.ultraSrtFcstId, A.baseDate, A.baseTime, A.fcstDate, A.fcstTime,
+    		A.POP, A.PTY, A.PCP, A.REH, A.SNO, A.SKY, A.TMP, A.TMN, A.TMX, A.UUU, A.VVV, A.WAV, A.VEC, A.WSD
+		FROM public_weather.villagefcst A
+		JOIN public_weather.cityforultrasrtncst B ON A.cityId = B.cityId
+		JOIN public_weather.nxny_conversion C ON A.cityId = C.city_Id AND C.old_nx = #{old_nx} AND C.old_ny = #{old_ny}
+		WHERE
+			A.baseDate = #{baseDate} AND A.baseTime = #{baseTime}
+		ORDER BY A.ultraSrtFcstId ASC
+	</select>
+
+	<!-- 등록된 지점의 현재 시각 단기예보 정보 가져오기  -->
+	<select id="selectCurrentWeatherVilageFcstInfoAll" parameterType="HashMap" resultType="WeatherVilageFcstVO">
+		SELECT
+			A.cityId, '제주도' province, A.city, A.dong, A.nx, A.ny, A.logoImageNm,
+			B.ultraSrtFcstId, B.baseDate, B.baseTime, B.fcstDate, B.fcstTime,
+    		B.POP, B.PTY, B.PCP, B.REH, B.SNO, B.SKY, B.TMP, B.TMN, B.TMX, B.UUU, B.VVV, B.WAV, B.VEC, B.WSD
+		FROM public_weather.cityforultrasrtncst A
+		LEFT OUTER JOIN public_weather.villagefcst B ON A.cityId = B.cityId
+		WHERE
+			B.baseDate = #{baseDate} AND B.baseTime = #{baseTime}
+			AND fcstDate = #{fcstDate} AND fcstTime = #{fcstTime}
+			<if test="mode = 'isView'">
+	        	AND A.isView = 'Y'
+			</if>
+		ORDER BY
+			<if test="legalCodeFirstOrder != '' and legalCodeFirstOrder != null">
+	        	FIELD(A.legalCode, (SELECT division_code FROM tb_main_legal_param WHERE legal_param = #{legalCodeFirstOrder} LIMIT 0,1)) DESC,
+			</if>
+			ultraSrtFcstId DESC
+	</select>
+
+	<!-- 등록된 지점의 현재 시각 초단기실황 정보 가져오기  -->
+	<select id="selectCurrentWeatherUltraSrtNcstInfoAll" resultType="WeatherUltraSrtNcstVO">
+		SELECT
+			A.cityId, '제주도' province, A.city, A.dong, A.nx, A.ny, A.logoImageNm,
+			B.ultraSrtNcstId, B.baseDate, B.baseTime,
+    		B.PTY, B.REH, B.RN1, B.T1H, B.UUU, B.VEC, B.VVV, B.WSD
+		FROM public_weather.cityforultrasrtncst A
+		LEFT OUTER JOIN public_weather.ultrasrtncst B ON A.cityId = B.cityId
+		WHERE B.baseDate = #{baseDate} AND B.baseTime = #{baseTime}
+		ORDER BY A.cityId DESC
+	</select>
+
+	<!-- MidLandRegId로 현재 시각 중기육상예보 정보 가져오기  -->
+	<select id="selectCurrentWeatherMidLandFcstIntoByMidLandRegId" parameterType="HashMap" resultType="WeatherMidLandFcstVO">
+		SELECT
+			A.cityId, A.city, A.midLandRegId,
+			B.midLandFcstId, B.tmFc,
+    		B.rnSt3Am, B.rnSt3Pm, B.rnSt4Am, B.rnSt4Pm, B.rnSt5Am, B.rnSt5Pm, B.rnSt6Am, B.rnSt6Pm, B.rnSt7Am, B.rnSt7Pm, B.rnSt8, B.rnSt9, B.rnSt10,
+    		B.wf3Am, B.wf3Pm, B.wf4Am, B.wf4Pm, B.wf5Am, B.wf5Pm, B.wf6Am, B.wf6Pm, B.wf7Am, B.wf7Pm, B.wf8, B.wf9, B.wf10
+		FROM public_weather.cityformidlandfcst A
+		LEFT OUTER JOIN public_weather.midlandfcst B ON A.cityId = B.cityId
+		WHERE A.midLandRegId = #{midLandRegId}
+		AND tmFc = #{tmFc}
+		ORDER BY midLandFcstId DESC LIMIT 0,1
+	</select>
+
+	<!-- midTaRegId로 현재 시각 중기기온조회 정보 가져오기  -->
+	<select id="selectCurrentWeatherMidTaIntoByMidTaRegId" parameterType="HashMap" resultType="WeatherMidTaVO">
+		SELECT
+			A.cityId, A.city, A.midTaRegId,
+			B.midTaId, B.tmFc,
+    		B.taMin3, B.taMin3Low, B.taMin3High, B.taMax3, B.taMax3Low, B.taMax3High,
+    		B.taMin4, B.taMin4Low, B.taMin4High, B.taMax4, B.taMax4Low, B.taMax4High,
+    		B.taMin5, B.taMin5Low, B.taMin5High, B.taMax5, B.taMax5Low, B.taMax5High,
+    		B.taMin6, B.taMin6Low, B.taMin6High, B.taMax6, B.taMax6Low, B.taMax6High,
+    		B.taMin7, B.taMin7Low, B.taMin7High, B.taMax7, B.taMax7Low, B.taMax7High,
+    		B.taMin8, B.taMin8Low, B.taMin8High, B.taMax8, B.taMax8Low, B.taMax8High,
+    		B.taMin9, B.taMin9Low, B.taMin9High, B.taMax9, B.taMax9Low, B.taMax9High,
+    		B.taMin10, B.taMin10Low, B.taMin10High, B.taMax10, B.taMax10Low, B.taMax10High
+		FROM public_weather.cityformidta A
+		LEFT OUTER JOIN public_weather.midta B ON A.cityId = B.cityId
+		WHERE A.midTaRegId = #{midTaRegId}
+		AND tmFc = #{tmFc}
+		ORDER BY midTaId DESC LIMIT 0,1
+	</select>
+
+	<!-- legalCode로 현재 시각 중기기온조회 정보 가져오기 -->
+	<select id="selectCurrentWeatherMidTaIntoByLegalCode" parameterType="HashMap" resultType="WeatherMidTaVO">
+		SELECT
+			A.cityId, A.city, A.midTaRegId,
+			B.midTaId, B.tmFc,
+    		B.taMin3, B.taMin3Low, B.taMin3High, B.taMax3, B.taMax3Low, B.taMax3High,
+    		B.taMin4, B.taMin4Low, B.taMin4High, B.taMax4, B.taMax4Low, B.taMax4High,
+    		B.taMin5, B.taMin5Low, B.taMin5High, B.taMax5, B.taMax5Low, B.taMax5High,
+    		B.taMin6, B.taMin6Low, B.taMin6High, B.taMax6, B.taMax6Low, B.taMax6High,
+    		B.taMin7, B.taMin7Low, B.taMin7High, B.taMax7, B.taMax7Low, B.taMax7High,
+    		B.taMin8, B.taMin8Low, B.taMin8High, B.taMax8, B.taMax8Low, B.taMax8High,
+    		B.taMin9, B.taMin9Low, B.taMin9High, B.taMax9, B.taMax9Low, B.taMax9High,
+    		B.taMin10, B.taMin10Low, B.taMin10High, B.taMax10, B.taMax10Low, B.taMax10High
+		FROM public_weather.cityformidta A
+		LEFT OUTER JOIN public_weather.midta B ON A.cityId = B.cityId
+		WHERE A.legalCode = #{legalCode}
+		AND tmFc = #{tmFc}
+		ORDER BY midTaId DESC LIMIT 0,1
+	</select>
+
+	<!-- cityId로 가장 최근 단기예보 1개 정보 가져오기 -->
+	<select id="selectCurrentWeatherVilageFcstInfoIntoByCityId" parameterType="HashMap" resultType="WeatherVilageFcstVO">
+		SELECT
+			A.cityId, A.city, A.dong, A.nx, A.ny, A.logoImageNm,
+			B.ultraSrtFcstId, B.baseDate, B.baseTime, B.fcstDate, B.fcstTime,
+    		B.POP, B.PTY, B.PCP, B.REH, B.SNO, B.SKY, B.TMP, B.TMN, B.TMX, B.UUU, B.VVV, B.WAV, B.VEC, B.WSD
+		FROM public_weather.cityforultrasrtncst A
+		JOIN public_weather.villagefcst B ON A.cityId = B.cityId
+
+		WHERE
+			B.cityId = #{cityId}
+			AND B.baseDate = #{baseDate} AND B.baseTime = #{baseTime}
+			AND fcstDate = #{fcstDate} AND fcstTime = #{fcstTime}
+		ORDER BY ultraSrtFcstId DESC LIMIT 0,1
+	</select>
+
+	<!-- cityId로 전체 단기예보 정보 가져오기 -->
+	<select id="selectWeatherVilageFcstInfoListIntoByCityId" parameterType="HashMap" resultType="WeatherVilageFcstVO">
+		SELECT
+			A.ultraSrtFcstId, A.baseDate, A.baseTime, A.fcstDate, A.fcstTime,
+    		A.POP, A.PTY, A.PCP, A.REH, A.SNO, A.SKY, A.TMP, A.TMN, A.TMX, A.UUU, A.VVV, A.WAV, A.VEC, A.WSD,
+    		DATE_FORMAT(concat(A.fcstDate, A.fcstTime,'00'), '%Y-%m-%d %T') fdate,
+    		DATE_FORMAT(A.fcstDate, '%Y-%m-%d') datef1,
+    		DATE_FORMAT(A.fcstDate, '%Y년 %m월 %d일 ') datef2,
+			(case DAYOFWEEK( DATE_FORMAT(A.fcstDate, '%Y-%m-%d') ) when '1' then '일' when '2' then '월' when '3' then '화' when '4' then '수' when '5' then '목' when '6' then '금' when '7' then '토' end) as DAY_OF_WEEK,
+    		time_format(concat(A.fcstTime,'00'), '%H:%i') timef1,
+			time_format(concat(A.fcstTime,'00'), '%H') timef2
+		FROM public_weather.villagefcst A
+		JOIN public_weather.cityforultrasrtncst B ON A.cityId = B.cityId
+		WHERE B.cityId = #{cityId}
+		  AND A.baseDate = #{baseDate}
+		  AND A.baseTime = #{baseTime}
+		  AND A.fcstDate &lt; DATE_FORMAT(now()+ INTERVAL 3 day, '%Y%m%d')
+		ORDER BY A.ultraSrtFcstId ASC
+	</select>
+
+	<!-- stnId로 현재 시각 특보목록 정보 가져오기 -->
+	<select id="selectCurrentWeatherWthrWrnListIntoByStnId" parameterType="WeatherWthrWrnListVO" resultType="WeatherWthrWrnListVO">
+		SELECT
+			A.wthrWrnListId, A.cityId, A.fromTmFc, A.toTmFc,
+    		A.title, A.tmSeq, A.tmFc
+		FROM public_weather.wthrwrnlist A
+		JOIN public_weather.cityforwthr B ON A.cityId = B.cityId
+		WHERE
+			B.stnId = #{stnId} AND ( A.fromTmFc = #{fromTmFc} OR A.fromTmFc = #{toTmFc} )
+
+		ORDER BY A.tmFc ASC
+	</select>
+
+	<!-- stnId로 현재 시각 예비특보목록 정보 가져오기 -->
+	<select id="selectCurrentWeatherWthrPwnListIntoByStnId" parameterType="WeatherWthrPwnListVO" resultType="WeatherWthrPwnListVO">
+		SELECT
+			A.wthrPwnListId, A.cityId, A.fromTmFc, A.toTmFc,
+    		A.title, A.tmSeq, A.tmFc
+		FROM public_weather.wthrpwnlist A
+		JOIN public_weather.cityforwthr B ON A.cityId = B.cityId
+		WHERE
+			B.stnId = #{stnId} AND ( A.fromTmFc = #{fromTmFc} OR A.fromTmFc = #{toTmFc} )
+
+		ORDER BY A.tmFc ASC LIMIT 0,1
+	</select>
+
+	<!-- stnId로 현재 시각 특보통보문 정보 가져오기 -->
+	<select id="selectCurrentWeatherWthrWrnMsgIntoByStnId" parameterType="WeatherWthrWrnMsgVO" resultType="WeatherWthrWrnMsgVO">
+		SELECT
+			A.wthrPwnMsgId, A.cityId, A.fromTmFc, A.toTmFc,
+    		A.tmFc, A.tmSeq,
+    		A.warFc,
+    		A.t1, A.t2, A.t3, A.t4, A.t5, A.t6, A.t7, A.other,
+    		B.stnId, B.city, B.cityDetail
+		FROM public_weather.wthrwrnmsg A
+		JOIN public_weather.cityforwthr B ON A.cityId = B.cityId
+		WHERE
+			B.cityDetail LIKE CONCAT('%', #{legalCodeMainNm}, '%')
+			AND ( A.fromTmFc = #{fromTmFc} OR A.fromTmFc = #{toTmFc} )
+		ORDER BY A.tmFc ASC LIMIT 0,1
+	</select>
+</mapper>

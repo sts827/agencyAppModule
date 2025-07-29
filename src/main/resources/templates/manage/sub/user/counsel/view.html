@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0">상담내용</h1>
+	    </div>
+		<div class="manage-content mb-10">
+			<h3 class="title">고객정보</h3>
+			<div class="container-fluid p-0">
+				<form id="saveUserForm" name="saveUserForm" enctype="multipart/form-data">
+					<input type="hidden" name="userTokenId" th:value="${user.userTokenId}" />
+					<div class="row form-group ">
+						<label class="col-md-2" for="userEmail">회원ID</label>
+						<input type="text" class="form-control col-md-6" name="userEmail" th:value="${user.userEmail}" readonly>
+						<label class="col-md-2" for="userJoinDate">가입일시</label>
+						<input type="text" class="form-control col-md-2" th:value="${user.userJoinDate}" readonly>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2 req" for="userTel">회원명</label>
+						<input type="text" class="form-control col-md-10 req" name="userName" th:value="${user.userName}">
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2" for="createDate">연락처</label>
+						<input type="text" class="form-control col-md-6" name="userMobile" th:value="${user.userMobile}">
+						<label class="col-md-2" for="createDate">회원등급</label>
+						<select name="userGrade" class="form-control col-md-2">
+							<option value="0" th:selected="${user.userGrade eq '0'}">없음</option>
+							<option value="1" th:selected="${user.userGrade eq '1'}">일반회원</option>
+							<option value="2" th:selected="${user.userGrade eq '2'}">우수회원</option>
+						</select>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2" for="createDate">회원메모</label>
+						<textarea class="form-control col-md-10" name="userMemo" th:text="${userMemo}" rows="5"></textarea>
+					</div>
+				</form>
+				<div class="col-md-12 clearfix">
+					<div class="text-center">
+						<button type="button" class="btn btn-primary" onclick="fnUserSave()">저장하기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-content mb-10">
+			<h3 class="title">상담내역</h3>
+			<div th:replace="~{/manage/inc/manage-tab-counsel :: tab-conusel('view')}"/>
+<!--/*
+			<div class="container-fluid p-0">
+				<table id="datatable" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+			</div>
+*/-->
+		</div>
+
+		<div class="col-md-12 clearfix">
+			<div class="text-center">
+				<button type="button" class="btn btn-black"   onclick="preList()">목록으로</button>
+			</div>
+		</div>
+	    <!-- /.content -->
+	</div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashboard.js"></script>
+	-->.
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function() {
+			//initDatatable();
+			$('.tab-content[data-id="counsel"]').show();
+		});
+
+		preList = function(){
+			location.href = "/manage/user/counsel/list?params="+parmas;
+		}
+/*
+		initDatatable = function(){
+			var baseColumns = [
+				{ "name" : "id", "title" : "", "data" : "id", "className" : "dt-head-center dt-body-left","visible":false},
+				{
+					title : "세부내용",
+		            className: 'dt-control dt-head-center dt-body-center',
+		            orderable: false,
+		            data: null,
+		            defaultContent: '',
+		            width:'60px'
+		        },
+				{ "name" : "requestDate", "title" : "상담일자", "data" : "requestDate", "className" : "dt-head-center dt-body-center", width:'100px'},
+				{ "name" : "requestCategory", "title" : "요청유형", "data" :
+					function (row, type, set) {
+						var html= "";
+						var strclass = row["requestCategory"];
+						var strText = "";
+
+						switch(row["requestCategory"]){
+							case "product":     strText="상품문의"; break;
+							case "payment":     strText="결제문의"; break;
+							case "reservation": strText="예약문의"; break;
+							case "cancel":      strText="취소문의"; break;
+							default :           strText="미요청"; break;
+						}
+
+						html = `<span class="box-label ${strclass}">${strText}</span>`;
+
+						return html;
+					},
+					"className" : "dt-head-center dt-body-center" , width:'80px'},
+				{ "name" : "requestText", "title" : "상담내용", "data" : "requestText", "className" : "dt-head-center dt-body-cneter tofe"},
+				{ "name" : "responseText", "title" : "응대내용", "data" : "responseText", "className" : "dt-head-center dt-body-cneter tofe"},
+
+				{ "name" : "responseName", "title" : "상담사명", "data" : "responseName", "className" : "dt-head-center dt-body-center", width:'80px'},
+				{ "name" : "responseDate", "title" : "응대일자", "data" : "responseDate", "className" : "dt-head-center dt-body-center", width:'100px'},
+			];
+
+			datatable = $("#datatable").DataTable({
+				"searching" : false
+				,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+				,"paging": true
+				,"bPaginate": true
+				,"responsive": true
+				,"language": lang_kor
+				,"ordering": false
+				,"bLengthChange" : false
+				,"bInfo":false
+				,"ajax" : {
+					"url" : "/manage/user/counsel-list"
+					,"method" : "post"
+					, "beforeSend": function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					}
+					,"data" : function(d) {
+						d.userEmail = [[${user.userEmail}]];
+					}
+				},"processing": true
+				,"serverSide": true
+				,"order" :
+					[ [0, 'desc'] ]
+				,"createdRow": function(row, data) {
+					  if ( data.deleteYn === "Y" ) {
+						  $(row).css('background-color', '#DC3545');
+					  } else if ( data.secretYn === "Y" ) {
+						  $(row).css('background-color', '#e9e9e9');
+					  }
+				  }
+				,"initComplete": function(settings, json) {
+	    			//fnInitBootstrapToggle();
+	  			}
+				,"columns": baseColumns
+			});
+
+			// Add event listener for opening and closing details
+			datatable.on('click', 'td.dt-control', function (e) {
+			    let tr = e.target.closest('tr');
+			    let row = datatable.row(tr);
+
+			    if (row.child.isShown()) {
+			        // This row is already open - close it
+			        row.child.hide();
+			    }
+			    else {
+			        // Open this row
+			        row.child( trDetailContent(row.data()) ).show();
+			    }
+			});
+		};
+*/
+		trDetailContent = function(d) {
+
+				var strRelation;
+
+				switch( d.requestRelation ){
+					case "self": strRelation ='본인'; break;
+					case "mate": strRelation ='배우자'; break;
+					case "bns": strRelation ='형제·자매'; break;
+					case "parents": strRelation ='부모'; break;
+					case "children": strRelation ='자녀'; break;
+					default: strRelation ='기타'; break;
+				}
+
+			    return (
+					`<div>` +
+				        `<div class="row form-group tac aic">` +
+						`<label class="col-md-1" for="requestName">상담고객명</label>` +
+						`<input type="text" class="form-control col-md-2" value="${d.requestName}" readonly>` +
+						`<label class="col-md-1" for="requestRelation">상담고객관계</label>` +
+						`<input type="text" class="form-control col-md-1"  value="${strRelation}" readonly>` +
+						`<label class="col-md-2" for="requestTel">상담고객 연락처</label>` +
+						`<input type="text" class="form-control col-md-2" value="${d.requestTel}" readonly>` +
+						`<label class="col-md-1" for="requestTel">세부요청유형</label>` +
+						`<input type="text" class="form-control col-md-2" value="${d.requestSubcategory}" readonly>` +
+						`</div>`+
+				        `<div class="row form-group tac aic">` +
+							`<label class="col-md-1" for="requestName">상담내용</label>` +
+			        		`<textarea class='form-control col-11' rows='5' readonly>${d.requestText}</textarea>` +
+						`</div>`+
+						 `<div class="row form-group tac aic">` +
+						`<label class="col-md-1" for="requestName">처리유형</label>` +
+						`<input type="text" class="form-control col-md-2" value="${d.responseCategory}" readonly>` +
+						`<label class="col-md-1" for="requestRelation">세부처리유형</label>` +
+						`<input type="text" class="form-control col-md-2"  value="${d.responseSubcategory}" readonly>` +
+						`</div>`+
+				        `<div class="row form-group tac aic">` +
+							`<label class="col-md-1" for="requestName">응대내용</label>` +
+			        		`<textarea class='form-control col-11' rows='5' readonly>${d.responseText}</textarea>` +
+						`</div>`+
+					`</div>`
+			    );
+			}
+
+		fnUserSave = function(){
+			if(confirm("저장하시겠습니까?")){
+				$.ajax({
+					url : '/manage/user/accountSimpleInfo',
+					type : "POST",
+					data : $('#saveUserForm').serialize(),
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					},
+					success : function(res){
+						if("success" == res.result){
+							alert("변경처리 되었습니다.");
+							location.reload();
+						}else{
+							alert(res.message)
+						}
+					}
+				})
+			}
+		}
+
+	</script>
+	<style>
+	    #attach-file-list .filebox img {
+		    width: 70%;
+		    height: auto;
+		}
+
+		.ck-editor__editable { height: 200px; }
+
+		.board_photo{position: relative;width: 150px;height: 150px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 5px;}
+		.board_photo img{width: 100%; height: 100%;}
+		.board_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+
+		.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+		.board_btn.thumnail {top: 5px;left: 5px;}
+		.board_btn.thumnail.check {background-color: greenyellow;}
+		.board_btn.delete {top: 5px;right: 5px;}
+		.control-label {justify-content: unset !important;}
+
+		.way-table .box-label{display: inline-block;min-width: 90%;color: #FFF;border: 1px solid #999999;border-radius: 5px;background-color: #999999;text-align: center;}
+
+		.way-table .box-label.product     {background-color: #d8530e;border-color: #d8530e;}
+		.way-table .box-label.cancel      {background-color: #f30b0b;border-color: #f30b0b;}
+		.way-table .box-label.payment     {background-color: #309115;border-color: #309115;}
+		.way-table .box-label.reservation {background-color: #feff00;border-color: #feff00;}
+	</style>
+	</body>
+</html>

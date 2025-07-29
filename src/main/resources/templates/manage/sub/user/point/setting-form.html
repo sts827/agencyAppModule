@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <form id="user-point-form">
+            <input type="hidden" name="id" id="point-id" th:value="${point != null} ? ${point.id}" />
+            <input type="hidden" name="accruedCode" th:value="${point != null} ? ${point.accruedCode}" />
+            <div class="content-header">
+                <h1 class="m-0">포인트 설정 <small>상세</small></h1>
+            </div>
+            <div class="manage-content no-pd mt-4">
+                <div class="input-box">
+                    <input type="text" class="form-control" name="accruedReason" th:value="${point != null} ? ${point.accruedReason}" readonly="readonly" />
+                    <div class="row mt-4 mb-3 form-inline">
+                        <div class="input-area-quad">
+                            <label class="input-label">발생포인트</label>
+                            <input type="number" class="form-control inline-one" name="accruedPoint" placeholder="발생 포인트" th:value="${point != null} ? ${point.accruedPoint}" />
+                        </div>
+                        <div class="input-area-half">
+                            <label class="input-label">유효기간</label>
+                            <input type="number" class="form-control inline-extra-short" name="expiredDay" placeholder="유효기간" th:value="${point != null and !point.expiredDay.isEmpty()} ? ${point.expiredDay.substring(0, point.expiredDay.length()-1)}" />
+                            <select class="form-control inline-extra-short" name="expiredDayType">
+                                <option value="" th:selected="${point != null and point.expiredDay.isEmpty()} ? 'selected'">없음</option>
+                                <option value="d" th:selected="${point != null and point.expiredDay.contains('d')} ? 'selected'">일</option>
+                                <option value="m" th:selected="${point != null and point.expiredDay.contains('m')} ? 'selected'">개월</option>
+                                <option value="y" th:selected="${point != null and point.expiredDay.contains('y')} ? 'selected'">년</option>
+                            </select>
+                        </div>
+                        <div class="input-area-quad">
+                            <label class="input-label">사용여부</label>
+                            <input class="form-control" type="checkbox" id="use-yn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${point != null and point.useYn == 'Y'} ? 'checked'" />
+                        </div>
+                    </div>
+                    <div class="row form-inline mb-3">
+                        <div class="input-area-half">
+                            <label class="input-label">시작일</label>
+                            <input type="text" class="form-control inline-one date-time" name="startDate" id="start-date" placeholder="사용 시작일시" readonly="readonly" autocomplete="off" th:value="${point != null} ? ${point.startDate}" />
+                            <div class="input-overlay">
+                                <button type="button" class="overlay-button" onclick="fnSetNullDatetime('start-date')"><img src="/images/icon/bell.svg" /></button>
+                            </div>
+                        </div>
+                        <div class="input-area-half">
+                            <label class="input-label">종료일</label>
+                            <input type="text" class="form-control inline-one date-time" name="expireDate" id="expire-date" placeholder="사용 종료일시" readonly="readonly" autocomplete="off" th:value="${point != null} ? ${point.expireDate}" />
+                            <div class="input-overlay">
+                                <button type="button" class="overlay-button" onclick="fnSetNullDatetime('expire-date')"><img src="/images/icon/bell.svg" /></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="manage-control">
+                    <button type="button" class="btn btn-dark" onclick="history.back()">취소하기</button>
+                    <button type="button" class="btn btn-primary" th:onclick="${point != null} ? 'fnUpdatePointSet()'">저장하기</button>
+                </div>
+            </div>
+        </form>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $('.date-time').daterangepicker({
+            minDate:moment().add(-1, 'hour'),
+            autoUpdateInput: true,
+            singleDatePicker:true,
+            showDropdowns: true,
+            showCustomRangeLabel:false,
+            timePicker: true,
+            timePicker24Hour: true,
+            timePickerMinutes:true,
+            drops:"auto",
+            locale: {
+                format: 'YYYY-MM-DD HH:mm:ss',
+                applyLabel: "적용",
+                cancelLabel: "취소",
+                daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                separator:separator
+            }
+        }, function(start, end, label){});
+
+        let item = [[${point}]];
+        if(item == null){
+            $('#start-date').val('');
+            $('#expire-date').val('');
+        }else{
+            $('#start-date').val(item.startDate);
+            $('#expire-date').val(item.expireDate);
+        }
+    });
+
+    fnSetNullDatetime = function(target){
+        $('#'+target).val('');
+    }
+
+    fnUpdatePointSet = function(){
+        let form = document.getElementById('user-point-form');
+        let id = document.getElementById('point-id')
+        $.ajax({
+            url : `/manage/point/setting/update`,
+            type : "PUT",
+            data : $(form).serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    if( data.result === "success" ){
+                        alert(data.message);
+                        location.reload();
+                    }else{
+                        alert(data.message);
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        })
+    }
+
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

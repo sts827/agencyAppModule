@@ -1,0 +1,92 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <div th:fragment="paging-group">
+        <th:block th:if="!${#arrays.isEmpty(#objects.nullSafe(paging, null))}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination" th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}">
+                    <li class="page-group-item-btn" th:classappend="${paging.currentPageNumber} == 1 ? 'disabled'">
+                        <a th:href="${paging.currentPageNumber} > 1 ? ${urlBuilder.replaceQueryParam('page', 1).build()}: '#'"  aria-label="First">
+                            <img class="page-guide-icon" src="/images/icon/page-first.svg" alt="처음" />
+                        </a>
+                    </li>
+                    <li class="page-group-item-btn" th:classappend="${paging.currentPageNumber} == 1 ? 'disabled'">
+                        <a th:href="${paging.currentPageNumber} > 1 ? ${urlBuilder.replaceQueryParam('page', paging.currentPageNumber-1).build()} : '#'" aria-label="Previous">
+                            <img class="page-guide-icon" src="/images/icon/page-prev.svg" alt="이전" />
+                        </a>
+                    </li>
+
+                    <li class="page-group-item-num" th:each="page: ${#numbers.sequence(paging.currentGroupNumber*paging.groupPerSize-(paging.groupPerSize-1), paging.currentGroupNumber*paging.groupPerSize)}" th:classappend="${page == paging.currentPageNumber} ? 'active'" th:if="${page <= paging.totalPageNumber}">
+                        <a th:text="${page}" th:href="${urlBuilder.replaceQueryParam('page', page).build()}">1</a>
+                    </li>
+
+                    <li class="page-group-item-btn" th:classappend="${paging.totalPageNumber <= paging.currentPageNumber} ? 'disabled'">
+                        <a th:href="${paging.totalPageNumber > paging.currentPageNumber} ? ${urlBuilder.replaceQueryParam('page', paging.currentPageNumber+1).build()} : '#'" aria-label="Next">
+                            <img class="page-guide-icon" src="/images/icon/page-next.svg" alt="다음" />
+                        </a>
+                    </li>
+                    <li class="page-group-item-btn" th:classappend="${paging.totalPageNumber <= paging.currentPageNumber} ? 'disabled'">
+                        <a th:href="${paging.totalPageNumber > paging.currentPageNumber} ? ${urlBuilder.replaceQueryParam('page', paging.totalPageNumber).build() } : '#'"  aria-label="Last">
+                            <img class="page-guide-icon" src="/images/icon/page-last.svg" alt="끝" />
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </th:block>
+        <th:block th:unless="!${#arrays.isEmpty(#objects.nullSafe(paging, null))}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-group-item-btn prev disabled">
+                        <img class="page-guide-icon" src="/images/icon/page-prev.svg" alt="이전" />
+                    </li>
+                    <li class="page-group-item-num active">1</li>
+                    <li class="page-group-item-btn next disabled">
+                        <img class="page-guide-icon" src="/images/icon/page-next.svg" alt="다음" />
+                    </li>
+                </ul>
+            </nav>
+        </th:block>
+    </div>
+    <div th:fragment="paging-page">
+        <th:block th:if="!${#arrays.isEmpty(#objects.nullSafe(paging, null))}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination" th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}">
+                    <li class="page-item-arrow" th:classappend="${paging.currentPageNumber} == 1 ? 'disabled'">
+                        <a class="page-link" th:href="${paging.currentPageNumber} > 1 ? ${urlBuilder.replaceQueryParam('page', paging.currentPageNumber-1).build()}: '#'"  aria-label="Previous">
+                            <img src="/images/icon/page-prev.svg" class="page-guide-icon" alt="이전" />
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link">
+                            <span class="current-page-no" th:text="${#numbers.formatInteger(paging.currentPageNumber, 2)}">01</span>
+                            <span class="total-page-no" th:text="|/ ${#numbers.formatInteger(paging.totalPageNumber, 2)}|">/ 01</span>
+                        </a>
+                    </li>
+                    <li class="page-item-arrow" th:classappend="${paging.totalPageNumber <= paging.currentPageNumber} ? 'disabled'">
+                        <a class="page-link" th:href="${paging.totalPageNumber > paging.currentPageNumber} ? ${urlBuilder.replaceQueryParam('page', paging.currentPageNumber+1).build() } : '#'"  aria-label="Next">
+                            <img src="/images/icon/page-next.svg" class="page-guide-icon" alt="다음" />
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </th:block>
+        <th:block th:unless="!${#arrays.isEmpty(#objects.nullSafe(paging, null))}">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item-arrow disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <img src="/images/icon/page-prev.svg" class="page-guide-icon" alt="이전" />
+                        </a>
+                    </li>
+                    <li class="page-item active"><a class="page-link">01</a></li>
+                    <li class="page-item-arrow disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <img src="/images/icon/page-next.svg" class="page-guide-icon" alt="다음" />
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </th:block>
+    </div>
+</body>
+</html>

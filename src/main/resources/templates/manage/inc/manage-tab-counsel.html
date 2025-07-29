@@ -1,0 +1,354 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <div th:fragment="tab-conusel(tabMode)" class="tab-content" data-id="counsel" style="display: none;">
+		<div class="manage-content mb-10" th:if="${tabMode ne 'view'}">
+			<div class="row col-md-12">
+				<form id="user-counsel-form" class="col-md-12">
+					<input type="hidden" name="page" value="1" />
+					<input type="hidden" name="userTokenId" th:value="${user.userTokenId}" />
+					<input type="hidden" name="userEmail"   th:value="${user.userEmail}" />
+					<input type="hidden" name="createId"    th:value="${session.login.userEmail}">
+					<h3 class="title">상담정보</h3>
+					<div class="row mb-10">
+						<div class="col-md-12">
+					        <div class="float-right">
+								<button type="button" class="btn btn-danger" id="btn-new-counsel" th:onclick="fnToggleCounselForm('open')">새 상담이력</button>
+							</div>
+						</div>
+			        </div>
+					<div class="col-12 counsel-write">
+						<div class="container-fluid p-0">
+							<div class="row form-group ">
+								<label class="col-md-2 req" for="requestRelation">고객과 관계</label>
+								<select class="form-control col-md-2 req" name="requestRelation" id="requestRelation"  data-name="고객과 관계" onclick="fnSelectReation()">
+									<option value="">미선택</option>
+									<option value="self">본인</option>
+									<option value="mate">배우자</option>
+									<option value="bns">형제·자매</option>
+									<option value="parents">부모</option>
+									<option value="children">자녀</option>
+								</select>
+								<label class="col-md-2 req" for="requestName">상담자명</label>
+								<input type="text" class="form-control col-md-2 req" name="requestName" id="requestName" data-name="상담자명">
+								<label class="col-md-2" for="requestTel">상담자 연락처</label>
+								<input type="text" class="form-control col-md-2" name="requestTel" id="requestTel" data-name="상담자 연락처">
+							</div>
+
+							<div class="row form-group ">
+								<label class="col-md-2 req" for="requestCategory">요청유형</label>
+								<select class="form-control col-md-2 req" name="requestCategory" id="requestCategory" data-name="요청유형">
+									<option value="">미선택</option>
+									<option value="product">상품문의</option>
+									<option value="reservation">예약문의</option>
+									<option value="payment">결제문의</option>
+									<option value="cancel">취소문의</option>
+								</select>
+								<label class="col-md-2" for="requestSubcategory">세부 요청유형</label>
+								<input type="text" class="form-control col-md-2" name="requestSubcategory" id="requestSubcategory"  >
+								<label class="col-md-2" for="requestDate">상담일자</label>
+								<input type="text" class="form-control col-md-2 date-single-picker" name="requestDate" id="requestDate">
+							</div>
+							<div class="row form-group ">
+								<label class="col-md-2 req" for="requestName">상담고객 요청사항</label>
+								<textarea class="form-control col-md-10 req" name="requestText" data-name="상담고객 요청사항" rows="5"></textarea>
+							</div>
+							<div class="row form-group ">
+								<label class="col-md-2" for="responseName">상담사명</label>
+								<input type="text" class="form-control col-md-2" name="responseName" id="responseName"  th:value="${session.login.userName}">
+								<label class="col-md-2" for="responseCategory">처리유형</label>
+<!--/*
+								<input type="text" class="form-control col-md-2" name="responseCategory" id="responseCategory" >
+*/-->
+								<select class="form-control col-md-2" name="responseCategory" id="responseCategory"></select>
+
+								<label class="col-md-2" for="responseSubcategory">세부처리유형</label>
+								<input type="text" class="form-control col-md-2" name="responseSubcategory">
+							</div>
+							<div class="row form-group ">
+								<label class="col-md-2" for="responseText">응대내용</label>
+								<textarea class="form-control col-md-10" name="responseText" rows="5"></textarea>
+							</div>
+						</div>
+
+						<div class="col-12 manage-control p-0">
+							<button type="button" class="btn btn-dark" th:onclick="fnToggleCounselForm('close')">취소</button>
+							<button type="button" class="btn btn-primary" th:onclick="fnCounselSave()">상담이력 저장</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="container-fluid p-0">
+					<table id="datatableCounsel" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" th:inline="javascript">
+			var datatableCounsel;
+			$(document).ready(function() {
+				initDatatableCounsel();
+
+				$('#responseCategory').html(       loadMakeUpHtmlSelect('statusType', '', 'responseCategory', 'responseCategory','class',false ) );
+			});
+
+			preList = function(){
+				location.href = "/manage/user/counsel/list?params="+parmas;
+			}
+
+			initDatatableCounsel = function(){
+				var baseColumns = [
+					{ "name" : "id", "title" : "", "data" : "id", "className" : "dt-head-center dt-body-left","visible":false},
+					{
+						title : "세부내용",
+			            className: 'dt-control dt-head-center dt-body-center',
+			            orderable: false,
+			            data: null,
+			            defaultContent: '',
+			            width:'60px'
+			        },
+					{ "name" : "requestDate", "title" : "상담일자", "data" : "requestDate", "className" : "dt-head-center dt-body-center", width:'100px'},
+					{ "name" : "requestCategory", "title" : "요청유형", "data" :
+						function (row, type, set) {
+							var html= "";
+							var strclass = row["requestCategory"];
+							var strText = "";
+
+							switch(row["requestCategory"]){
+								case "product":     strText="상품문의"; break;
+								case "payment":     strText="결제문의"; break;
+								case "reservation": strText="예약문의"; break;
+								case "cancel":      strText="취소문의"; break;
+								default :           strText="미요청"; break;
+							}
+
+							html = `<span class="box-label ${strclass}">${strText}</span>`;
+
+							return html;
+						},
+						"className" : "dt-head-center dt-body-center" , width:'80px'},
+	/*
+					{ "name" : "requestName", "title" : "상담고객명", "data" : "requestName", "className" : "dt-head-center dt-body-center"},
+					{ "name" : "requestTel", "title" : "상담고객 연락처", "data" : "requestTel", "className" : "dt-head-center dt-body-center"},
+					{ "name" : "requestRelation", "title" : "상담고객 관계", "data" : "requestRelation", "className" : "dt-head-center dt-body-cneter"},
+	*/
+					{ "name" : "requestText", "title" : "상담내용", "data" : "requestText", "className" : "dt-head-center dt-body-cneter tofe"},
+					{ "name" : "responseText", "title" : "응대내용", "data" : "responseText", "className" : "dt-head-center dt-body-cneter tofe"},
+
+					{ "name" : "responseName", "title" : "상담사명", "data" : "responseName", "className" : "dt-head-center dt-body-center", width:'80px'},
+					{ "name" : "responseDate", "title" : "응대일자", "data" : "responseDate", "className" : "dt-head-center dt-body-center", width:'100px'},
+				];
+
+				datatableCounsel = $("#datatableCounsel").DataTable({
+					"searching" : false
+					,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+					,"paging": true
+					,"bPaginate": true
+					,"responsive": true
+					,"language": lang_kor
+					,"ordering": false
+					,"bLengthChange" : false
+					,"bInfo":false
+					,"ajax" : {
+						"url" : "/manage/user/counsel-list"
+						,"method" : "post"
+						, "beforeSend": function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						}
+						,"data" : function(d) {
+							d.userEmail = [[${user.userEmail}]];
+	/*
+							if( $('#dateType option:selected').index() > 0 ){
+								d.dateType = $('#dateType option:selected').val();
+
+								var dateRange = $('#dateRange').val().split(separator);
+
+								d.dateFrom = dateRange[0];
+								d.dateTo   = dateRange[1];
+
+							}
+							if( $('#requestCategory option:selected').index() > 0 ){
+								d.requestCategory = $('#requestCategory option:selected').val();
+							}
+
+							if ($('#responseName').val().trim() != "") d.responseName       = $('#responseName').val().trim();
+							if ($('#searchKey').val().trim() != "") d.searchKey = $('#searchKey').val().trim();
+	*/
+						}
+					},"processing": true
+					,"serverSide": true
+					,"order" :
+						[ [0, 'desc'] ]
+					,"createdRow": function(row, data) {
+						  if ( data.deleteYn === "Y" ) {
+							  $(row).css('background-color', '#DC3545');
+						  } else if ( data.secretYn === "Y" ) {
+							  $(row).css('background-color', '#e9e9e9');
+						  }
+					  }
+					,"initComplete": function(settings, json) {
+		    			//fnInitBootstrapToggle();
+		  			}
+					,"columns": baseColumns
+				});
+
+				// Add event listener for opening and closing details
+				datatableCounsel.on('click', 'td.dt-control', function (e) {
+				    let tr = e.target.closest('tr');
+				    let row = datatableCounsel.row(tr);
+
+				    if (row.child.isShown()) {
+				        // This row is already open - close it
+				        row.child.hide();
+				    }
+				    else {
+				        // Open this row
+				        row.child( trDetailContent( row.data() ) ).show();
+				    }
+				});
+			};
+
+			trDetailContent = function(d) {
+
+				var strRelation;
+
+				switch( d.requestRelation ){
+					case "self": strRelation ='본인'; break;
+					case "mate": strRelation ='배우자'; break;
+					case "bns": strRelation ='형제·자매'; break;
+					case "parents": strRelation ='부모'; break;
+					case "children": strRelation ='자녀'; break;
+					default: strRelation ='기타'; break;
+				}
+
+			    return (
+					`<div>` +
+				        `<div class="row form-group tac aic">` +
+						`<label class="col-md-1" for="requestName">상담고객명</label>` +
+						`<input type="text" class="form-control col-md-2" value="${d.requestName}" readonly>` +
+						`<label class="col-md-1" for="requestRelation">상담고객관계</label>` +
+						`<input type="text" class="form-control col-md-1"  value="${strRelation}" readonly>` +
+						`<label class="col-md-2" for="requestTel">상담고객 연락처</label>` +
+						`<input type="text" class="form-control col-md-2" value="${d.requestTel}" readonly>` +
+						`<label class="col-md-1" for="requestTel">세부요청유형</label>` +
+						`<input type="text" class="form-control col-md-2" value="${d.requestSubcategory}" readonly>` +
+						`</div>`+
+				        `<div class="row form-group tac aic">` +
+							`<label class="col-md-1" for="requestName">상담내용</label>` +
+			        		`<textarea class='form-control col-11' rows='5' readonly>${d.requestText}</textarea>` +
+						`</div>`+
+						 `<div class="row form-group tac aic">` +
+						`<label class="col-md-1" for="requestName">처리유형</label>` +
+						`<input type="text" class="form-control col-md-2" value="${d.responseCategory}" readonly>` +
+						`<label class="col-md-1" for="requestRelation">세부처리유형</label>` +
+						`<input type="text" class="form-control col-md-2"  value="${d.responseSubcategory}" readonly>` +
+						`</div>`+
+				        `<div class="row form-group tac aic">` +
+							`<label class="col-md-1" for="requestName">응대내용</label>` +
+			        		`<textarea class='form-control col-11' rows='5' readonly>${d.responseText}</textarea>` +
+						`</div>`+
+					`</div>`
+			    );
+			}
+/*
+			fnUserSave = function(){
+				if(confirm("저장하시겠습니까?")){
+					$.ajax({
+						url : '/manage/user/accountSimpleInfo',
+						type : "POST",
+						data : $('#saveUserForm').serialize(),
+						dataType : "json",
+						beforeSend: function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						},
+						success : function(res){
+							if("success" == res.result){
+								alert("변경처리 되었습니다.");
+								location.reload();
+							}else{
+								alert(res.message)
+							}
+						}
+					})
+				}
+			}
+*/
+			fnToggleCounselForm = function(type){
+				switch (type){
+					case 'open':
+						$('.counsel-write').show();
+						$('#btn-new-counsel').hide();
+						break;
+					case 'close':
+						$('.counsel-write').hide();
+						$('#btn-new-counsel').show();
+						break;
+				}
+			}
+
+			fnSelectReation = function(){
+				var data = $('#requestRelation option:selected').val();
+
+				if(data === 'self'){
+					$('#requestName').val( $('#userName').val() );
+					$('#requestTel').val( $('#userMobile').val() );
+				}
+			}
+
+			fnCounselSave = function(){
+				if(checkForm('user-counsel-form') && confirm("저장하시겠습니까?")){
+					$.ajax({
+						url : '/manage/user/counsel',
+						type : "POST",
+						data : $('#user-counsel-form').serialize(),
+						dataType : "json",
+						beforeSend: function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						},
+						success : function(res){
+							if("success" == res.result){
+								alert("처리 되었습니다.");
+								fnToggleCounselForm('close');
+								datatableCounsel.ajax.reload();
+							}else{
+								alert(res.message)
+							}
+						}
+					})
+				}
+			}
+
+		</script>
+		<style>
+		    #attach-file-list .filebox img {
+			    width: 70%;
+			    height: auto;
+			}
+
+			.ck-editor__editable { height: 200px; }
+
+			.board_photo{position: relative;width: 150px;height: 150px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 5px;}
+			.board_photo img{width: 100%; height: 100%;}
+			.board_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+
+			.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+			.board_btn.thumnail {top: 5px;left: 5px;}
+			.board_btn.thumnail.check {background-color: greenyellow;}
+			.board_btn.delete {top: 5px;right: 5px;}
+			.control-label {justify-content: unset !important;}
+
+			.way-table .box-label{display: inline-block;min-width: 90%;color: #FFF;border: 1px solid #999999;border-radius: 5px;background-color: #999999;text-align: center;}
+
+			.way-table .box-label.product     {background-color: #d8530e;border-color: #d8530e;}
+			.way-table .box-label.cancel      {background-color: #f30b0b;border-color: #f30b0b;}
+			.way-table .box-label.payment     {background-color: #309115;border-color: #309115;}
+			.way-table .box-label.reservation {background-color: #feff00;border-color: #feff00;}
+		</style>
+
+	</div>
+</body>
+</html>

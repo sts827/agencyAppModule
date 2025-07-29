@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+	<property name="CONSOLE_LOG_PATTERN"
+			  value="[%d{HH:mm:ss.SSS}] %clr([%-5level]) %clr([%15.15thread]){faint} %clr(%logger.%method:line%line){cyan} %clr(:){faint} %msg%n" />
+	<property name="FILE_LOG_PATTERN"
+			  value="[%d{yyyy MMM dd HH:mm:ss.SSS}][%-5level][%logger.%method:line%line] - %msg%n" />
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}${LOG_FILE}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN}</fileNamePattern>
+			<maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY}</maxHistory>
+			<maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE}</maxFileSize>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<springProfile name="dev">
+		<logger name="org.springframework.security" level="debug" />
+		<logger name="org.springframework" level="error" additivity="false"  />
+		<logger name="org.apache" level="info" />
+		<logger name="org.thymeleaf" level="info" />
+		<logger name="com.zaxxer.hikari" level="debug" additivity="false" />
+		<logger name="org.mybatis" level="debug" />
+		<logger name="kr.co.wayplus.travel" level="debug" />
+		<logger name="kr.co.wayplus.travel.util" level="error" additivity="false" />
+		<root level="debug">
+			<appender-ref ref="console" />
+		</root>
+	</springProfile>
+	<springProfile name="kang">
+		<logger name="org.springframework.security" level="debug" />
+		<logger name="org.springframework" level="debug" />
+		<logger name="org.apache" level="info" />
+		<logger name="org.thymeleaf" level="info" />
+		<logger name="com.zaxxer.hikari" level="info" />
+		<logger name="org.mybatis" level="debug" />
+		<logger name="kr.co.wayplus.travel" level="debug" />
+		<root level="info">
+			<appender-ref ref="console" />
+		</root>
+	</springProfile>
+	<springProfile name="server">
+		<root level="info">
+			<appender-ref ref="file" />
+		</root>
+	</springProfile>
+
+</configuration>

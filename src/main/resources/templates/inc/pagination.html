@@ -1,0 +1,41 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <div th:fragment="paging">
+        <th:block th:if="!${#arrays.isEmpty(#objects.nullSafe(paging, null))}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination" th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}">
+                    <li class="page-item-arrow" th:classappend="${paging.currentPageNumber} == 1 ? 'disabled'">
+                        <a class="page-link" th:href="${paging.currentPageNumber} > 1 ? ${urlBuilder.replaceQueryParam('page', paging.currentPageNumber-1).build()}: '#'"  aria-label="Previous">
+                            <img src="/images/icon/page-left.svg" class="page-guide-icon" alt="이전" />
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" th:utext="|<span class='page-text'>${#numbers.formatInteger(paging.currentPageNumber, 2)}</span> / ${#numbers.formatInteger(paging.totalPageNumber, 2)}|">01</a></li>
+                    <li class="page-item-arrow" th:classappend="${paging.totalPageNumber <= paging.currentPageNumber} ? 'disabled'">
+                        <a class="page-link" th:href="${paging.totalPageNumber > paging.currentPageNumber} ? ${urlBuilder.replaceQueryParam('page', paging.currentPageNumber+1).build() } : '#'"  aria-label="Next">
+                            <img src="/images/icon/page-right.svg" class="page-guide-icon" alt="다음" />
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </th:block>
+        <th:block th:unless="!${#arrays.isEmpty(#objects.nullSafe(paging, null))}">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item-arrow disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <img src="/images/icon/page-prev.svg" class="page-guide-icon" alt="이전" />
+                        </a>
+                    </li>
+                    <li class="page-item active"><a class="page-link">01</a></li>
+                    <li class="page-item-arrow disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <img src="/images/icon/page-next.svg" class="page-guide-icon" alt="다음" />
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </th:block>
+    </div>
+</body>
+</html>

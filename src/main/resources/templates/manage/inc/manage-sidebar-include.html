@@ -1,0 +1,98 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!--/* sidebar-menu-v1 ------------------------------------------ */-->
+<aside class="main-sidebar sidebar-dark-primary" th:fragment="sidebar-menu-v1">
+    <a href="/manage/index" class="brand-link">
+        <img src="/images/icon/wayplus-ci.svg" alt="WAYPLUS" class="brand-image">
+    </a>
+    <div class="sidebar">
+        <div class="user-panel pt-3 pb-3 d-flex">
+            <div class="image">
+                <img src="/images/icons/logo/wayplus_logo.svg" class="img-circle elevation-2" alt="WAYPLUS">
+            </div>
+            <div class="info">
+                <a href="#" class="d-block" th:text="${session.login.userName}">사용자 명</a>
+            </div>
+            <div class="status">
+                <a href="/user/logout">
+                    <img src="/images/icon/logout.svg" class="logout"/>
+                </a>
+            </div>
+        </div>
+        <nav>
+            <ul id="side-nav-menu" class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item">
+                    <a href="/manage/index" class="nav-link pt-3 pb-3">
+                        <i class="nav-icon way-icon wi-dashboard"></i>
+                        <p>대시보드</p>
+                    </a>
+                </li>
+                <th:block th:each="menu, menuStat : ${listTopMenu}"
+                          th:with="role=${menu.menuPermission}">
+                <li th:if="${#strings.equals(role, 'MANAGER') and #authorization.expression('hasRole(''ROLE_MANAGER'')')}
+                            or ${#strings.equals(role, 'ADMIN') and #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                    th:class="${menu.menuType eq 'header' ? 'nav-header' : 'nav-item' }"
+                    th:classappend="${ #lists.size( listTopMenu ) ne menuStat.count ? (listTopMenu[ menuStat.count ].menuType eq 'header' ? ' mb-3' : '')  : ' mb-3'}">
+                    <th:block th:if="${menu.menuType eq 'header'}" th:text="${menu.menuName}"></th:block>
+                    <th:block th:unless="${menu.menuType eq 'header'}">
+                        <th:block th:if="${ menu.listChildMenuL eq null }">
+                            <a class="nav-link" th:href="${menu.menuUrl}">
+                                <i th:class="|nav-icon ${menu.menuIcon}|"></i>
+                                <p>
+                                    <th:block th:text="${menu.menuName}"></th:block>
+                                </p>
+                            </a>
+                        </th:block>
+                        <th:block th:unless="${ menu.listChildMenuL eq null }">
+                            <a class="nav-link" href="#">
+                                <i th:class="|nav-icon ${menu.menuIcon}|"></i>
+                                <p>
+                                    <th:block th:text="${menu.menuName}"></th:block>
+                                    <i class="right fas fa-angle-left"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item" th:each="subMenu : ${menu.listChildMenuL}"
+                                    th:if="${#strings.equals(subMenu.menuPermission, 'MANAGER') and #authorization.expression('hasRole(''ROLE_MANAGER'')')}
+                                            or ${#strings.equals(subMenu.menuPermission, 'ADMIN') and #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                                    <th:block th:if="${ subMenu.listChildMenuL eq null }">
+                                        <a class="nav-link" th:href="${subMenu.menuUrl}">
+                                            <i th:class="|nav-icon ${subMenu.menuIcon}|"></i>
+                                            <p>
+                                                <th:block th:text="${subMenu.menuName}"></th:block>
+                                            </p>
+                                        </a>
+                                    </th:block>
+                                    <th:block th:unless="${ subMenu.listChildMenuL eq null }">
+                                        <a class="nav-link" href="#">
+                                            <i th:class="|nav-icon ${subMenu.menuIcon}|"></i>
+                                            <p>
+                                                <th:block th:text="${subMenu.menuName}"></th:block>
+                                                <i class="right fas fa-angle-left"></i></p>
+                                        </a>
+                                        <ul class="nav nav-treeview">
+                                            <li class="nav-item" th:each="sub2Menu : ${subMenu.listChildMenuL}">
+                                                <a class="nav-link" th:href="${sub2Menu.menuUrl}">
+                                                    <i th:class="|${sub2Menu.menuIcon} nav-icon|"></i>
+                                                    <p th:text="${sub2Menu.menuName}">메뉴이름</p>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </th:block>
+                                    <!--/*
+                                        <a class="nav-link" th:href="${subMenu.menuUrl}" >
+                                            <i th:class="|${subMenu.menuIcon} nav-icon|"></i>
+                                            <p th:text="${subMenu.menuName}">메뉴이름</p>
+                                        </a>
+                                    */-->
+                                </li>
+                            </ul>
+                        </th:block>
+                    </th:block>
+                </li>
+                </th:block>
+            </ul>
+        </nav>
+    </div>
+</aside>
+</html>

@@ -1,0 +1,626 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.BoardManageMapper">
+<!--################################### boardSetting ###################################-->
+	<select id="selectCountBoardSetting" parameterType="HashMap" resultType="Integer">
+		SELECT count(id)
+		  FROM board_setting
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+					  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='userEmail'" >and title LIKE CONCAT('%', #{searchKey}, '%')</if>
+			</if>
+
+       		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and title like concat('%',#{titleLike},'%')</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(url)" >	and url=#{url}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(typeCode)" >	and type_code=#{typeCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(subtitle)" >	and subtitle=#{subtitle}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailYn)" >	and thumbnail_yn=#{thumbnailYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerLargeYn)" >	and banner_large_yn=#{bannerLargeYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerSmallYn)" >	and banner_small_yn=#{bannerSmallYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryYn)" >	and category_yn=#{categoryYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCodeYn)" >	and apply_code_yn=#{applyCodeYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	and secret_yn=#{secretYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestYn)" >	and guest_yn=#{guestYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentYn)" >	and comment_yn=#{commentYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tagYn)" >	and tag_yn=#{tagYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteYn)" >	and favorite_yn=#{favoriteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapYn)" >	and scrap_yn=#{scrapYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesYn)" >	and series_yn=#{seriesYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(defaultPageSize)" >	and default_page_size=#{defaultPageSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentStoreDays)" >	and content_store_days=#{contentStoreDays}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	and fix_yn=#{fixYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachFileSize)" >	and attach_file_size=#{attachFileSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	and start_date=#{startDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	and expire_date=#{expireDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+		</where>
+	</select>
+
+	<select id="selectListBoardSetting" parameterType="HashMap" resultType="BoardSetting">
+		select *
+		  from (
+			SELECT @rownum:=@rownum+1 AS rownum,
+			       id, url, type_code, title, subtitle, thumbnail_yn,
+			       banner_large_yn, banner_small_yn, category_yn,
+			       apply_code_yn, secret_yn, guest_yn, comment_yn,
+			       tag_yn, favorite_yn, scrap_yn, series_yn,
+			       default_page_size, content_store_days, use_yn, fix_yn,
+			       start_date, expire_date, create_id, create_date,
+			       last_update_id, last_update_date, delete_yn,
+			       delete_id, delete_date, attach_file_size
+			  FROM board_setting
+			  join (SELECT @rownum:= 0) rnum
+			<where>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+						  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+					<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='userEmail'" >and title LIKE CONCAT('%', #{searchKey}, '%')</if>
+				</if>
+
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and title like concat('%',#{titleLike},'%')</if>
+
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(url)" >	and url=#{url}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(typeCode)" >	and type_code=#{typeCode}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(subtitle)" >	and subtitle=#{subtitle}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailYn)" >	and thumbnail_yn=#{thumbnailYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerLargeYn)" >	and banner_large_yn=#{bannerLargeYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerSmallYn)" >	and banner_small_yn=#{bannerSmallYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryYn)" >	and category_yn=#{categoryYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCodeYn)" >	and apply_code_yn=#{applyCodeYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	and secret_yn=#{secretYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestYn)" >	and guest_yn=#{guestYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentYn)" >	and comment_yn=#{commentYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tagYn)" >	and tag_yn=#{tagYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteYn)" >	and favorite_yn=#{favoriteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapYn)" >	and scrap_yn=#{scrapYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesYn)" >	and series_yn=#{seriesYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(defaultPageSize)" >	and default_page_size=#{defaultPageSize}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentStoreDays)" >	and content_store_days=#{contentStoreDays}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	and fix_yn=#{fixYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachFileSize)" >	and attach_file_size=#{attachFileSize}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	and start_date=#{startDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	and expire_date=#{expireDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			</where> ) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<select id="selectOneBoardSetting" parameterType="HashMap" resultType="BoardSetting">
+		SELECT id, url, type_code, title, subtitle, thumbnail_yn,
+		       banner_large_yn, banner_small_yn, category_yn,
+		       apply_code_yn, secret_yn, guest_yn, comment_yn,
+		       tag_yn, favorite_yn, scrap_yn, series_yn,
+		       default_page_size, content_store_days, use_yn, fix_yn,
+		       start_date, expire_date, create_id, create_date,
+		       last_update_id, last_update_date, delete_yn,
+		       delete_id, delete_date, attach_file_size
+		  FROM board_setting
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(url)" >	and url=#{url}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(typeCode)" >	and type_code=#{typeCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(subtitle)" >	and subtitle=#{subtitle}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailYn)" >	and thumbnail_yn=#{thumbnailYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerLargeYn)" >	and banner_large_yn=#{bannerLargeYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerSmallYn)" >	and banner_small_yn=#{bannerSmallYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryYn)" >	and category_yn=#{categoryYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCodeYn)" >	and apply_code_yn=#{applyCodeYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	and secret_yn=#{secretYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestYn)" >	and guest_yn=#{guestYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentYn)" >	and comment_yn=#{commentYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tagYn)" >	and tag_yn=#{tagYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteYn)" >	and favorite_yn=#{favoriteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapYn)" >	and scrap_yn=#{scrapYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesYn)" >	and series_yn=#{seriesYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(defaultPageSize)" >	and default_page_size=#{defaultPageSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentStoreDays)" >	and content_store_days=#{contentStoreDays}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	and fix_yn=#{fixYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachFileSize)" >	and attach_file_size=#{attachFileSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	and start_date=#{startDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	and expire_date=#{expireDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+		</where>
+	</select>
+
+	<insert id="insertBoardSetting" parameterType="BoardSetting" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO board_setting
+               (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(url)" >	url,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(typeCode)" >	type_code,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	title,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(subtitle)" >	subtitle,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailYn)" >	thumbnail_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerLargeYn)" >	banner_large_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerSmallYn)" >	banner_small_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryYn)" >	category_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCodeYn)" >	apply_code_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	secret_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestYn)" >	guest_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentYn)" >	comment_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tagYn)" >	tag_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteYn)" >	favorite_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapYn)" >	scrap_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesYn)" >	series_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(defaultPageSize)" >	default_page_size,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentStoreDays)" >	content_store_days,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	fix_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachFileSize)" >	attach_file_size,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	start_date,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	expire_date,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	delete_yn,	</if>
+				create_date)
+        VALUES (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	#{id},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(url)" >	#{url},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(typeCode)" >	#{typeCode},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	#{title},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(subtitle)" >	#{subtitle},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailYn)" >	#{thumbnailYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerLargeYn)" >	#{bannerLargeYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerSmallYn)" >	#{bannerSmallYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryYn)" >	#{categoryYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCodeYn)" >	#{applyCodeYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	#{secretYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestYn)" >	#{guestYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentYn)" >	#{commentYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tagYn)" >	#{tagYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteYn)" >	#{favoriteYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapYn)" >	#{scrapYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesYn)" >	#{seriesYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(defaultPageSize)" >	#{defaultPageSize},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentStoreDays)" >	#{contentStoreDays},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	#{useYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	#{fixYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachFileSize)" >	#{attachFileSize},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	#{startDate},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	#{expireDate},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	#{createId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	#{deleteYn},	</if>
+                now())
+    </insert>
+
+	<update id="updateBoardSetting" parameterType="BoardSetting">
+        Update board_setting
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(url)" >	url=#{url},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(typeCode)" >	type_code=#{typeCode},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	title=#{title},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(subtitle)" >	subtitle=#{subtitle},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailYn)" >	thumbnail_yn=#{thumbnailYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerLargeYn)" >	banner_large_yn=#{bannerLargeYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerSmallYn)" >	banner_small_yn=#{bannerSmallYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryYn)" >	category_yn=#{categoryYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCodeYn)" >	apply_code_yn=#{applyCodeYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	secret_yn=#{secretYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestYn)" >	guest_yn=#{guestYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentYn)" >	comment_yn=#{commentYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tagYn)" >	tag_yn=#{tagYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteYn)" >	favorite_yn=#{favoriteYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapYn)" >	scrap_yn=#{scrapYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesYn)" >	series_yn=#{seriesYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(defaultPageSize)" >	default_page_size=#{defaultPageSize},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentStoreDays)" >	content_store_days=#{contentStoreDays},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	fix_yn=#{fixYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachFileSize)" >	attach_file_size=#{attachFileSize},	</if>
+			<choose>
+				<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">start_date=#{startDate},</when>
+				<otherwise>start_date=null,</otherwise>
+			</choose>
+			<choose>
+				<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">expire_date=#{expireDate},</when>
+				<otherwise>expire_date=null,</otherwise>
+			</choose>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id=#{createId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	delete_yn=#{deleteYn},	</if>
+			last_update_date=now()
+        </set>
+        <where>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+        </where>
+    </update>
+
+    <update id="restoreBoardSetting" parameterType="BoardSetting">
+        UPDATE board_setting
+           SET delete_yn='N'
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteBoardSetting" parameterType="BoardSetting">
+        Update board_setting
+        <set>
+			delete_yn='Y',
+			delete_id=#{id},
+			delete_date=now()
+        </set>
+        <where>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+        </where>
+    </update>
+
+<!--################################### boardContents ###################################-->
+	<select id="selectOneBoardContents" parameterType="HashMap" resultType="BoardContents">
+        SELECT id, board_id,
+               category_id, (SELECT title FROM board_category ct WHERE ct.board_id = bc.id AND ct.id = bc.category_id) category_name,
+               title, content, apply_code,
+               series_id, tags, thumbnail_url,
+               favorite_count, scrap_count, comment_count,
+               view_count, attachment_count, use_yn, fix_yn, secret_yn,
+               start_date, expire_date,
+			   guest_name, guest_pass,
+               delete_yn, delete_id, delete_date,
+               create_id, create_date, last_update_id, last_update_date, u.user_name
+          FROM board_contents bc
+          left join `user` u on bc.create_id = u.user_email
+          join (SELECT @rownum:= 0) rnum
+         <where>
+         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)">and id = #{boardId}</if>
+         </where>
+	</select>
+
+	<select id="selectListBoardContents" parameterType="HashMap" resultType="BoardContents">
+		SELECT *
+		  FROM(
+	        SELECT @rownum:=@rownum+1 AS rownum, id, board_id,
+	               category_id, (SELECT title FROM board_category ct WHERE ct.board_id = bc.id AND ct.id = bc.category_id) category_name,
+	               title, content, ifnull(apply_code,'') apply_code,
+	               series_id, tags, thumbnail_url,
+	               favorite_count, scrap_count, comment_count,
+	               view_count, attachment_count, use_yn, fix_yn, secret_yn,
+	               start_date, expire_date,
+	               delete_yn, delete_id, delete_date,
+	               ifnull(create_id,'') create_id, create_date, last_update_id, last_update_date, u.user_name
+	          FROM board_contents bc
+	          left join `user` u on bc.create_id = u.user_email
+	          join (SELECT @rownum:= 0) rnum
+	         <where>
+	         	and delete_yn = 'N'
+	         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)">and category_id = #{categoryId}</if>
+         		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)">and board_id = #{boardId}</if>
+         		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and title like concat('%',#{titleLike},'%')</if>
+         		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentLike)">and content like concat('%',#{contentLike},'%')</if>
+
+	         </where>
+
+	         <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+		    	ORDER BY
+		        <choose>
+		            <when test="sort == 'id'">id</when>
+		            <when test="sort == 'title'">title</when>
+		            <when test="sort == 'viewCount'">view_count</when>
+		            <when test="sort == 'useYn'">use_yn</when>
+		            <when test="sort == 'deleteYn'">delete_yn</when>
+		            <when test="sort == 'lastUpdateDate'">last_update_date</when>
+		            <otherwise>rownum</otherwise>
+		        </choose>
+		        <choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+		    	ORDER BY  <foreach item="item" index="index" collection="listSort" separator=",">
+		    	<choose>
+		            <when test="item.sort == 'id'">id</when>
+		            <when test="item.sort == 'title'">title</when>
+		            <when test="item.sort == 'viewCount'">view_count</when>
+		            <when test="item.sort == 'useYn'">use_yn</when>
+		            <when test="item.sort == 'deleteYn'">delete_yn</when>
+		            <when test="item.sort == 'lastUpdateDate'">last_update_date</when>
+		        </choose>
+		    	<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+			) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	 <select id="selectCountBoardContents" parameterType="HashMap" resultType="Integer">
+        SELECT count(id) FROM board_contents
+		<where>
+			and delete_yn = 'N'
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)">and category_id = #{categoryId}</if>
+       		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)">and board_id = #{boardId}</if>
+       		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and title like concat('%',#{titleLike},'%')</if>
+       		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentLike)">and content like concat('%',#{contentLike},'%')</if>
+         	<if test="isComment">and comment_count = 0 </if>
+       		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardIdLike)">and board_id in (select id from board_setting where url like concat('%',#{boardIdLike},'%') )</if>
+         	<if test="isOnlyReview">and id not in (select user_email from user where user_role = 'admin') and create_date BETWEEN  now() - interval 2 day and now()</if>
+         </where>
+    </select>
+
+	<insert id="insertBoardContents" parameterType="BoardContents" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO board_contents
+               (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)" >	board_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	category_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	title,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	content,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	apply_code,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesId)" >	series_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	tags,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailUrl)" >	thumbnail_url,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteCount)" >	favorite_count,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapCount)" >	scrap_count,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentCount)" >	comment_count,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(viewCount)" >	view_count,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachmentCount)" >	attachment_count,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	fix_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	secret_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestName)" >	guest_name,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestPass)" >	guest_pass,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	start_date,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	expire_date,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id,	</if>
+                create_date)
+        VALUES (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)" >	#{boardId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	#{categoryId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	#{title},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	#{content},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	#{applyCode},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesId)" >	#{seriesId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	#{tags},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailUrl)" >	#{thumbnailUrl},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteCount)" >	#{favoriteCount},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapCount)" >	#{scrapCount},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentCount)" >	#{commentCount},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(viewCount)" >	#{viewCount},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachmentCount)" >	#{attachmentCount},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	#{useYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	#{fixYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	#{secretYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestName)" >	#{guestName},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestPass)" >	#{guestPass},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	#{startDate},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	#{expireDate},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	#{createId},	</if>
+                now()
+                )
+    </insert>
+
+    <update id="updateBoardContents" parameterType="BoardContents">
+        UPDATE board_contents
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)" >	board_id=#{boardId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	category_id=#{categoryId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	title=#{title},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	content=#{content},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	apply_code=#{applyCode},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(seriesId)" >	series_id=#{seriesId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	tags=#{tags},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(thumbnailUrl)" >	thumbnail_url=#{thumbnailUrl},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(favoriteCount)" >	favorite_count=#{favoriteCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(scrapCount)" >	scrap_count=#{scrapCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentCount)" >	comment_count=#{commentCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(viewCount)" >	view_count=#{viewCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(attachmentCount)" >	attachment_count=#{attachmentCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fixYn)" >	fix_yn=#{fixYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	secret_yn=#{secretYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestName)" >	guest_name=#{guestName},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(guestPass)" >	guest_pass=#{guestPass},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	start_date=#{startDate},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	expire_date=#{expireDate},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	delete_yn=#{deleteYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	delete_id=#{deleteId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	delete_date=#{deleteDate},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+		</where>
+    </update>
+
+    <update id="restoreBoardContents" parameterType="BoardContents">
+        UPDATE board_contents
+           SET delete_yn='N'
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteBoardContents" parameterType="BoardContents">
+        UPDATE board_contents
+           SET delete_yn='Y'
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateBoardContentDelete" parameterType="BoardContents">
+        UPDATE board_contents
+           <set>
+               view_count = view_count + 1
+           </set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+		</where>
+    </update>
+
+    <update id="updateBoardContent_addViewCount" parameterType="HashMap">
+        UPDATE board_contents
+           SET comment_count = 1
+        WHERE id = #{content_id} AND delete_yn='N'
+    </update>
+
+    <update id="updateBoardContent_CommentCount" parameterType="HashMap">
+        UPDATE board_contents
+        SET comment_count = 1
+        WHERE id = #{content_id} AND delete_yn='N'
+    </update>
+
+	<update id="updateBoardContentsStatus" parameterType="BoardComment">
+		UPDATE board_contents
+		SET apply_code = #{applyCode}
+		<if test="@kr.co.wayplus.memil.util.MybatisUtil@isNotEmpty(secretYn)">, secret_yn = #{secretYn}</if>
+		WHERE id = #{contentId} AND board_id = #{boardId}
+	</update>
+<!--################################### boardComment ###################################-->
+    <select id="selectOneBoardComment" parameterType="HashMap" resultType="BoardComment">
+        SELECT id, board_id, content_id,
+               tab_index, upper_id, note,
+               warning_id, blind_yn,
+               create_id, create_date
+        FROM board_comment
+	<where>
+		AND delete_yn = 'N'
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+   		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)">and board_id = #{boardId}</if>
+   		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentId)">and content_id = #{contentId}</if>
+	</where>
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertBoardComment" parameterType="BoardComment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO board_comment
+        (
+            board_id, content_id,
+            tab_index, upper_id, note,
+            create_id, create_date
+        )
+        VALUES (
+                   #{boardId}, #{contentId},
+                   #{tabIndex}, #{upperId}, #{note},
+                   #{createId}, now()
+               )
+    </insert>
+
+    <update id="updateBoardComment" parameterType="BoardComment">
+        UPDATE board_comment
+           SET note = #{note}, last_update_id = #{createId}, last_update_date = now()
+         WHERE id = #{id} AND board_id = #{boardId} AND content_id = #{contentId}
+    </update>
+
+<!--################################### BoardAttachFile ###################################-->
+	<select id="selectCountBoardAttachFile" parameterType="HashMap" resultType="Integer">
+		SELECT count(id)
+		  FROM board_attach_file
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+					  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='userEmail'" >and title LIKE CONCAT('%', #{searchKey}, '%')</if>
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	and file_id=#{fileId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)" >	and board_id=#{boardId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentId)" >	and content_id=#{contentId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	and service_type=#{serviceType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	and upload_path=#{uploadPath}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	and upload_filename=#{uploadFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	and file_extension=#{fileExtension}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	and file_size=#{fileSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	and file_mimetype=#{fileMimetype}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	and origin_filename=#{originFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	and upload_id=#{uploadId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadDate)" >	and upload_date=#{uploadDate}	</if>
+			and delete_yn = 'N'
+		</where>
+	</select>
+
+	<select id="selectListBoardAttachFile" parameterType="HashMap" resultType="BoardAttachFile">
+		select *
+		  from (
+			SELECT @rownum:=@rownum+1 AS rownum,
+			       file_id, board_id, content_id, service_type, upload_path, upload_filename, file_extension, file_size, file_mimetype, origin_filename, upload_id, upload_date
+			  FROM board_attach_file
+			  join (SELECT @rownum:= 0) rnum
+			<where>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+						  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+					<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='userEmail'" >and title LIKE CONCAT('%', #{searchKey}, '%')</if>
+				</if>
+
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	and file_id=#{fileId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)" >	and board_id=#{boardId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentId)" >	and content_id=#{contentId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	and service_type=#{serviceType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	and upload_path=#{uploadPath}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	and upload_filename=#{uploadFilename}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	and file_extension=#{fileExtension}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	and file_size=#{fileSize}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	and file_mimetype=#{fileMimetype}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	and origin_filename=#{originFilename}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	and upload_id=#{uploadId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadDate)" >	and upload_date=#{uploadDate}	</if>
+
+			</where> ) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<select id="selectOneBoardAttachFile" parameterType="HashMap" resultType="BoardAttachFile">
+		SELECT file_id, board_id, content_id, service_type, upload_path, upload_filename, file_extension, file_size, file_mimetype, origin_filename, upload_id, upload_date
+		  FROM board_attach_file
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	and file_id=#{fileId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(boardId)" >	and board_id=#{boardId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentId)" >	and content_id=#{contentId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	and service_type=#{serviceType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	and upload_path=#{uploadPath}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	and upload_filename=#{uploadFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	and file_extension=#{fileExtension}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	and file_size=#{fileSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	and file_mimetype=#{fileMimetype}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	and origin_filename=#{originFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	and upload_id=#{uploadId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadDate)" >	and upload_date=#{uploadDate}	</if>
+		</where>
+	</select>
+
+    <insert id="insertBoardAttachFile" parameterType="BoardAttachFile" useGeneratedKeys="true" keyProperty="fileId">
+        INSERT INTO board_attach_file
+               (
+	                board_id, content_id, service_type,
+	                upload_path, upload_filename,
+	                file_extension, file_size, file_mimetype,
+	                origin_filename,
+	                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	upload_id,	</if>
+	                 upload_date
+                )
+        VALUES (
+                   #{boardId}, #{contentId}, #{serviceType},
+                   #{uploadPath}, #{uploadFilename},
+                   #{fileExtension}, #{fileSize}, #{fileMimetype},
+                   #{originFilename},
+                   <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	#{uploadId},	</if>
+                    now()
+               )
+    </insert>
+
+    <delete id="deleteBoardAttachFile" parameterType="BoardAttachFile">
+		delete from board_attach_file
+		 WHERE file_id = #{fileId}
+	</delete>
+
+</mapper>

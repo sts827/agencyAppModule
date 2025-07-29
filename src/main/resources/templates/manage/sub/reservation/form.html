@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0" ><th:block th:text="|예약 ${mode eq 'V' ? '보기' : (mode eq 'I' ? '등록' : '수정')}|"> </th:block></h1>
+	    </div>
+
+		<form id="saveForm" name="saveForm" enctype="multipart/form-data">
+			<input type="hidden" name="mode" th:value="${mode}">
+			<div class="manage-content mb-10">
+				<h3 class="title">고객정보
+					<button type="button" class="btn btn-black" id="searchCustomerBtn"><i class="fa fa-search"></i></button>
+				</h3>
+				<div class="container-fluid p-0">
+					<div class="container-fluid p-0">
+						<div class="row form-group form-inline mb-20">
+							<label class="control-label col-md-2 req" for="userName">고객명</label>
+							<input type="text" class="form-control col-md-2" name="userName" id="userName"  data-name="고객명" th:readonly="${mode ne 'I'}" th:value="${mode ne 'I' ? user.userName:''}">
+							<label class="control-label col-md-2 req" for="userMobile">고객연락처</label>
+							<input type="text" class="form-control col-md-2" name="userMobile" id="userMobile" data-name="연락처" th:readonly="${mode ne 'I'}" th:value="${mode ne 'I' ? user.userMobile:''}">
+							<label class="control-label col-md-1" for="userEmail">이메일</label>
+							<input type="text" class="form-control col-md-3" name="userEmail" id="userEmail" data-name="이메일" th:readonly="${mode ne 'I'}" th:value="${mode ne 'I' && user.userJoinType eq 'reservation' ? '비회원':user.userEmail }" placeholder="미입력시 비회원고객으로 ">
+						</div>
+				    	<div class="form-group row  mb-20">
+							<label class="control-label col-2 req">문의종류 </label>
+							<div class="col-10 row form-group" id="divInquriyType">
+							</div>
+						</div>
+			    	</div>
+				</div>
+			</div>
+
+			<div class="manage-content mb-10"  th:if="${mode eq 'I'}">
+				<h3 class="title">상품정보
+					<button type="button" class="btn btn-black" id="searchProductBtn"><i class="fa fa-search"></i></button>
+				</h3>
+				<div class="container-fluid p-0">
+					<div id="productInfo" class="col-md-11">
+						상품정보를 선택하여주십시오.
+					</div>
+				</div>
+			</div>
+
+			<div class="manage-content mb-10">
+				<h3 class="title" th:text="${mode eq 'I'?'여행정보':'예약정보'}">여행정보</h3>
+				<div class="container-fluid p-0">
+					<div class="row form-group form-inline" th:if="${mode ne 'I' and reservation.productTourId ne null}">
+						<label class="control-label col-2 req">상품정보</label>
+						<div class="col-9 form-inline">
+							<input type="hidden" id="productSerial" name="productSerial" value="${reservation.productSerial}">
+							<input type="hidden" id="productTourId" name="productTourId" value="${reservation.productTourId}">
+							<div class="col-5 thumnail"><img th:src="${product.productThumbnail}" alt="${product.productTitle}"></div>
+							<div id="product-title" class="col-5" th:text="${product.productTitle}"></div>
+							<div class="col-2">
+								<button type="button" class="btn btn-danger" id="btnDetailProductInfo" th:onclick="fnGoProductMove( [[${product.menuUrl}]], [[${product.productSerial}]] )" ><i class="fa fa-search"></i>보기</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-12 p-0 jsonForm" id="travelScheduleJson" name="travelScheduleJson">
+						<div class="row form-group form-inline">
+							<label class="control-label col-2 req">여행일정</label>
+							<div class="col-3 form-inline">
+								<input type="text" id="travelSchedule" name="travelSchedule" class="form-control col-10 date-range-picker-from req tac" data-name="여행일정">
+							</div>
+						</div>
+						<div class="row form-group form-inline">
+							<label class="control-label col-2 req">여행인원</label>
+							<div class="col-6 form-inline">
+								<div class="col-4 form-group">
+									<label class="control-label col-5">성인</label>
+									<select class="form-control col-7" id="memberA" name="memberA">
+										<option value="0" >미선택</option>
+										<th:block th:each="num : ${#numbers.sequence(1,30,1)}">
+											<option th:value="${num}" th:text="|${num}명|"></option>
+										</th:block>
+									</select>
+								</div>
+								<div class="col-4 form-group">
+									<label class="control-label col-5">어린이</label>
+									<select class="form-control col-7" id="memberC" name="memberC">
+										<option value="0">없음</option>
+										<th:block th:each="num : ${#numbers.sequence(1,10,1)}">
+											<option th:value="${num}" th:text="|${num}명|"></option>
+										</th:block>
+									</select>
+								</div>
+								<div class="col-4 form-group">
+									<label class="control-label col-5">유아</label>
+									<select class="form-control col-7" id="memberI" name="memberI">
+										<option value="0">없음</option>
+										<th:block th:each="num : ${#numbers.sequence(1,10,1)}">
+											<option th:value="${num}" th:text="|${num}명|"></option>
+										</th:block>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row form-group ">
+						<label class="control-label col-2 req">항공편</label>
+						<div class="row col-10">
+							<div class="row col-12">
+								<select class="form-control col-3" name="airTypeRequest" id="airTypeRequest" onclick="fnCheckAirType(this)" data-name="항공요청">
+									<option value="0" th:selected="${reservation.airTypeRequest eq '0'}">왕복</option>
+									<option value="1" th:selected="${reservation.airTypeRequest eq '1'}">출발</option>
+									<option value="2" th:selected="${reservation.airTypeRequest eq '2'}">복귀</option>
+									<option value="3" th:selected="${reservation.airTypeRequest eq '3' || reservation.airTypeRequest eq null}">미사용</option>
+								</select>
+							</div>
+							<div class="row col-12 jsonForm" name="airScheduleJson" id="airScheduleJson">
+								<div class="row col-12" id="depart">
+									<label class="form-inline back-label col-1">출발편</label>
+									<div class="row col-11">
+										<div class="col-3">
+											<label class="control-label col-12">출도작</label>
+											<input type="text" id="departFromArea" name="departFromArea" class="form-control col-12" placeholder="출도착 공항을 기입하여 주십시오" >
+										</div>
+										<div class="col-3">
+											<label class="control-label col-12">출발일시</label>
+											<input type="text" id="departFromDttm" name="departFromDttm" class="form-control col-12  date-single-time-picker-custom tac">
+										</div>
+										<div class="col-3">
+											<label class="control-label col-12">항공사명</label>
+											<input type="text" id="departFromAirline" name="departFromAirline" class="form-control col-12" placeholder="항공사명 기입하여 주십시오">
+										</div>
+										<div class="col-3">
+											<label class="control-label col-12">항공편명</label>
+											<input type="text" id="departFromFlightName" name="departFromFlightName" class="form-control col-12" placeholder="항공편명 기입하여 주십시오">
+										</div>
+									</div>
+								</div>
+								<div class="row col-12" id="arrive">
+									<label class="form-inline back-label col-1">복귀편</label>
+									<div class="row col-11">
+										<div class="col-3">
+											<label class="control-label col-12">출도작</label>
+											<input type="text" id="departToArea" name="departToArea" class="form-control col-12" placeholder="출도착 공항을 기입하여 주십시오">
+										</div>
+										<div class="col-3">
+											<label class="control-label col-12">출발일시</label>
+											<input type="text" id="departToDttm" name="departToDttm" class="form-control col-12 date-single-time-picker-custom tac">
+										</div>
+										<div class="col-3">
+											<label class="control-label col-12">항공사명</label>
+											<input type="text" id="departToAirline" name="departToAirline" class="form-control col-12" placeholder="항공사명 기입하여 주십시오">
+										</div>
+										<div class="col-3">
+											<label class="control-label col-12">항공편명</label>
+											<input type="text" id="departToFlightName" name="departToFlightName"  class="form-control col-12" placeholder="항공편명 기입하여 주십시오">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row form-group">
+						<label class="control-label col-2">숙소</label>
+						<input type="text" id="berthType" name="berthType" class="form-control col-10" placeholder="숙소명칭을 기입하여주십시오." th:value="${reservation.berthType}">
+					</div>
+					<div class="row form-group">
+						<label class="control-label col-2">차량</label>
+						<div class="row col-10">
+							<div class="row col-12">
+								<button type="button" class="btn btn-black" onclick="fnAddVehicleLine()"><i class="">교통편추가</i></button>
+							</div>
+							<div class="row col-12 jsonForm" id="vehicleJson" name="vehicleJson">
+								<div class="col-12 row form-group btn-group" th:if="${mode eq 'I'}">
+									<input type="text" name="Vehicle" class="form-control wd-p95" placeholder="요청사항을 기입하십시오.">
+									<button class="btn btn-black wd-p05" onclick='fnDelVehicleLine(this)'><i class="">X</i></button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row form-group">
+						<label class="control-label col-2" for="content">비고</label>
+						<div class="col-10 p-0">
+							<textarea class="form-control col-md-12 ckeditor" rows="5" id="comment" name="comment" th:text="${reservation.comment}"></textarea>
+						</div>
+					</div>
+					<div class="row form-group">
+						<label class="control-label col-2" for="content">상태처리</label>
+						<div class="col-10 row form-group p-0">
+							<div class="col-4">
+								<label class="control-label col-12">예약코드</label>
+								<select id="reservationCode" name="reservationCode" class="form-control">
+								</select>
+							</div>
+							<div class="col-4">
+								<label class="control-label col-12">취소여부</label>
+								<input class="form-control" type="checkbox" id="cancelYn" name="cancelYn" data-toggle="toggle" data-onstyle="success" data-on="취소처리" data-off="예약진행" data-width="100%">
+							</div>
+							<div class="col-4"  >
+								<label class="control-label col-12">취소코드</label>
+								<select id="cancelCode" name="cancelCode" class="form-control" th:disabled="${reservation.cancelYn eq 'N'}">
+								</select>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+
+		<div class="col-md-12 clearfix mt-20 mb-20">
+			<div class="text-center">
+				<button type="button" class="btn btn-black"   onclick="preList()">취소하기</button>
+				<button type="button" class="btn btn-primary" onclick="save()">저장하기</button>
+				<button type="button" class="btn btn-danger"  th:onclick="goDelete([[${reservation.id}]])" th:if="${mode eq 'U'}">삭제하기</button>
+			</div>
+		</div>
+
+		<div class="manage-content mb-10">
+			<h3 class="title">결제정보</h3>
+			<div class="container-fluid p-0">
+				<div class="row form-group">
+					<label class="control-label form-inline col-2">금액</label>
+					<div class="row form-group col-10 p-0">
+						<div class="row form-group col-12">
+							<div class="pd-lr-p005" th:classappend="${mode eq 'I' ? 'wd-p33' : 'wd-p30'}">
+								<label class="control-label col-12">총금액</label>
+								<input type="text" id="totalAmount" name="totalAmount" class="form-control col-12 tar" th:value="${reservation.totalAmount ne null ? #numbers.formatInteger(reservation.totalAmount, 1, 'COMMA'): 0} " value="0" th:readonly="${mode ne 'I'}">
+							</div>
+							<div class="pd-lr-p005" th:classappend="${mode eq 'I' ? 'wd-p33' : 'wd-p30'}">
+								<label class="control-label col-12">결제금액</label>
+								<input type="text" id="depsitAmount" name="depsitAmount" class="form-control col-12 tar"value="0" readonly>
+							</div>
+							<div class="pd-lr-p005" th:classappend="${mode eq 'I' ? 'wd-p33' : 'wd-p30'}">
+								<label class="control-label col-12">잔금</label>
+								<input type="text" id="balanceAmount" name="balanceAmount" class="form-control col-12 tar" value="0" readonly>
+							</div>
+							<div class="pd-lr-p005" th:classappend="${mode eq 'I' ? 'wd-p33' : 'wd-p10'}" th:if="${mode ne 'I'}">
+								<div class="float-right col-12 ht-p100 p-0">
+									<button type="button" class="btn btn-danger col-12 ht-p100" onclick="fnTogglePaymentGen()" ><i class="">발생금액<br>등록</i></button>
+								</div>
+							</div>
+						</div>
+						<div class="row form-group col-12" id="divPaymentGenForm" style="display: none;" th:if="${mode ne 'I'}">
+							<form id="savePaymentGenForm" name="savePaymentGenForm" enctype="multipart/form-data" class="col-12">
+								<input type="hidden" name="reservationId" th:value="${reservation.id}">
+								<input type="hidden" name="userEmail" th:value="${reservation.userEmail}">
+								<input type="hidden" name="payDivision" value="G">
+
+								<label class="control-label col-12">발생내역</label>
+								<div class="row form-group col-12 dataForm">
+									<div class="wd-p40 pd-lr-p005"></div>
+									<div class="wd-p30 pd-lr-p005">
+										<label class="control-label col-12 req">내용</label>
+										<input type="text" id="payComment" name="payComment" class="form-control col-12 req" data-name="발생 내용" >
+									</div>
+									<div class="wd-p20 pd-lr-p005">
+										<label class="control-label col-12 req">금액</label>
+										<input type="number" id="payAmount" name="payAmount" class="form-control col-12 req tar"  data-name="발생 금액" min="-999999999"  max="999999999" value="0" >
+										<small>*금액 정정시 (-) 입력가능</small>
+									</div>
+									<div class="wd-p10 pd-lr-p005">
+										<div class="float-right col-12 ht-p100 p-0">
+											<button type="button" class="btn btn-black col-12 ht-p100" onclick="savePaymentGen()"><i class="">등록</i></button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="row form-group col-12" th:if="${mode ne 'I'}">
+							<label class="control-label col-12">결제내역</label>
+							<table id="datatablePayment" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+						<div class="row form-group col-12" th:if="${mode ne 'I'}">
+							<form id="savePaymentDpsForm" name="savePaymentDpsForm" enctype="multipart/form-data" class="col-12">
+								<input type="hidden" name="reservationId" th:value="${reservation.id}">
+								<input type="hidden" name="userEmail" th:value="${reservation.userEmail}">
+								<input type="hidden" name="payDivision" value="D">
+
+								<label class="control-label col-12">입금내역</label>
+								<div class="row form-group col-12 dataForm">
+<!--/*
+									<div class="col-3">
+										<label class="control-label col-12 req">구분</label>
+										<select id="payDivision" name="payDivision" class="form-control col-12  req" data-name="결제 구분" onclick="changeDivision()">
+											<option>미선택</option>
+											<option value="G">발생비용</option>
+											<option value="D">입금비용</option>
+										</select>
+									</div>
+*/-->
+									<div class="wd-p20 pd-lr-p005">
+										<label class="control-label col-12 req">일시</label>
+										<input type="text" id="payDate" name="payDate" class="form-control col-12 req date-single-time-picker tac"  data-name="결제 일시">
+									</div>
+									<div class="wd-p20 pd-lr-p005">
+										<label class="control-label col-12 req">방법</label>
+<!--/*										<input type="text" id="payMethod" name="payMethod" class="form-control col-12 req"  data-name="결제 방법">*/-->
+										<select id="payMethod" name="payMethod" class="form-control col-12  req" data-name="결제 방법" >
+											<option>미선택</option>
+											<option value="1">계좌이체</option>
+											<option value="2">신용카드</option>
+											<option value="3">현금결제</option>
+											<option value="9">기타</option>
+										</select>
+									</div>
+									<div class="wd-p30 pd-lr-p005">
+										<label class="control-label col-12 req">내용</label>
+										<input type="text" id="payComment" name="payComment" class="form-control col-12 req" data-name="결제 내용" >
+									</div>
+									<div class="wd-p20 pd-lr-p005">
+										<label class="control-label col-12 req">금액</label>
+										<input type="number" id="payAmount" name="payAmount" class="form-control col-12 req tar"  data-name="결제 금액" min="-999999999"  max="999999999" value="0" >
+										<small>*금액 정정시 (-) 입력가능</small>
+									</div>
+									<div class="wd-p10 pd-lr-p005">
+										<div class="float-right col-12 ht-p100 p-0">
+											<button type="button" class="btn btn-black col-12 ht-p100" onclick="savePaymentDps()"><i class="">등록</i></button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row mb-10" th:if="${mode eq 'U'}">
+			<div class="col-md-12">
+				<div class="float-left">
+		            <button class="tab-btn active" data-id="counsel"                      th:onclick="fnTabSeleced(this)">상담이력</button>
+		            <button class="tab-btn"        data-id="inquiry" data-category-id="1" th:onclick="fnTabSeleced(this)">1:1문의이력</button>
+		            <button class="tab-btn"        data-id="inquiry" data-category-id="2" th:onclick="fnTabSeleced(this)">상품문의이력</button>
+<!--/*
+		            <button class="tab-btn"        data-id="inquiry" data-category-id="3" th:onclick="fnTabSeleced(this)">ㅅㄷㄴㅅ</button>
+*/-->
+				</div>
+	        </div>
+        </div>
+
+		<div class="manage-content mb-10" th:if="${mode eq 'U'}">
+			<div th:replace="~{/manage/inc/manage-tab-inquiry :: tab-inquiry('1',${reservation.userEmail} )}"/>
+			<div th:replace="~{/manage/inc/manage-tab-inquiry :: tab-inquiry('2',${reservation.userEmail} )}"/>
+<!--/*
+			<div th:replace="~{/manage/inc/manage-tab-inquiry :: tab-inquiry('3',${reservation.userEmail} )}"/>
+*/-->
+	        <div th:replace="~{/manage/inc/manage-tab-counsel :: tab-conusel('')}"/>
+		</div>
+
+
+	    <!-- /.content -->
+	</div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+
+	<div th:replace="~{/manage/inc/manage-popup-customer :: modal-customer}"/>
+	<div th:replace="~{/manage/inc/manage-popup-product :: modal-product}"/>
+	<!-- ./wrapper -->
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashboard.js"></script>
+	-->.
+	<script type="text/javascript" th:inline="javascript">
+	//var attchFileSize;
+	//let editor, editorComment;
+	//var reservation = [[${reservationYn}]] === 'Y' ? true : false;
+		var datatablePayment,editorComment;
+		let mode = [[${mode}]];
+		$(document).ready(function() {
+			var _dateOption = _daterangepickerOptionRangeOnlyDate;
+			_dateOption.minDate = moment().add(1, 'day');
+			_dateOption.maxDate = moment().add(3, 'month');
+			_dateOption.autoUpdateInput = false;
+			_dateOption.locale.cancelLabel='지우기';
+
+			$('.date-range-picker-from')
+				.daterangepicker(_dateOption, function(start, end, label) {})
+				.on('apply.daterangepicker', function(ev, picker) {
+					var format = _dateOption.locale.format;
+					$(this).val(picker.startDate.format(format) + separator + picker.endDate.format(format));
+				}).on('cancel.daterangepicker', function(ev, picker) {
+					$(this).val('');
+				});
+
+			var _datetimeOption = _daterangepickerOptionSingleDateTime;
+			_datetimeOption.minDate = moment().add(1, 'day');
+			_datetimeOption.maxDate = moment().add(3, 'month');
+
+			$('.date-single-time-picker-custom')
+				.daterangepicker(_datetimeOption, function(start, end, label) {});
+
+			fnMakeCkeditor($('#comment')[0],  false).then(
+				makedEditor => {
+					editorComment = makedEditor;
+				});
+
+			$('#reservationCode').html(
+				loadMakeUpHtmlSelect('reservationType', '${reservation.reservationCode}', 'reservationCode', 'reservationCode','class',false ) );
+			$('#cancelCode').html(
+				loadMakeUpHtmlSelect('cancelType', '${reservation.cancelCode}', 'cancelCode', 'cancelCode','class',false, "미사용" ) );
+
+			fnLoadInquiryItemList();
+
+			$('#airTypeRequest').trigger('click');
+
+			if( mode !== 'I'){
+				fnInitJsonData([[${reservation.travelScheduleJson}]]);
+				fnInitJsonData([[${reservation.airScheduleJson}]]);
+				fnInitJsonDataVehicle([[${reservation.vehicleJson}]]);
+
+				initDatatablePayment();
+
+				$('.tab-btn.active').trigger('click');
+			}
+		});
+
+		$(`input[name='cancelYn'][data-toggle="toggle"]`)
+			.bootstrapToggle()
+			.change(function(e){
+				var target = $(e.target);
+
+				$('#cancelCode').attr('disabled', !$(e.target).is(':checked'));
+				$('#reservationCode').attr('disabled',$(e.target).is(':checked'));
+			});
+datatablePayment
+		fnLoadInquiryItemList = function(){
+			$.ajax({
+	            url: '/manage/inquiry/category-list',
+	            type : 'GET',
+	            data : { 'length':100, 'reservationSwitchYn':'Y', 'sort':'orderNum', 'sortOrder':'ASC' },
+	            success : function(res) {
+					var html = "";
+					for(var i in res.data){
+						var item = res.data[i];
+
+						html +=
+							`<div class="form-check mr-05">`+
+							`<label class="form-check-label" for="categoryId${item.id}">`+
+							`<input type="radio" name="categoryId" id="categoryId${item.id}"`+
+							` class="form-check-input" value="${item.id}"`+
+							` groupYn="${item.groupYn}" reservationSwitchYn="${item.reservationSwitchYn}"`+
+							` onclick="checkCategory(this)" ${i==0?'checked':''} `+
+							`>${item.title}</label>`+
+							`</div>`;
+					}
+
+					$('#divInquriyType').html(html);
+	            },
+	            error : function(xhr, code, errorMsg) { },
+	            beforeSend : function() { },
+	            complete : function() { }
+	        });
+		}
+
+		fnInitJsonData = function( json ){
+			if(json !== undefined && json.length > 0 ){
+		    	var _data = JSON.parse( json );
+		    	//console.log(_data);
+
+				var id   = _data['id'];
+				var data = _data['data'];
+
+				$.each( data, function( key, value ){
+				    //console.log(`$('#${key}','#${id}')` );
+				    //console.log('key:' + key + ' / ' + 'value:' + value );
+				    $(`#${key}`,`#${id}`).val( value );
+				});
+			}
+			//$('#divProductPriceOption').html();
+		}
+
+		fnInitJsonDataVehicle = function( json, _key ){
+			if(json !== undefined && json.length > 0 ){
+		    	var _data = JSON.parse( json );
+		    	//console.log(_data);
+
+				var id   = _data['id'];
+				var data = _data['data'];
+
+				if(data !== undefined){
+					if( typeof(data.Vehicle) == 'string' ){
+						 if(data.Vehicle != '') fnAddVehicleLine( data.Vehicle );
+					} else {
+						$.each( data.Vehicle, function( key, value ){
+							if(value != '') fnAddVehicleLine( value );
+						})
+					}
+				}
+			}
+		}
+
+		fnReceiveSelectCustomer = function( data ){
+			$('#userEmail').val( data.userEmail );
+			$('#userName').val( data.userName );
+			$('#userMobile').val( data.userMobile );
+		}
+
+		fnReceiveSelectProduct = function(data){
+			var html ='';
+			html +=`<div class='form-inline'>`;
+			html +=`<input type="hidden" id="productSerial" name="productSerial" value="${data.productSerial}">`;
+			html +=`<input type="hidden" id="productTourId" name="productTourId" value="${data.productTourId}">`;
+			html +=`<div class="col-5 thumnail"><img src="${data.productThumbnail}" alt="${data.productTitle}"></div>`;
+			html +=`<div class="col-5">${data.productTitle}</div>`;
+			html +=`<div class="col-2"><button type="button" class="btn btn-danger" id="deleteProductBtn" onclick="fnPopupProductRemove()"><i class="fa fa-search"></i>취소</button></div>`;
+			html +=`</div>`;
+			$('#productInfo').html(html);
+
+			$('.func-product-modal').modal("hide");
+		}
+
+		$('#searchCustomerBtn').click(function(){
+			fnPopupCustomerOpen(fnReceiveSelectCustomer);
+			//fnPopupCustomerOpen(fnSelectCustomerTest);
+		});
+
+		$('#searchProductBtn').click(function(){
+			fnPopupProductOpen(fnReceiveSelectProduct);
+			//fnPopupCustomerOpen(fnSelectCustomerTest);
+		});
+
+		fnCheckAirType = function(e){
+	      var airType = $(e).val();
+
+	      $("#airScheduleJson").show();
+
+	      if( airType == 0 ){
+	        $("#depart").show();
+	        $("#arrive").show();
+	      } else if( airType == 1 ){
+	        $("#depart").show();
+	        $("#arrive").hide();
+	      } else if( airType == 2 ){
+	        $("#depart").hide();
+	        $("#arrive").show();
+	      } else if( airType == 3 ){
+	        $("#depart").hide();
+	        $("#arrive").hide();
+	        $("#airScheduleJson").hide();
+	      }
+	    }
+
+	    fnAddVehicleLine = function( data = undefined ){
+			var html ="";
+
+			html += `<div class="col-12 row form-group btn-group">`+
+					`<input type="text" name="Vehicle" class="form-control wd-p95" placeholder="요청사항을 기입하십시오." value='${data === undefined ? '': data}'>`+
+					`<button class="btn btn-black wd-p05" onclick='fnDelVehicleLine(this)'><i class="">X</i></button>`+
+					`</div>`;
+
+			$('#vehicleJson').append(html);
+		}
+
+		fnDelVehicleLine = function(e){
+			$(e).parent().remove();
+		}
+
+		preList = function(){
+			location.href = `/manage/reservation/list?params=`+getParams();
+		}
+
+		fnGenJsonToStr = function(targetId){
+			var _json = {'id':targetId};
+			var _data ={}
+			var _mp = new MapCustom();
+			var _keyset = new Array();
+
+			$(`input:not([disabled='disabled']), select:not([disabled='disabled'])`, `#${targetId}`).each(function(i,e){
+				var size = $(`${$(e).prop('tagName')}[name='${$(e).attr('name')}']`).length;
+//				console.log( $(e).val() );
+				if( size > 1 ){
+					var _key = $(e).attr('name');
+					var arr;
+
+					if( _mp.get(_key) === undefined  ){
+						_keyset.push( _key );
+						arr = new Array();
+						_mp.put(_key, arr);
+					} else {
+						arr = _mp.get(_key);
+					}
+
+					arr.push($(e).val());
+				} else {
+					_data[$(e).attr('name')] = $(e).val();
+				}
+			});
+
+			for(var i in _keyset){
+				var _key = _keyset[i];
+				var arr = _mp.get(_key);
+				var _subData ={};
+
+				for(var j in arr){
+					_subData[ j ] = arr[j];
+				}
+				_data[ _key ] = _subData;
+			}
+
+			_json["data"] = _data;
+
+			return JSON.stringify(_json);
+		}
+
+		save = function() {
+			if( checkForm('saveForm') ){
+				var form = document.saveForm;
+
+				var airType = $.trim(form.airTypeRequest.value);
+
+				var departFrom =
+					($.trim(form.departFromArea.value) == "" ||
+					 $.trim(form.departFromDttm.value) == "" ||
+					 $.trim(form.departFromAirline.value) == "" ||
+					 $.trim(form.departFromFlightName.value) == "");
+				var departTo =
+					($.trim(form.departToArea.value) == "" ||
+					 $.trim(form.departToDttm.value) == "" ||
+					 $.trim(form.departToAirline.value) == "" ||
+					 $.trim(form.departToFlightName.value) == "");
+
+				if($.trim(form.travelSchedule.value) == "") {
+					alert("여행일정을 입력해 주세요.");
+					form.travelSchedule.focus();
+				} else if( $.trim(form.memberA.value) == "0" &&
+						   $.trim(form.memberC.value) == "0" &&
+						   $.trim(form.memberI.value) == "0" ) {
+					alert("여행인원을 확인하여주세요.");
+				} else if( (airType === 0 && departFrom && departTo ) ){
+					alert("항공편 출발/복귀편 입력하여주십시오.");
+				} else if( (airType === 1 && departFrom ) ){
+					alert("항공편 출발편 입력하여주십시오.");
+				} else if( (airType === 2 && departTo ) ){
+					alert("항공편 복귀편 입력하여주십시오.");
+				} else {
+					var isDoing = false;
+					var isGuest = ($('#userEmail' ).val().trim() === '');
+
+					if( isGuest ){
+						isDoing = confirm("'비회원'으로 저장 하시겠습니까?")
+					} else {
+						isDoing = confirm("저장 하시겠습니까?");
+					}
+
+					if(isDoing){
+						$("#comment").text(editorComment.getData());
+
+						$('input, select','.jsonForm').attr('disabled',true);
+						var _data = $('#saveForm').serialize();
+						$('input, select','.jsonForm').attr('disabled',false);
+
+						_data += `&travelScheduleJson=` + fnGenJsonToStr('travelScheduleJson');
+						_data += `&airScheduleJson=`    + fnGenJsonToStr('airScheduleJson');
+						_data += `&vehicleJson=`        + fnGenJsonToStr('vehicleJson');
+
+						if(mode === 'I')
+							_data += '&totalAmount='        + $('#totalAmount').val();
+
+						if(isGuest)
+							_data += '&isGuest='        + isGuest;
+
+						$.ajax({
+				            url: "/manage/reservation/save",
+				            type : 'POST',
+				            data : _data,
+				            success : function(data) {
+				                if (typeof data.result != "undefined" && data.result == "error") {
+				                    alert(data.message);
+				                    return;
+				                } else {
+									preList();
+				                    alert(data.message);
+				                }
+				            },
+				            error : function(xhr, code, errorMsg) { },
+				            beforeSend : function(xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+				            complete : function() { }
+				        });
+					}
+				}
+			}
+		}
+
+		changeDivision = function(){
+			if($('#payDivision option:selected').val() !== '' ){
+				if( $('#payDivision option:selected').val() === 'G' ){
+					$('#savePaymentDpsForm #payMethod').attr('disabled',true);
+				} else {
+					$('#savePaymentDpsForm #payMethod').attr('disabled',false);
+				}
+			}
+		}
+
+		savePaymentGen = function() {
+			if( checkForm('savePaymentGenForm') ){
+				if(confirm("저장 하시겠습니까?")){
+
+					if($('#savePaymentGenForm #payAmount').val().trim() == '0'){
+						alert('결제 금액이 0원은 입력 할 수 없습니다.');
+						$('#savePaymentGenForm #payAmount').focus();
+					} else {
+						var _data = $('#savePaymentGenForm').serialize();
+
+						$.ajax({
+				            url: "/manage/user/payment-save",
+				            type : 'POST',
+				            data : _data,
+				            success : function(data) {
+				                if (typeof data.result != "undefined" && data.result == "error") {
+				                    alert(data.message);
+				                    return;
+				                } else {
+									datatablePayment.ajax.reload();
+/*
+									$('input', '#savePaymentGenForm').val('');
+									$('select option:eq(0)', '#savePaymentDpsForm').prop('selected',true);
+*/
+				                    alert(data.message);
+				                }
+				            },
+				            error : function(xhr, code, errorMsg) { },
+				            beforeSend : function(xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+				            complete : function() { }
+				        });
+			        }
+				}
+			}
+		}
+
+		savePaymentDps = function() {
+			if( checkForm('savePaymentDpsForm') ){
+				if(confirm("저장 하시겠습니까?")){
+
+					if($('#savePaymentDpsForm #payAmount').val().trim() == '0'){
+						alert('결제 금액이 0원은 입력 할 수 없습니다.');
+						$('#savePaymentDpsForm #payAmount').focus();
+					} else {
+						var _data = $('#savePaymentDpsForm').serialize();
+
+						$.ajax({
+				            url: "/manage/user/payment-save",
+				            type : 'POST',
+				            data : _data,
+				            success : function(data) {
+				                if (typeof data.result != "undefined" && data.result == "error") {
+				                    alert(data.message);
+				                    return;
+				                } else {
+									datatablePayment.ajax.reload();
+
+									$('input', '#savePaymentDpsForm').val('');
+									$('select option:eq(0)', '#savePaymentDpsForm').prop('selected',true);
+
+				                    alert(data.message);
+				                }
+				            },
+				            error : function(xhr, code, errorMsg) { },
+				            beforeSend : function(xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+				            complete : function() { }
+				        });
+			        }
+				}
+			}
+		}
+
+		initDatatablePayment = function(){
+			var baseColumns = [
+				{ "name" : "payDate", "title" : "일시","data" : "pay_date","className" : "dt-head-center dt-body-center",width:'120px'},
+				{ "name" : "amtG",    "title" : "발생비용",
+				  "data" : function (row, type, set) { return numberWithCommas( row["amt_g"] ); },
+				  "className" : "dt-head-center dt-body-right",width:'100px'},
+				{ "name" : "amtD",    "title" : "입금비용",
+				  "data" : function (row, type, set) { return numberWithCommas( row["amt_d"] ); },
+				  "className" : "dt-head-center dt-body-right",width:'100px'},
+				{ "name" : "payComment",   "title" : "내용","data" : "pay_comment","className" : "dt-head-center dt-body-left"},
+				{ "name" : "createName",   "title" : "작성자","data" : "create_name","className" : "dt-head-center dt-body-center",width:'100px'},
+				{ "name" : "createDate",   "title" : "작성일","data" : "create_date","className" : "dt-head-center dt-body-center",width:'120px'},
+				{ "name" : "createId",   "title" : "작성자","data" : "create_id","className" : "dt-head-center dt-body-center",visible:false},
+			];
+
+			datatablePayment = $("#datatablePayment").DataTable({
+				"searching" : false
+				,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+				,"paging": true
+				,"bPaginate": true
+				,"responsive": true
+				,"language": lang_kor
+				,"ordering": true
+				,"bLengthChange" : false
+				,"bInfo":false
+				,"ajax" : {
+					"url" : "/manage/user/payment-list-v"
+					,"method" : "post"
+					, "beforeSend": function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					}
+					,"data" : function(d) {
+						d.reservationId = [[${reservation.id}]];
+						d.userEmail     = [[${reservation.userEmail}]];
+					}
+				},"processing": true
+				,"serverSide": true
+				,"order" :
+					[ [5, 'desc'] ]
+				,"createdRow": function(row, data) {
+					  if ( data.deleteYn === "Y" ) {
+						  $(row).css('background-color', '#DC3545');
+					  } else if ( data.secretYn === "Y" ) {
+						  $(row).css('background-color', '#e9e9e9');
+					  }
+				  }
+				,"initComplete": function(settings, json) {}
+				,"columns": baseColumns
+				,"drawCallback": function (settings) {
+			        // Here the response
+			        var dataTotal = settings.json.dataTotal;
+			        console.log(dataTotal);
+
+			        if(dataTotal !== null  ){
+				         if(dataTotal !== undefined){
+							$('#totalAmount').val(numberWithCommas( dataTotal.amt_g !== null ? dataTotal.amt_g : 0  ));
+							$('#depsitAmount').val(numberWithCommas( dataTotal.amt_d !== null ? dataTotal.amt_d : 0 ));
+							$('#balanceAmount').val(numberWithCommas( dataTotal.amt_g !== null && dataTotal.amt_d !== null ? dataTotal.amt_g - dataTotal.amt_d : 0));
+						}
+					}
+			    }
+			});
+		}
+
+		fnTabSeleced =function( e ){
+			$('.tab-btn').removeClass('active');
+			$('.tab-content').hide();
+
+			var id = $(e).data('id');
+			var cid = $(e).data('category-id');
+
+			console.log(cid, id);
+			$(e).addClass('active');
+
+			var selector = `.tab-content[data-id='${id}']`;
+			if(cid !== undefined){
+				selector += `[data-category-id='${cid}']`;
+			}
+
+			$(selector).show();
+		}
+
+		fnTogglePaymentGen = function(){
+			if( $('#divPaymentGenForm').css('display') !== 'none' ){
+				$('#divPaymentGenForm').hide();
+			} else {
+				$('#divPaymentGenForm').show();
+			}
+		}
+
+		fnGoProductMove = function(url, ptSerial){
+
+			var url = `/product${url}/${ptSerial}`;
+			//location.href = url;
+			window.open(url, '_blank');
+		}
+
+	</script>
+	<style>
+	    #attach-file-list .filebox img {
+		    width: 70%;
+		    height: auto;
+		}
+
+		.ck-editor__editable { height: 200px; }
+
+		.board_photo{position: relative;width: 150px;height: 150px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 5px;}
+		.board_photo img{width: 100%; height: 100%;}
+		.board_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+
+		.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+		.board_btn.thumnail {top: 5px;left: 5px;}
+		.board_btn.thumnail.check {background-color: greenyellow;}
+		.board_btn.delete {top: 5px;right: 5px;}
+		.control-label {justify-content: unset !important;}
+
+		.thumnail img{max-width: 400px;}
+		/*input#totalAmount,*/
+		input#balanceAmount{color:red;font-weight: 700;}
+
+		.back-label{background-color: #efefef;border-radius: 5px;justify-content: center;margin-top:1rem;}
+
+		#savePaymentGenForm,
+		#savePaymentDpsForm{
+		    background-color: #efefef;
+		    border-radius: 5px;
+		    padding: 15px 10px;
+		}
+	</style>
+	</body>
+</html>

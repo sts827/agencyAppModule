@@ -1,0 +1,200 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <div th:fragment="modal-customer">
+		<div class="modal fade func-customer-modal" tabindex="1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 id="func-customer-modal-title" class="Customer-title">고객목록</h4>
+						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-inline col-12">
+							<div class="form-inline col-10" id="customerSearchBar">
+								<div class="col-4">
+									<label class="control-label col-12">성함</label>
+									<div class="col-12">
+										<input type="text" id="name" name="name" class="form-control col-md-12 col-xs-12" placeholder="성함을 입력하여주십시오.">
+									</div>
+								</div>
+								<div  class="col-4">
+									<label class="control-label col-12">연락처</label>
+									<div class="col-12">
+										<input type="text" id="phone" name="phone" class="form-control col-md-12 col-xs-12" placeholder="연락처를 입력하여 주십시오.">
+									</div>
+								</div>
+								<div class="col-4">
+									<label class="control-label col-12">이메일</label>
+									<div class="col-12">
+										<input type="text" id="email" name="email" class="form-control col-md-12 col-xs-12" placeholder="이메일을 입력하여 주십시오.">
+									</div>
+								</div>
+							</div>
+							<button type="button" class="btn btn-black" id="searchCustometBtn" onclick="fnPopupCustomerSearch()"><i class="fa fa-search"></i> 검색</button>
+						</div>
+
+						<table id="customer-list" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" th:inline="javascript" >
+			var datatableCustomer;
+			let fnSelectedCustomer;
+			fnPopupCustomerOpen = function( _fnSelectedCustomer ){
+				if( _fnSelectedCustomer !== undefined ){
+					fnSelectedCustomer = _fnSelectedCustomer;
+				} else {
+					console.info('고객선택시 콜백(callback)처리용 함수 설정이 안되어 있습니다.');
+				}
+
+				fnInitDatatableCustomerList();
+				$('.func-customer-modal').modal("show");
+			}
+			fnPopupCustomerSearch = function(){
+				datatableCustomer.ajax.reload();
+			}
+
+			fnInitDatatableCustomerList = function(){
+				if( datatableCustomer !== undefined){
+					datatableCustomer.ajax.reload();
+					return;
+				}
+
+				datatableCustomer = $("#customer-list").DataTable({
+					"searching" : false
+					,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+					,"paging": true
+					,"bPaginate": true
+					,"responsive": true
+					,"language": lang_kor
+					,"ordering": false
+					,"bLengthChange" : false
+					,"bInfo":false
+					,"ajax" : {
+						"url" : "/manage/user/list"
+						,"method" : "post"
+						, "beforeSend": function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						}
+						,"data" : function(d) {
+							var searchText = '';
+							$('#name,#phone,#email', '#customerSearchBar').each(function(i,e){
+							    searchText += $(e).val().replaceAll('-','');
+							});
+
+							if ( searchText.length > 0 ) { d.searchText = searchText; }
+						},"datasrc":function ( json ){
+							console.log("done.");
+						}
+					}
+					,"processing": true
+					,"serverSide": true
+					,"order" : [ [0, 'desc'] ]
+					,"createdRow": function(row, data) {}
+					,"initComplete": function(settings, json) {
+						if(datatableCustomer !== undefined){
+							setTimeout(function(){
+								datatableCustomer.columns.adjust().draw();
+							},200);
+						}
+					}
+					,"drawCallback": function(settings) {
+					   //console.log("drawCallback");
+						if(settings.json.recordsTotal == 1){
+							var _data = settings.json.data[0];
+							setTimeout(function(){
+								fnForwardSelectedCustomer(_data, false);
+							},500);
+						}
+					}
+					,"columns": [
+						{ "name" : "user_name", "title" : "이름", 	"data" : "userName", "className" : "dt-head-center dt-body-center"},
+						{ "name" : "user_mobile", "title" : "연락처", 	"data" : "userMobile", "className" : "dt-head-center dt-body-center"},
+						{ "name" : "user_email", "title" : "이메일", 	"data" : "userEmail", "className" : "dt-head-center dt-body-center"},
+						{ "name" : "func_btns", "title":"기능",
+							"data" :function (row, type, set) {
+								let html = "";
+								html += `<div class="form-inline justify-content-center">`;
+/*
+								html += `<button type='button' class='btn btn-default' data-toggle='tooltip' title='선택'`+
+								        `onclick='fnSelectCustomer("${row["userName"]}","${row["userMobile"]}","${row["userEmail"]}")'>선택</button>&nbsp;`;
+*/
+								html += `<button type='button' class='btn btn-default btn-select' data-toggle='tooltip' title='선택'>선택</button>&nbsp;`;
+								html += `</div>`;
+								return html;
+							},
+							"className": "dt-head-center dt-body-center", "orderable" : false, "width":"60px"},
+					]
+				});
+
+				datatableCustomer
+					.on('click', 'tbody tr', function (e) {
+					    let tr = e.target;
+					    let row = datatableCustomer.row(tr);
+					    fnForwardSelectedCustomer(row.data());
+					}).on('click', 'td .btn-select', function (e) {
+						e.stopPropagation();
+					    let tr = e.target.closest('tr');
+					    let row = datatableProduct.row(tr);
+					    fnForwardSelectedProduct(row.data());
+					});
+			}
+
+			fnForwardSelectedCustomer = function(data, isAlert = true){
+				if(typeof fnSelectedCustomer === 'undefined'){
+					console.info('고객선택시 콜백(callback)처리용 함수 설정이 안되어 있습니다.\r\nfnPopupCustomerOpen 펑션 호출시 콜백(callback) 함수 설정이 필요합니다.');
+				} else {
+					var isForward;
+					if(isAlert === true){
+						isForward = confirm("해당고객을 선택하십니까?");
+					} else {
+						isForward = true;
+					}
+					if( isForward ){
+						fnSelectedCustomer(data);
+
+						setTimeout(function(){
+							$('.func-customer-modal').modal("hide");
+							fnCustomerSearchBarReset();
+						},500);
+				    }
+				}
+			}
+
+			fnSelectCustomer = function(userName, userMobile, userEmail, isAlert = true){
+				var isProcess;
+				if(isAlert === true){
+					isProcess = confirm("해당고객을 선택하십니까?");
+				} else {
+					isProcess = true;
+				}
+
+				if( isProcess ){
+					var html ='';
+					$('#funcScheduleForm #customerName').val( userName );
+					$('#funcScheduleForm #customerPhone').val( userMobile );
+					$('#customerEmail, #createId' ,'#funcScheduleForm ').val( userEmail );
+
+					setTimeout(function(){
+						$('.func-customer-modal').modal("hide");
+						fnCustomerSearchBarReset();
+					},500);
+				}
+			}
+			fnCustomerSearchBarReset = function(){
+				$('#name,#phone,#email', '#customerSearchBar').val('');
+			}
+			fnCustomerReset = function(){
+				$('#customerName,#customerPhone,#customerEmail,#createId', '#funcScheduleForm').val('');
+			}
+		</script>
+	</div>
+</body>
+</html>

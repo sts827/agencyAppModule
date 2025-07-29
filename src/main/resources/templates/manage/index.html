@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<head>
+	<link rel="stylesheet" type="text/css" href="/css/manage/dashboard-calendar.css" th:href="@{/css/manage/dashboard-calendar.css}" />
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <section class="content-wrapper">
+		  <div class="content-header">
+			  <h1 class="m-0">대시보드</h1>
+		  </div>
+		  <div class="manage-board">
+			  <div class="col-md-3">
+				  <div class="card">
+					  <div class="card-body">
+					  <h5 class="card-title" onclick="fnGoReservationMoveList('N')">
+						  예약접수
+						  <i class="card-icon way-icon wi-dash-reserv"></i>
+					  </h5>
+					  <div class="card-text grid">
+						  <div class="inline">
+							  <label>신규</label>
+							  <div class="count" id="reservation-new-count" onclick="fnGoReservationMoveList('N', 0)">0</div>
+						  </div>
+						  <div class="bar"></div>
+						  <div class="inline">
+							  <label>진행</label>
+							  <div class="count" id="reservation-continue-count" onclick="fnGoReservationMoveList('N', 1)">0</div>
+						  </div>
+					  </div>
+					  </div>
+				  </div>
+			  </div>
+			  <div class="col-md-3">
+				  <div class="card">
+					  <div class="card-body">
+					  <h5 class="card-title" onclick="fnGoReservationMoveList('Y')">
+						  예약취소
+						  <i class="card-icon way-icon wi-dash-cancel" ></i>
+					  </h5>
+						  <div class="card-text grid">
+							  <div class="inline">
+								  <label>신규</label>
+								  <div class="count" id="cancel-new-count"  onclick="fnGoReservationMoveList('Y',0 )">0</div>
+							  </div>
+							  <div class="bar"></div>
+							  <div class="inline">
+								  <label>진행</label>
+								  <div class="count" id="cancel-continue-count"  onclick="fnGoReservationMoveList('Y', 1)">0</div>
+							  </div>
+						  </div>
+					  </div>
+				  </div>
+			  </div>
+			  <div class="col-md-3">
+				  <div class="card">
+					  <div class="card-body">
+					  <h5 class="card-title" onclick="fnGoInquiryMove('N')">
+						  견적문의
+						  <i class="card-icon way-icon wi-dash-estimate"></i>
+					  </h5>
+						  <div class="card-text grid">
+							  <div class="inline">
+								  <label>신규</label>
+								  <div class="count" id="estimate-new-count" onclick="fnGoInquiryMove('N',2)">0</div>
+							  </div>
+							  <div class="bar"></div>
+							  <div class="inline">
+								  <label>진행</label>
+								  <div class="count" id="estimate-continue-count" onclick="fnGoInquiryMove('N',2)">0</div>
+							  </div>
+						  </div>
+					  </div>
+				  </div>
+			  </div>
+			  <div class="col-md-3">
+				  <div class="card">
+					  <div class="card-body">
+					  <h5 class="card-title" onclick="fnGoInquiryMove('N',1)">
+						  1:1문의
+						  <i class="card-icon way-icon wi-dash-1on1"></i>
+					  </h5>
+						  <div class="card-text grid">
+							  <div class="inline">
+								  <label>신규</label>
+								  <div class="count" id="qna-new-count" onclick="fnGoInquiryMove('N',1,0)">0</div>
+							  </div>
+							  <div class="bar"></div>
+							  <div class="inline">
+								  <label>진행</label>
+								  <div class="count" id="qna-continue-count" onclick="fnGoInquiryMove('N',1,2)">0</div>
+							  </div>
+						  </div>
+					  </div>
+				  </div>
+			  </div>
+
+			  <div class="col-md-3">
+				  <div class="card">
+					  <div class="card-body">
+					  <h5 class="card-title row align-items-center justify-content-between">
+						  새로운 상품 리뷰
+						  <div class="inline-counter">
+							  <span class="cnt" id="review-new-count" th:onclick="fnGoCustomerMove()">0</span>
+							  <span>건</span>
+						  </div>
+					  </h5>
+					  </div>
+				  </div>
+			  </div>
+			  <div class="col-md-3">
+				  <div class="card">
+					  <div class="card-body">
+					  <h5 class="card-title row align-items-center justify-content-between">
+						  신규 회원가입
+						  <div class="inline-counter">
+							  <span class="cnt" id="new-join-count" th:onclick="fnGoCustomerMove()">0</span>
+							  <span>명</span>
+						  </div>
+					  </h5>
+					  </div>
+				  </div>
+			  </div>
+			  <div class="col-md-6">
+				  <div class="card">
+					  <div class="card-body">
+					  <h5 class="card-title row align-items-center justify-content-between">
+						  알림톡 잔여건수
+						  <div class="inline-counter">
+							  <span class="cnt">0</span>
+							  <span>건</span>
+							  <button class="btn btn-primary">충전하기</button>
+						  </div>
+					  </h5>
+					  </div>
+				  </div>
+			  </div>
+		  </div>
+		  <div class="line"></div>
+		  <div class="content-header">
+			  <h1 class="m-0">예약일정 캘린더</h1>
+			  <small class="float-right">※기준 : 출발일</small>
+		  </div>
+		  <div class="manage-calendar">
+			  <div class="calendar">
+			  	<div id="calendar"></div>
+			  </div>
+			  <div class="checklist">
+				  <h5>주요 체크리스트</h5>
+				  <div class="day-schedule">
+					  <div class="day-title">
+						  <div class="arrow prev-day"></div>
+						  <div class="today">2023.09.08</div>
+						  <div class="arrow next-day">
+						  </div>
+					  </div>
+					  <div class="checkpoint">
+						  <div class="status apply">접수</div>
+						  <div class="customer-list">
+							  <div>1번이름</div>
+							  <div>1번이름</div>
+							  <div>1번이름</div>
+							  <div>1번이름</div>
+							  <div>1번이름</div>
+							  <div>1번이름</div>
+							  <div>1번이름</div>
+						  </div>
+					  </div>
+					  <div class="checkpoint">
+						  <div class="status reservation">예약</div>
+						  <div class="customer-list"></div>
+					  </div>
+					  <div class="checkpoint">
+						  <div class="status confirm">확약</div>
+						  <div class="customer-list"></div>
+					  </div>
+					  <div class="checkpoint">
+						  <div class="status cancel">취소접수</div>
+						  <div class="customer-list"></div>
+					  </div>
+					  <div class="checkpoint">
+						  <div class="status canceling">취소진행</div>
+						  <div class="customer-list"></div>
+					  </div>
+				  </div>
+				  <div class="box-btn" id="btnScheduleAdd" ><img src="/images/icon/plusBtn-white.svg" /> 일정 등록하기</div>
+			  </div>
+		  </div>
+	  </section>
+
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+
+		<!-- popup window -->
+		<div th:replace="~{/manage/inc/manage-popup-reservation :: modal-reservation}"/>
+		<!-- /.popup window -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	let calendar;
+
+	var backgroundColor = {apply:'#DADADA',reservation:'#048409',confirm:'#0374F8',cancel:'#CC2170',canceling:'#F8E2EC'};
+	var fontColor       = {apply:'#212529',reservation:'#FFFFFF',confirm:'#FFFFFF',cancel:'#FFFFFF',canceling:'#212529'};
+
+	$.widget.bridge('uibutton', $.ui.button);
+	$(document).ready(function(){
+		//fnLoadInquiry();
+		fnLoadReservation( 'N' ); //예약접수
+		fnLoadReservation( 'Y' ); //예약취소
+		fnLoadInquiry( [2,3], 'N' );		  //견적문의
+		fnLoadInquiry( 1 );					  //1:1믄의
+		fnLoadReviewBoard( 'review' );		  //상품리뷰게시판.
+		fnLoadNewJoinCustomer();			  //신규회원가입자.
+		fnLoadCalendarReservation();
+		fnLoadScheduleCustomerList( moment().format('YYYY-MM-DD') );
+
+		const calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            headerToolbar: {
+                left: 'prev title next',
+                right: 'today reload'
+            },
+            displayEventTime: false, // don't show the time column in list view
+            locale : 'ko',
+			selectable: true,
+			customButtons:{
+				prev:{
+					click:function(){
+						calendar.prev();
+						fnLoadCalendarReservation(calendar.getDate());
+					}
+				},
+				next: {
+			        click: function() {
+						calendar.next();
+						fnLoadCalendarReservation(calendar.getDate());
+					}
+				},
+				today:{
+					text:'오늘',
+					click:function(){
+						calendar.today();
+						fnLoadCalendarReservation(calendar.getDate());
+					}
+				},
+				reload:{
+					text:'재조회',
+					click:function(){
+						fnLoadCalendarReservation(calendar.getDate());
+					}
+				}
+			},
+			dateClick: function(info) {
+				console.log('clicked ' + info.dateStr);
+				fnLoadScheduleCustomerList( info.dateStr );
+			},
+        });
+        calendar.render();
+	});
+
+	$('#btnScheduleAdd').click(function(){
+		fnPopupScheduleAdd( fnLoadCalendarReservation );
+	});
+
+	fnLoadReservation =function( cancelYn = undefined ){
+		var data ={};
+		var targetId;
+
+		if(cancelYn !== undefined)		data.cancelYn = cancelYn;
+
+		if( cancelYn === 'N' ){
+			targetId = 'reservation-';
+		} else {
+			targetId = 'cancel-';
+		}
+		$.ajax({
+			url : "/manage/reservation/status-count" ,
+			type : "GET" ,
+			data : data,
+			dataType : "json" ,
+			async:true,
+			//traditional: true,
+			//beforeSend: function (xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+			success : function(res) {
+				if ("success" == res.result) {
+					var data = res.data;
+
+					var nCnt = data["code0"];
+					var pCnt = data["code1"];
+
+					$(`#${targetId}new-count`).html( nCnt );
+					$(`#${targetId}continue-count`).html( pCnt );
+				}else if("duplicate" == res.result){
+					alert(res.message);
+				}else {
+					alert(res.message);
+				}
+			},
+        	error:function(request,status,error) {
+        		alert('처리중 시스템 장애입니다');
+        		console.log("code:"+request.status+"\nerror:"+error);
+        	}
+		});
+	}
+
+	fnLoadInquiry =function( id = undefined, reservationYn = undefined, cancelYn = undefined){
+		var data ={};
+		var targetId;
+
+		if(id !== undefined){
+			if( Array.isArray( id ) ){
+				data.listCategoryId = id;
+			} else {
+				data.categoryId = id;
+			}
+		}
+
+		if(reservationYn !== undefined) data.reservationYn = reservationYn;
+		if(cancelYn !== undefined)		data.cancelYn = cancelYn;
+
+		if( reservationYn === 'Y' ){
+			if( cancelYn === 'N' ){
+				targetId = 'reservation-';
+			} else {
+				targetId = 'cancel-';
+			}
+		} else if(id !== undefined){
+			if( Array.isArray( id ) ){
+				targetId = 'estimate-';
+			} else {
+				targetId = 'qna-';
+			}
+		}
+
+		$.ajax({
+			url : "/manage/inquiry/status-count" ,
+			type : "GET" ,
+			data : data,
+			dataType : "json" ,
+			traditional: true,
+			//beforeSend: function (xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+			success : function(res) {
+				if ("success" == res.result) {
+					for(i in res.data){
+						var data = res.data[i];
+
+						var nCnt = data["code0"];
+						var pCnt = data["code1"];
+
+						$(`#${targetId}new-count`).html( nCnt );
+						$(`#${targetId}continue-count`).html( pCnt );
+/*
+						$(`.inquiry${id} .new h4`).html( nCnt );
+						$(`.inquiry${id} .inprogress h4`).html( pCnt );
+*/
+					}
+				}else if("duplicate" == res.result){
+					alert(res.message);
+				}else {
+					alert(res.message);
+				}
+			},
+        	error:function(request,status,error) {
+        		alert('처리중 시스템 장애입니다');
+        		console.log("code:"+request.status+"\nerror:"+error);
+        	}
+		});
+	}
+
+	fnLoadReviewBoard = function(boardIdLike){
+		var data ={isOnlyReview:true};
+
+		if(boardIdLike !== undefined) data.boardIdLike = boardIdLike;
+
+		$.ajax({
+			url : "/manage/board/contents-count" ,
+			type : "GET" ,
+			data : data,
+			dataType : "json" ,
+			//traditional: true,
+			success : function(res) {
+				if ("success" == res.result) {
+						$(`#review-new-count`).html( res.count );
+				}else if("duplicate" == res.result){
+					alert(res.message);
+				}else {
+					alert(res.message);
+				}
+			},
+        	error:function(request,status,error) {
+        		alert('처리중 시스템 장애입니다');
+        		console.log("code:"+request.status+"\nerror:"+error);
+        	}
+		});
+	}
+
+	fnLoadNewJoinCustomer = function(){
+		var data ={isOnlyNewJoin:true};
+
+		$.ajax({
+			url : "/manage/user/count" ,
+			type : "GET" ,
+			data : data,
+			dataType : "json" ,
+			success : function(res) {
+				if ("success" == res.result) {
+						$(`#new-join-count`).html( res.count );
+				}else if("duplicate" == res.result){
+					alert(res.message);
+				}else {
+					alert(res.message);
+				}
+			},
+        	error:function(request,status,error) {
+        		alert('처리중 시스템 장애입니다');
+        		console.log("code:"+request.status+"\nerror:"+error);
+        	}
+		});
+	};
+
+	fnLoadCalendarReservation = function(targetMonth = undefined){
+		var data = {'isGtZero': true};
+
+		if( targetMonth === undefined){
+			data.fromDate = moment().startOf('month').format('YYYY-MM-DD');
+			data.toDate   = moment().add('1','month').endOf('month').format('YYYY-MM-DD');
+		} else {
+			data.fromDate = moment(targetMonth).startOf('month').format('YYYY-MM-DD');
+			data.toDate   = moment(targetMonth).add('1','month').endOf('month').format('YYYY-MM-DD') + " 23:59:59" ;
+		}
+
+		$.ajax({
+			url : "/manage/reservation/calendar-count" ,
+			type : "GET" ,
+			data : data,
+			dataType : "json" ,
+			success : function(res) {
+				if ("success" == res.result) {
+					calendar.removeAllEvents();
+					for(var i in res.data){
+						var _data = res.data[i];
+
+						calendar.addEvent(
+						{
+							title: `${_data.name} (${_data.cnt} 건)`,
+							start: _data.travel_from_dt,
+							backgroundColor:backgroundColor[_data.code],
+							borderColor:backgroundColor[_data.code],
+							textColor:fontColor[_data.code],
+						});
+					}
+				}else {
+					alert(res.message);
+				}
+			},
+        	error:function(request,status,error) {
+        		alert('처리중 시스템 장애입니다');
+        		console.log("code:"+request.status+"\nerror:"+error);
+        	}
+		});
+	}
+
+	fnLoadScheduleCustomerList = function( day ){
+		var html;
+
+		html = `<div class="day-title">`+
+					`<div class="arrow prev-day"></div>`+
+					`<div class="today">${day}</div>`+
+					`<div class="arrow next-day">`+
+					`</div>`+
+				`</div>`;
+
+		$.ajax({
+			url : "/manage/reservation/calendar-check-list" ,
+			type : "GET" ,
+			data : {'targetDate': day},
+			dataType : "json" ,
+			async:false,
+			success : function(res) {
+				if ("success" == res.result) {
+						//$(`#new-join-count`).html( res.count );
+					var _listCode  = [ ['apply','접수'],['reservation','예약'],['confirm','확약'],['cancel','취소접수'],['canceling','취소진행'] ];
+					var _hsMapList = new MapCustom();
+
+					for(var i in res.data){
+						var _data = res.data[i];
+						var _arr;
+						//console.log(_data);
+
+						if(_hsMapList.containsKey(_data.code)){
+							_arr = _hsMapList.get(_data.code);
+						} else {
+							_arr = new Array();
+							_hsMapList.put(_data.code, _arr);
+						}
+						_arr.push(_data);
+					}
+					//console.log(_hsMapList);
+					for(var i in _listCode){
+						//console.log( _listCode[i][0] );
+						html += fnSubMakeScheduleCustomerList(_listCode[i][0],       _listCode[i][1],   _hsMapList.get(_listCode[i][0]) );
+					}
+				}else {
+					alert(res.message);
+				}
+			},
+        	error:function(request,status,error) {
+        		alert('처리중 시스템 장애입니다');
+        		console.log("code:"+request.status+"\nerror:"+error);
+        	}
+		});
+		//console.log(html);
+
+		$('.day-schedule').html(html);
+
+		$('.day-schedule .prev-day').on('click', function(){
+			var toDay = $('.day-schedule .today');
+			var nowDate =  $(toDay).text();
+			var prevDate = moment(nowDate).add(-1,"day").format("YYYY-MM-DD");
+
+			if( moment(nowDate).format('YYYY-MM') !== moment(prevDate).format('YYYY-MM') ){
+				calendar.prev();
+			}
+
+			fnLoadScheduleCustomerList( prevDate );
+		});
+
+		$('.day-schedule .next-day').on('click', function(){
+			var toDay = $('.day-schedule .today');
+			var nowDate =  $(toDay).text();
+			var nextDate = moment(nowDate).add(1,"day").format("YYYY-MM-DD");
+
+			if( moment(nowDate).format('YYYY-MM') !== moment(nextDate).format('YYYY-MM') ){
+				calendar.next();
+			}
+
+			fnLoadScheduleCustomerList( nextDate );
+		});
+	}
+
+	fnSubMakeScheduleCustomerList = function(type, name, customerList){
+		var html =  `<div class="checkpoint">`+
+			`<div class="status ${type}">${name}</div>`+
+			`<div class="customer-list">`;
+		for(var i in customerList){
+			var customer = customerList[i];
+			html +=`<div onclick='fnGoReservationMoveForm(${customer.id})'>${customer.user_name}(${customer.user_mobile})</div>`;
+		}
+
+
+		html +=`</div>`+ `</div>`;
+		return html;
+	}
+
+	fnGoReservationMoveList = function(cancelYn, reservationCode = undefined){
+		//params=iˇslˇboardIdˇ1,¿
+		//'params=iˇslˇcategroryIdˇ1';
+		var params = '?params=';
+
+		if(reservationCode !== undefined){
+			params += `¿ipˇslˇreservationCodeˇ${reservationCode}`;
+		}
+
+		var url = `/manage/reservation/list`+params;
+		//location.href = url;
+		window.open(url, '_blank');
+	}
+
+
+	fnGoReservationMoveForm = function(id){
+		var params = '&params=';
+/*
+		if(categoryId !== undefined){
+			params += `ipˇbtˇdata-idˇ${categoryId}`;
+
+			if(applyCode !== undefined){
+				params += `¿ipˇslˇapplyCodeˇ${applyCode}`;
+			}
+		}
+*/
+		//location.href = '/manage/reservation/list'+params;
+		var url = `/manage/reservation/form?mode=U&id=${id}` + params;
+		//location.href = url;
+		window.open(url, '_blank');
+	}
+
+
+	fnGoInquiryMove = function(reservation,categoryId = undefined, applyCode = undefined){
+		//params=iˇslˇboardIdˇ1,¿
+		//'params=iˇslˇcategroryIdˇ1';
+		var params = '?params=';
+
+		if(categoryId !== undefined){
+			params += `ipˇbtˇdata-idˇ${categoryId}`;
+
+			if(applyCode !== undefined){
+				params += `¿ipˇslˇapplyCodeˇ${applyCode}`;
+			}
+		}
+
+		var url = `/manage/inquiry/${reservation === 'Y'?'reservation':'inquiry'}`+params;
+		//location.href = url;
+		window.open(url, '_blank');
+	}
+
+	fnGoCustomerMove = function(){
+		var params = '?params=';
+/*
+		if(categoryId !== undefined){
+			params += `ipˇbtˇdata-idˇ${categoryId}`;
+
+			if(applyCode !== undefined){
+				params += `¿ipˇslˇapplyCodeˇ${applyCode}`;
+			}
+		}
+*/
+		var url = `/manage/user/list`+params;
+		//location.href = url;
+		window.open(url, '_blank');
+	}
+	</script>
+	<style>
+		.info-box span{line-height: 2rem;}
+		.info-box .cnt{font-size: 3rem;}
+		.link-cursor, .card-body h5.card-title, .grid .count{cursor: pointer;}
+
+		.fc .fc-reload-button {border: none;color: #FFFFFF;background-color: #0374F8;}
+		.fc .fc-reload-button:hover {background-color: #0374F8;}
+	</style>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+	<!-- AdminLTE for demo purposes -->
+<!-- 	<script src="/js/manage/demo.js"></script> -->
+	<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<!--	<script src="/js/manage/pages/dashboard.js"></script>-->
+
+	</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${company != null} ? ${company.siteName}">#{여행사}</title>
+    <head th:replace="~{inc/common-header :: include}" />
+    <head th:replace="~{inc/header :: header-script}" />
+    <link rel="stylesheet" type="text/css" href="/css/user/user.css" th:href="@{/css/user/user.css}" />
+    <link rel="stylesheet" type="text/css" href="/css/front/member.css" th:href="@{/css/front/member.css}" />
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        addressOpen = function (){
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    console.log(data);
+                    let roadAddr = data.roadAddress;
+                    $('#user-addr-jibun').val(data.jibunAddress);
+                    $('#user-addr-road').val(roadAddr);
+                    $('#user-addr-zipcode').val(data.zonecode);
+                    if(roadAddr !== ''){
+                        let extraRoadAddr = '';
+                        if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                            extraRoadAddr += data.bname;
+                        }
+                        if(data.buildingName !== '' && data.apartment === 'Y'){
+                            extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        if(extraRoadAddr !== ''){
+                            extraRoadAddr = ' (' + extraRoadAddr + ')';
+                        }
+                        $('#user-addr-extra').val(extraRoadAddr);
+                    }else{
+                        $('#user-addr-extra').val('');
+                    }
+                }
+            }).open();
+        }
+
+        fnCheckPassword = function(){
+            if($('#user-password').val().trim() !== ''
+                && $('#user-password-check').val().trim() !== ''){
+                if($('#user-password').val() === $('#user-password-check').val()){
+                    if(formValidCheck($('#user-password'), 'input', 'is-invalid', 'medium-pass')){
+                        $('#validate-user-password').text('비밀번호가 일치합니다.').addClass('is-valid').removeClass('is-invalid');
+                    }else{
+                        $('#validate-user-password').text('영문,숫자,특수문자를 사용하여 8~16자로 작성해주세요.').addClass('is-invalid').removeClass('is-valid');
+                    }
+                } else{
+                    $('#validate-user-password').text('비밀번호가 일치하지 않습니다.').addClass('is-invalid').removeClass('is-valid');
+                }
+            }
+        }
+
+        fnUpdateUser = function(){
+            $('#user-mobile').val($('#tel1').val()+'-'+$('#tel2').val()+'-'+$('#tel3').val());
+
+            let form = $('#user-form');
+            formValidCheck($('#user-name'), 'input', 'is-invalid', null);
+            formValidCheck($('#user-mobile'), 'input', 'is-invalid', 'mobile');
+            fnCheckPassword();
+            formValidCheck($('#user-addr'), 'input', 'is-invalid', 'text');
+
+            if($(form).find('.is-invalid').length > 0){
+                alert('사용자정보를 정확히 입력해주세요.');
+                return;
+            }
+
+            if($('#user-password').val().trim() !== ''
+                && $('#user-password-check').val().trim() !== ''){
+                var password = $('#user-password');
+                const cipher = CryptoJS.AES.encrypt(password.val(), CryptoJS.enc.Utf8.parse([[${session.encrypt}]]), {
+                    iv: CryptoJS.enc.Utf8.parse([[${session.iv}]]),
+                    padding: CryptoJS.pad.Pkcs7,
+                    mode: CryptoJS.mode.CBC
+                });
+                $('input[name=userPassword]').val(cipher.toString());
+            }else{
+                $('input[name=userPassword]').val('');
+            }
+
+            $.ajax({
+                url: '/user/update',
+                type : "PUT",
+                data : $(form).serialize(),
+                success : function(data) {
+                    if (typeof data.result != "undefined" && data.result == "error") {
+                        alert(data.error);
+                        return;
+                    } else {
+                        if(data.result == "success"){
+                            alert(data.message);
+                        }else{
+                            alert(data.message);
+                            return;
+                        }
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend : function(xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            });
+        }
+
+        fnWithdrawalUser = function(){
+            let form = $('#user-form');
+            if(!formValidCheck($('#user-password'), 'input', 'is-invalid', 'medium-pass')){
+                alert('현재 비밀번호를 입력해주세요.');
+                return;
+            }else{
+                var password = $('#user-password');
+                const cipher = CryptoJS.AES.encrypt(password.val(), CryptoJS.enc.Utf8.parse([[${session.encrypt}]]), {
+                    iv: CryptoJS.enc.Utf8.parse([[${session.iv}]]),
+                    padding: CryptoJS.pad.Pkcs7,
+                    mode: CryptoJS.mode.CBC
+                });
+                $('input[name=userPassword]').val(cipher.toString());
+            }
+
+            if(confirm('정말 탈퇴처리 하시겠습니까?')){
+                $.ajax({
+                    url : "/user/withdrawal",
+                    type : "POST",
+                    data :  $(form).serialize(),
+                    dataType : "json",
+                    success : function(data){
+                        alert(data.message);
+                        if( data.result === "success" ){
+                            location.replace('/user/logout');
+                        }
+                    },
+                    error : function(xhr, code, errorMsg) { },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(
+                            [[${_csrf.headerName}]], [[${_csrf.token}]]
+                        );
+                    },
+                    complete : function() { }
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+<header th:replace="~{inc/header :: header-nav}" />
+<section class="wrap">
+    <div class="contents">
+        <div class="subpage-category">
+            <form id="subpage-form">
+            <ul class="subpage-category-list">
+                <li class="subpage-category-item">마이페이지</li>
+                <li class="subpage-category-item">회원정보</li>
+                <li class="subpage-category-item">예약내역</li>
+                <li class="subpage-category-item">1:1문의</li>
+                <li class="subpage-category-item">견적내역</li>
+                <li class="subpage-category-item">리뷰/후기</li>
+            </ul>
+            </form>
+        </div>
+        <div class="subpage-contents">
+            <form id="user-form" method="post" th:action="@{/user/login-progress}">
+                <input type="hidden" name="userEmail" th:value="${session.login.userEmail}" />
+                <input type="hidden" name="userTokenId" th:value="${session.login.userTokenId}" />
+                <input type="hidden" name="userPassword" />
+                <div class="join-step-content active">
+                    <div class="join-data">
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-email">이메일</label>
+                            <input class="join-input short" id="user-email" type="text" required="required" readonly="readonly" th:value="${session.login.userEmail}" />
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-name">이름</label>
+                            <input class="join-input short" name="userName" id="user-name" type="text" required="required" placeholder="이름을 입력해주세요." th:value="${session.login.userName}" />
+                            <span class="validate-text"></span>
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-password">비밀번호</label>
+                            <input class="join-input" id="user-password" type="password" required="required" placeholder="비밀번호를 입력해주세요." maxlength="16" onkeyup="fnCheckPassword()" />
+                            <span class="info-text">8~16자 영문, 숫자, 특수문자 혼합 사용</span>
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-password-check">비밀번호 확인</label>
+                            <input class="join-input" id="user-password-check" type="password" placeholder="비밀번호를 다시 입력해주세요." maxlength="16" onkeyup="fnCheckPassword()" />
+                            <span id="validate-user-password" class="validate-text"></span>
+                            <span class="info-text">비밀번호 미입력시 이전 비밀번호 그대로 사용됩니다.</span>
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-addr-find">주소</label>
+                            <input type="text" class="join-input short" name="userAddrZipcode" id="user-addr-zipcode" placeholder="우편번호" readonly="readonly" th:value="${session.login.userAddrZipcode}" />
+                            <button type="button" class="join-button id-check" id="user-addr-find"  onclick="addressOpen()">주소검색</button>
+                            <input type="text" class="join-input" name="userAddrRoad" id="user-addr-road" placeholder="도로명주소" readonly="readonly" th:value="${session.login.userAddrRoad}" />
+                            <input type="text" class="join-input" name="userAddrJibun" id="user-addr-jibun" placeholder="지번주소" readonly="readonly" th:value="${session.login.userAddrJibun}" />
+                            <input type="text" class="join-input" name="userAddrExtra" id="user-addr-extra" placeholder="주소 참고사항" readonly="readonly" th:value="${session.login.userAddrExtra}" />
+                            <input type="text" class="join-input" name="userAddrDetail" placeholder="세부 주소" th:value="${session.login.userAddrDetail}" />
+                        </div>
+                        <div class="input-item" th:with="item = ${session.login.userMobile != null ? session.login.userMobile.split('-') : null}">
+                            <input type="hidden" name="userMobile" id="user-mobile">
+                            <label class="input-item-label">휴대전화</label>
+                            <input class="join-input w50" name="tel1" id="tel1" type="number" maxlength="4" th:value="${item != null} ? ${item[0]}" />
+                            <span class="inline-letter">-</span>
+                            <input class="join-input w80" name="tel2" id="tel2" type="number" maxlength="4" th:value="${item != null} ? ${item[1]}" />
+                            <span class="inline-letter">-</span>
+                            <input class="join-input w80" name="tel3" id="tel3" type="number" maxlength="4" th:value="${item != null} ? ${item[2]}" />
+                            <span id="validate-user-mobile" class="validate-text"></span>
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label">메일수신동의</label>
+                            <input type="checkbox" id="agree-message" name="mailingYn" value="Y" th:checked="${session.login.mailingYn == 'Y'} ? 'checked'" />
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label">회원탈퇴</label>
+                            <button type="button" onclick="fnWithdrawalUser()">탈퇴</button>
+                        </div>
+                        <div class="join-submit">
+                            <button class="join-button submit" type="button" onclick="fnUpdateUser();">수정</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+<footer th:replace="~{inc/footer :: footer}" />
+</body>
+</html>

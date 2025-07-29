@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#{여행사}</title>
+    <head th:replace="~{inc/common-header :: include}" />
+    <link rel="stylesheet" type="text/css" href="/css/user/user.css" th:href="@{/css/user/user.css}" />
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript" th:inline="javascript">
+        $(document).ready(function(){
+            $('#agree-all').change(function(){
+                let checkAll = $('#agree-all').prop('checked');
+                if(checkAll){
+                    $('.agree-item').find('input[type=checkbox]').prop('checked', 'checked');
+                }else{
+                    $('.agree-item').find('input[type=checkbox]').prop('checked', '');
+                }
+            });
+
+            $('.agree-item').find('input[type=checkbox]').change(function(){
+                for(let i=0; i < $('.agree-item').find('input[type=checkbox]').length; i++){
+                    if(!$('.agree-item').find('input[type=checkbox]').eq(i).prop('checked')){
+                        $('#agree-all').prop('checked', '');
+                        break;
+                    }
+                }
+            });
+
+            $('#user-email').change(function(){
+                $('#id-check').val('N');
+                $('#user-email').removeClass('is-invalid').removeClass('is-valid');
+            });
+
+        });
+
+        addressOpen = function (){
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    console.log(data);
+                    let roadAddr = data.roadAddress;
+                    $('#user-addr-jibun').val(data.jibunAddress);
+                    $('#user-addr-road').val(roadAddr);
+                    $('#user-addr-zipcode').val(data.zonecode);
+                    if(roadAddr !== ''){
+                        let extraRoadAddr = '';
+                        if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                            extraRoadAddr += data.bname;
+                        }
+                        if(data.buildingName !== '' && data.apartment === 'Y'){
+                            extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        if(extraRoadAddr !== ''){
+                            extraRoadAddr = ' (' + extraRoadAddr + ')';
+                        }
+                        $('#user-addr-extra').val(extraRoadAddr);
+                    }else{
+                        $('#user-addr-extra').val('');
+                    }
+                }
+            }).open();
+        }
+
+        fnCheckTermsAgree = function(){
+            $('#terms-check').val('N');
+            for(let i=0; i<$('.agree-item').length; i++){
+                if($('.agree-item').eq(i).find('input[type=checkbox]').attr('required') !== undefined){
+                    if(!$('.agree-item').eq(i).find('input[type=checkbox]').prop('checked')){
+                        alert('약관 필수항목 동의가 필요합니다.');
+                        return false;
+                    }
+                }
+            }
+            $('#terms-check').val('Y');
+            return true;
+        }
+
+        fnCheckPassword = function(){
+            if($('#user-password').val().trim() !== ''
+                && $('#user-password-check').val().trim() !== ''){
+                if($('#user-password').val() === $('#user-password-check').val()){
+                    if(formValidCheck($('#user-password'), 'input', 'is-invalid', 'medium-pass')){
+                        $('#validate-user-password').text('비밀번호가 일치합니다.').addClass('is-valid').removeClass('is-invalid');
+                    }else{
+                        $('#validate-user-password').text('영문,숫자,특수문자를 사용하여 8~16자로 작성해주세요.').addClass('is-invalid').removeClass('is-valid');
+                    }
+                } else{
+                    $('#validate-user-password').text('비밀번호가 일치하지 않습니다.').addClass('is-invalid').removeClass('is-valid');
+                }
+            }else{
+                $('#validate-user-password').text('영문,숫자,특수문자를 사용하여 8~16자로 작성해주세요.').addClass('is-invalid').removeClass('is-valid');
+            }
+        }
+
+        fnCheckUserId = function(){
+            if(!formValidCheck($('#user-email'), 'input', 'is-invalid', 'email')){
+                alert('올바른 이메일을 입력해주세요.');
+                return;
+            }
+
+            $.ajax({
+                url: '/user/check/'+($('#user-email').val()),
+                type : "GET",
+                data : {
+                    [[${_csrf.parameterName}]]: [[${_csrf.token}]],
+                },
+                success : function(data) {
+                    if (typeof data.result != "undefined" && data.result == "error") {
+                        alert(data.error);
+                        return;
+                    } else {
+                        if(data.duplicate){
+                            alert('이미 가입된 이메일입니다.');
+                            $('#id-check').val('N');
+                            $('#user-email').addClass('is-invalid');
+                        }else{
+                            alert('사용가능한 이메일입니다.');
+                            $('#id-check').val('Y');
+                            $('#user-email').addClass('is-valid');
+                        }
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend : function() { },
+                complete : function() { }
+            });
+        }
+
+        fnRegisterUser = function(){
+            $('#user-mobile').val($('#tel1').val()+'-'+$('#tel2').val()+'-'+$('#tel3').val());
+
+            let form = $('#user-form');
+            if(!($(form).find('#id-check').val() === 'Y')){
+                alert('아이디 중복확인을 해주세요.');
+                return false;
+            }
+
+            formValidCheck($('#user-name'), 'input', 'is-invalid', null);
+            formValidCheck($('#user-mobile'), 'input', 'is-invalid', 'mobile');
+            fnCheckPassword();
+            formValidCheck($('#user-addr'), 'input', 'is-invalid', 'text');
+
+            if($(form).find('.is-invalid').length > 0){
+                alert('사용자정보를 정확히 입력해주세요.');
+                return false;
+            }
+
+            if(!fnCheckTermsAgree()){ return; }
+
+            let password = $('#user-password').val();
+            const cipher = CryptoJS.AES.encrypt(password, CryptoJS.enc.Utf8.parse([[${session.encrypt}]]), {
+                iv: CryptoJS.enc.Utf8.parse([[${session.iv}]]),
+                padding: CryptoJS.pad.Pkcs7,
+                mode: CryptoJS.mode.CBC
+            });
+            $('input[name=userPassword]').val(cipher.toString());
+
+            $.ajax({
+                url: '/user/register',
+                type : "POST",
+                data : $(form).serialize(),
+                success : function(data) {
+                    if (typeof data.result != "undefined" && data.result == "error") {
+                        alert(data.message);
+                        return;
+                    } else {
+                        if(data.result == "success"){
+                            alert('가입 완료');
+                            setTimeout(() => location.replace('/user/login'), 1000);
+                        }else{
+                            alert(data.message);
+                            return false;
+                        }
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            });
+        }
+    </script>
+</head>
+<body>
+<header th:replace="~{inc/header :: header-nav}" />
+<section class="wrap">
+    <div class="contents">
+        <div class="join-area">
+            <div class="login-title">
+                <span class="title-text">회원가입</span>
+            </div>
+            <form id="user-form" method="post" th:action="@{/user/login-progress}">
+                <input type="hidden" id="id-check" value="N" />
+                <input type="hidden" id="terms-check" value="N" />
+                <input type="hidden" name="userPassword" />
+                <!-- 회원정보 입력 -->
+                <div class="join-step-content">
+                    <div class="join-data">
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-email">이메일</label>
+                            <input class="join-input short" name="userEmail" id="user-email" type="text" required="required" placeholder="이메일 주소를 입력해 주세요." />
+                            <button type="button" class="join-button id-check" onclick="fnCheckUserId()">중복확인</button>
+                            <span class="info-text">이메일주소는 회원 아이디로 사용됩니다.</span>
+                            <span id="validate-user-email" class="validate-text"></span>
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-name">이름</label>
+                            <input class="join-input short" name="userName" id="user-name" type="text" required="required" placeholder="이름을 입력해주세요." />
+                            <span class="validate-text"></span>
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-password">비밀번호</label>
+                            <input class="join-input" id="user-password" type="password" required="required" placeholder="비밀번호를 입력해주세요." maxlength="16" onkeyup="fnCheckPassword()" />
+                            <span class="info-text">8~16자 영문, 숫자, 특수문자 혼합 사용</span>
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-password-check">비밀번호 확인</label>
+                            <input class="join-input" id="user-password-check" type="password" placeholder="비밀번호를 다시 입력해주세요." maxlength="16" onkeyup="fnCheckPassword()" />
+                            <span id="validate-user-password" class="validate-text"></span>
+                        </div>
+                        <div class="input-item">
+                            <label class="input-item-label" for="user-addr-find">주소</label>
+                            <input type="text" class="join-input short" name="userAddrZipcode" id="user-addr-zipcode" placeholder="우편번호" readonly="readonly" />
+                            <button type="button" class="join-button id-check" id="user-addr-find"  onclick="addressOpen()">주소검색</button>
+                            <input type="text" class="join-input" name="userAddrRoad" id="user-addr-road" placeholder="도로명주소" readonly="readonly" />
+                            <input type="text" class="join-input" name="userAddrJibun" id="user-addr-jibun" placeholder="지번주소" readonly="readonly" />
+                            <input type="text" class="join-input" name="userAddrExtra" id="user-addr-extra" placeholder="주소 참고사항" readonly="readonly" />
+                            <input type="text" class="join-input" name="userAddrDetail" placeholder="세부 주소" />
+                        </div>
+                        <div class="input-item">
+                            <input type="hidden" name="userMobile" id="user-mobile">
+                            <label class="input-item-label">휴대전화</label>
+                            <input class="join-input w50" name="tel1" id="tel1" type="number" maxlength="4" />
+                            <span class="inline-letter">-</span>
+                            <input class="join-input w80" name="tel2" id="tel2" type="number" maxlength="4" />
+                            <span class="inline-letter">-</span>
+                            <input class="join-input w80" name="tel3" id="tel3" type="number" maxlength="4" />
+                            <span id="validate-user-mobile" class="validate-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 이용약관 동의 -->
+                <div class="join-step-content">
+                    <div class="join-agree">
+                        <div class="agree-item all">
+                            <input type="checkbox" id="agree-all" />
+                            <label class="label" for="agree-all">모든 약관에 동의합니다.</label>
+                        </div>
+                        <div class="agree-item">
+                            <input type="checkbox" id="agree-usage" required="required" />
+                            <label class="label" for="agree-usage">[필수] 이용약관</label>
+                            <div class="popup" onclick="fnOpenTerms('usage')">내용보기</div>
+                        </div>
+                        <div class="agree-item">
+                            <input type="checkbox" id="agree-policy" required="required" />
+                            <label class="label" for="agree-policy">[필수] 개인정보취급방침</label>
+                            <div class="popup" onclick="fnOpenTerms('policy')">내용보기</div>
+                        </div>
+                        <div class="agree-item">
+                            <input type="checkbox" id="agree-privacy" required="required" />
+                            <label class="label" for="agree-privacy">[필수] 개인정보수집 및 이용동의</label>
+                            <div class="popup" onclick="fnOpenTerms('privacy')">내용보기</div>
+                        </div>
+                        <div class="agree-item">
+                            <input type="checkbox" id="agree-message" name="mailingYn" value="Y" />
+                            <label class="label" for="agree-message">[선택] 마케팅 정보 수신 동의</label>
+                            <div class="popup" onclick="fnOpenTerms('marketing')">내용보기</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="join-submit">
+                    <button class="join-button submit" type="button" onclick="fnRegisterUser();">가입하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+<footer th:replace="~{inc/footer :: footer}" />
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.common.LoggerMapper">
+
+    <insert id="insertLogMailSend" parameterType="LogMailSend" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO log_mail_send
+           SET from_email = #{fromEmail},
+               to_email = #{toEmail},
+               mail_properties = #{mailProperties},
+               mail_format_id = #{mailFormatId},
+               mail_subject = #{mailSubject},
+               mail_content = #{mailContent},
+               mail_content_type = #{mailContentType},
+               send_request_time = now(),
+               send_request_userid = #{sendRequestUserid}
+    </insert>
+
+    <update id="updateMailingLogResult" parameterType="LogMailSend">
+        UPDATE log_mail_send
+           SET send_result = #{sendResult},
+               send_result_time = now(),
+               send_result_message = #{sendResultMessage}
+         WHERE id = #{id}
+    </update>
+</mapper>

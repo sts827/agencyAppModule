@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <div class="content-wrapper">
+	    <div class="content-header">
+			<h1 class="m-0">게시글 관리</h1>
+	    </div>
+	    <section class="content">
+	      <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0 search-body">
+							<input type="hidden" id="boardId" name="boardId" th:value="${board != null} ? ${board.id}" />
+							<div class="row">
+								<div class="form-inline col-md-3">
+	                             	<label class="col-3">제목</label>
+	                             	<input type="text" id="titleLike" class="form-control col-8" placeholder="제목 입력" maxlength="30">
+								</div>
+								<div class="form-inline col-md-4">
+	                             	<label class="col-3">내용</label>
+	                             	<input type="text" id="contLike" class="form-control col-8" placeholder="내용 입력" maxlength="30">
+								</div>
+								<div class="col-md-2 clearfix">
+									<div class="btn-group float-right">
+										<button type="button" class="btn btn-primary" id="searchBtn"><i class="fa fa-search"></i> 검색</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			  <div class="row mb-10">
+				  <div class="col-md-12">
+					  <div class="float-left">
+						  <th:block th:each="item : ${listBoard}">
+							  <button class="tab-btn" th:text="${item.title}" th:classappend="${board != null and item.getId() == board.getId()} ? 'active'"  th:data-id="${item.id}" th:onclick="fnSetBoardId([[${item.id}]], [[${item.typeCode}]])">게시판</button>
+						  </th:block>
+					  </div>
+				  </div>
+			  </div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0">
+							<table id="datatable" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+			  <div class="row form-group">
+				  <div class="col-md-12">
+					  <div class="float-right">
+						  <button type="button" class="btn btn-primary pull-right" onclick="goInsert()">등록하기</button>
+					  </div>
+				  </div>
+			  </div>
+	      </div>
+	    </section>
+	  </div>
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <aside class="control-sidebar control-sidebar-dark"></aside>
+	</div>
+
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<script src="/js/manage/adminlte.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+	let board = [[${board}]];
+
+	let datatable = null;
+	let numberRow ={ "name" : "no", "title" : "번호", "data" : "rownum", "className" : "dt-head-center dt-body-center data-number"};
+	let titleRow = { "name" : "title", "title" : "제목", "data" : "title", "className" : "dt-head-center dt-body-center data-title"};
+	let createRow = { "name" : "createId", "title" : "작성자", "data" : "createId", "className" : "dt-head-center dt-body-center data-writer" };
+	let stateRow = { "name" : "applyCode", "title" : "처리구분", 	"data" : "applyCode", "className" : "dt-head-center dt-body-center data-state"};
+	let useYnRow = { "name" : "useYn", "title" : "사용 여부","data" :
+						function (row, type, set) {
+							var html = "";
+							html +=  `<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%" ${row["useYn"] === 'Y' ? 'checked' :''} data-id='${row["id"]}'>`;
+							return html;
+						}, "className" : "dt-head-center dt-body-center data-yn"};
+	let createDateRow = { "name" : "createDate", "title" : "작성일시", "data" : "createDate", "className" : "dt-head-center dt-body-center data-datetime"};
+	let lastUpdateRow = { "name" : "lastUpdateDate", "title" : "최종수정일시", "data" : "lastUpdateDate", "className" : "dt-head-center dt-body-center data-datetime"};
+	let functionRow = { "name" : "func_btns", "title":"기능", "data" :
+						function (row, type, set) {
+							var html = "";
+							html += `<div class="form-inline justify-content-center">`;
+							html += "<button type='button' class='btn btn-default' data-toggle='tooltip' title='세부' onclick='goEdit(\""+row["id"]+"\")'>세부</button>&nbsp;";
+							if ( row["deleteYn"] === 'Y' ) {
+								html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='복구'  onclick='goRestore(\""+row["id"]+"\")' style='color:#fff;background-color:#007bff;border-color:#007bff;box-shadow:none'>복구</button>";
+							} else  {
+								html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제'  onclick='goDelete(\""+row["id"]+"\")'>삭제</button>";
+							}
+							html += `</div>`;
+							return html;
+						}, "className": "dt-head-center dt-body-center data-control", "orderable" : false};
+	let columns = [];
+	columns['defualt'] = [numberRow, titleRow, createRow, useYnRow, lastUpdateRow, functionRow];
+	columns['board']  = [numberRow, titleRow, createRow, useYnRow, createDateRow, lastUpdateRow, functionRow];
+	columns['qna']    = [titleRow, createRow, stateRow, useYnRow, createDateRow, lastUpdateRow, functionRow];
+	columns['faq']	  = [numberRow, titleRow, createRow, useYnRow, lastUpdateRow, functionRow];
+	//columns['album']  = [numberRow, titleRow, createRow, useYnRow, lastUpdateRow, functionRow];
+	//columns['review'] = [numberRow, titleRow, createRow, useYnRow, lastUpdateRow, functionRow];
+
+	$(document).ready(function() {
+		searchParams = new URLSearchParams(window.location.search);
+		if(searchParams.has('params')){
+			$('.tab-btn').removeClass('active');
+			$(`.tab-btn[data-id='${$('#boardId').val()}']`).addClass('active');
+		}
+		initDatatable(board.typeCode);
+	});
+
+	initDatatable = function(type){
+		if(datatable != null){
+			datatable.destroy();
+			$("#datatable").empty();
+			datatable =  null;
+		}
+
+		var _baseColums = columns['defualt'];
+
+		if( columns.hasOwnProperty(type) ){
+			_baseColums = columns[type];
+		}
+
+		datatable = $("#datatable").DataTable({
+			"searching" : false
+			,"sDom": '<"top"i>rt<"bottom"lp><"clear">'
+			,"paging": true
+			,"bPaginate": true
+			,"responsive": true
+			,"language": lang_kor
+			,"ordering": false
+			,"bLengthChange" : false
+			,"bInfo":false
+			,"ajax" : {
+				"url" : "/manage/board/contents-list"
+				,"method" : "post"
+				, "beforeSend": function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				}
+				,"data" : function(d) {
+					if ($('#boardId').val() != "")   {d.boardId   = $('#boardId').val();	}
+	 				if ($('#titleLike').val() != "") {d.titleLike = $('#titleLike').val();	}
+	 				if ($('#contLike').val() != "")  {d.contLike  = $('#contLike').val();	}
+				}
+			}
+			,"processing": true
+			,"serverSide": true
+			,"order" : [ [0, 'desc'] ]
+			,"createdRow": function(row, data) {
+				  if ( data.deleteYn === "Y" ) {
+					  $(row).css('background-color', '#DC3545');
+				  }
+				  else if ( data.useYn === "N" ) {
+					  $(row).css('background-color', '#D9D9D9');
+				  }
+			  }
+			,"initComplete": function(settings, json) {
+  			},"drawCallback": function( settings ) {
+				fnInitBootstrapToggle();
+		    }
+			,"columns": _baseColums
+		});
+	}
+
+	$("#searchBtn").click(function() {
+		datatable.ajax.reload();
+	});
+
+	$("#resetBtn").click(function() {
+		searchReset();
+		datatable.ajax.reload();
+	});
+
+	goInsert = function() {
+		location.href = `/manage/board/contents/form?mode=I&bid=${$('#boardId').val()}&params=${getParams()}`;
+	}
+
+	goEdit = function(id) {
+		location.href = `/manage/board/contents/form?mode=U&id=${id}&bid=${$('#boardId').val()}&params=${getParams()}`;
+	}
+
+	goRestore = function(id) {
+		  $.ajax({
+			  url : "/manage/board/contents-restore",
+			  type : "POST",
+			  data : {"id" : id},
+			  dataType : "json",
+			  beforeSend: function (xhr) {
+				  xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+			  },
+			  success : function(data){
+				  if( data.result === "success" ){
+					  alert("복구되었습니다.");
+					  datatable.ajax.reload();
+				  }else{
+					  alert(data.message)
+				  }
+			  }
+		  })
+	  }
+
+	goDelete = function(id){
+		if(confirm("삭제하시겠습니까?")){
+			$.ajax({
+				url : '/manage/board/contents-delete',
+				type : "POST",
+				data : {"id" : id},
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				},
+				success : function(res){
+					if("success" == res.result){
+						alert("삭제되었습니다.");
+						datatable.ajax.reload();
+					}else{
+						alert(res.message)
+					}
+				}
+			})
+		}
+	}
+	fnUseYnUpdate = function( id, Yn){
+			var formData = new FormData();
+			formData.append("mode", "U");
+			formData.append("id", id);
+			formData.append("useYn", Yn);
+			$.ajax({
+				url : '/manage/board/contents-save',
+				type : "POST",
+				data : formData,
+				enctype: 'multipart/form-data',
+				contentType : false,
+				processData : false,
+				dataType : "json",
+				beforeSend: function (xhr) {
+						xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+				},
+				success : function(res) {
+					if (res.result === "success" ) {
+						//alert(res.message);
+	                    //preList();
+					}else {
+						//alert(res.message);
+	                    return;
+					}
+				}
+			});
+	}
+	fnInitBootstrapToggle = function(){
+		setTimeout(function(){
+			$('.content input[data-toggle="toggle"]')
+				.bootstrapToggle()
+				.change(function(e){
+					selector = '';
+					id='';
+					yn = 'Y';
+					type = this.name;
+
+					$.each(this.attributes, function() {
+			         	if(this.name =='data-id'){
+							id = this.value;
+							selector = `input[name=${type}][data-id=${id}]`;
+							if(!$(selector).prop('checked')){yn = 'N';}
+							switch(type){
+								case 'useYn': fnUseYnUpdate(id, yn); break;
+								case 'deleteYn':break;
+							}
+						}
+			        });
+
+			        if(type = 'useYn'){
+				        if(yn==='N'){
+							$(this).closest('tr').css('background-color','#E6E6E6');
+						} else {
+							$(this).closest('tr').css('background-color','unset');
+						}
+					}
+				});
+		},50);
+	}
+
+	fnSetBoardId =function(id, type){
+		$('.tab-btn').removeClass('active');
+
+		if(id !== undefined){
+			$('#boardId').val(id);
+			$(`.tab-btn[data-id='${id}']`).addClass('active');
+			initDatatable(type);
+		}else{
+			$('#boardId').val('');
+			$(`.tab-btn[data-id='all']`).addClass('active');
+			initDatatable(board);
+		}
+
+		//$("#searchBtn").trigger('click');
+	}
+	</script>
+	</body>
+</html>

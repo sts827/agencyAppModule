@@ -1,0 +1,211 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.CodeManageMapper">
+
+<!--################################### CodeItem ###################################-->
+	 <select id="selectCountCodeItem" parameterType="HashMap" resultType="Integer">
+		with recursive tree as (
+			select 1 as lev, concat(sort,'|',code) idpath, CAST(concat(0,'-') as varchar(100) ) pid,
+			       code, upper_code, name, code_desc, code_acronym, code_depth, sort, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+			  from code_item a
+			 where upper_code = ''
+			union all
+			select 1+lev as lev, concat(c.idpath,'->',p.sort,'|',p.code) as idpath, concat(c.code, '-') as pid,
+			       p.code,	p.upper_code,	p.name,	p.code_desc,p.code_acronym,	p.code_depth,	p.sort,	p.use_yn,	p.create_id,	p.create_date,	p.last_update_id,	p.last_update_date,	p.delete_yn,	p.delete_id,	p.delete_date
+			  from code_item p
+			  inner join tree c on p.upper_code = c.code)
+		select count(*)
+		  from tree
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	and code=#{code}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	and upper_code=#{upperCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	and name=#{name}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	and code_desc=#{codeDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	and code_depth=#{codeDepth}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	and code_acronym=#{codeAcronym}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	and sort=#{sort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+         </where>
+    </select>
+
+	<select id="selectListCodeItem" parameterType="HashMap" resultType="CodeItem">
+		with recursive tree as (
+			select 1 as lev, concat(sort,'|',code) idpath, CAST(concat(0,'-') as varchar(100) ) pid,
+			       code, upper_code, name, code_desc ,code_acronym, code_depth, sort, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+			  from code_item a
+			 where upper_code = ''
+			union all
+			select 1+lev as lev, concat(c.idpath,'->',p.sort,'|',p.code) as idpath, concat(c.code, '-') as pid,
+			       p.code,	p.upper_code,	p.name,	p.code_desc ,p.code_acronym,	p.code_depth,	p.sort,	p.use_yn,	p.create_id,	p.create_date,	p.last_update_id,	p.last_update_date,	p.delete_yn,	p.delete_id,	p.delete_date
+			  from code_item p
+			  inner join tree c on p.upper_code = c.code)
+		SELECT *
+		  FROM(
+			select @rownum:=@rownum+1 AS rownum, lev, idpath, pid,
+				   (select count(code) from code_item c where c.upper_code = tree.code) ccnt,
+			       code, COALESCE(upper_code,'') upper_code, name, code_desc , COALESCE(code_acronym,'') code_acronym, code_depth, sort, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+			  from tree
+	          join (SELECT @rownum:= 0) rnum
+	         <where>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	and code=#{code}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	and upper_code=#{upperCode}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	and name=#{name}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	and code_desc=#{codeDesc}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	and code_depth=#{codeDepth}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@FisNotEmpty(codeAcronym)" >	and code_acronym=#{codeAcronym}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	and sort=#{sort}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+	         </where>
+
+	        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+		    	ORDER BY
+		        <choose>
+					<when test="sort=='code'" >	code	</when>
+					<when test="sort=='upperCode'" >	upper_code	</when>
+					<when test="sort=='name'" >	name	</when>
+					<when test="sort=='codeDesc'" >	code_desc	</when>
+					<when test="sort=='codeDepth'" >	code_depth	</when>
+					<when test="sort=='codeAcronym'" >	code_acronym	</when>
+					<when test="sort=='sort'" >	sort	</when>
+					<when test="sort=='useYn'" >	use_yn	</when>
+					<when test="sort=='createId'" >	create_id	</when>
+					<when test="sort=='createDate'" >	create_date	</when>
+					<when test="sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="sort=='deleteYn'" >	delete_yn	</when>
+					<when test="sort=='deleteId'" >	delete_id	</when>
+					<when test="sort=='deleteDate'" >	delete_date	</when>
+
+		            <otherwise>rownum</otherwise>
+		        </choose>
+		        <choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="!@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) or !@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+				ORDER BY idpath
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+		    	ORDER BY  <foreach item="item" index="index" collection="listSort" separator=",">
+		    	<choose>
+					<when test="item.sort=='code'" >	code	</when>
+					<when test="item.sort=='upperCode'" >	upper_code	</when>
+					<when test="item.sort=='name'" >	name	</when>
+					<when test="item.sort=='codeDesc'" >	code_desc	</when>
+					<when test="item.sort=='codeDepth'" >	code_depth	</when>
+					<when test="item.sort=='codeAcronym'" >	code_acronym	</when>
+					<when test="item.sort=='sort'" >	sort	</when>
+					<when test="item.sort=='useYn'" >	use_yn	</when>
+					<when test="item.sort=='createId'" >	create_id	</when>
+					<when test="item.sort=='createDate'" >	create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="item.sort=='deleteYn'" >	delete_yn	</when>
+					<when test="item.sort=='deleteId'" >	delete_id	</when>
+					<when test="item.sort=='deleteDate'" >	delete_date	</when>
+		        </choose>
+		    	<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+			) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<select id="selectOneCodeItem" parameterType="HashMap" resultType="CodeItem">
+        SELECT code, upper_code, name, code_desc, code_acronym, code_depth, sort, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+          FROM code_item a
+          join (SELECT @rownum:= 0) rnum
+         <where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	and code=#{code}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	and upper_code=#{upperCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	and name=#{name}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	and code_desc=#{codeDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	and code_depth=#{codeDepth}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	and code_acronym=#{codeAcronym}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	and sort=#{sort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+         </where>
+	</select>
+
+	<insert id="insertCodeItem" parameterType="CodeItem" useGeneratedKeys="true" keyProperty="code">
+        INSERT INTO code_item
+               (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	code,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	upper_code,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	name,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	code_desc,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	code_depth,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	code_acronym,	</if>
+				<if test="!@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	code_acronym,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	sort,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id,	</if>
+                create_date)
+        VALUES (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	#{code},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	#{upperCode},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	#{name},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	#{codeDesc},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	#{codeDepth},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	#{codeAcronym},	</if>
+				<if test="!@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	null,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	#{sort},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	#{useYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	#{createId},	</if>
+                now())
+    </insert>
+
+    <update id="updateCodeItem" parameterType="CodeItem">
+        UPDATE code_item
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	code=#{code},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	upper_code=#{upperCode},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	name=#{name},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	code_desc=#{codeDesc},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	code_depth=#{codeDepth},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	code_acronym=#{codeAcronym},	</if>
+			<choose>
+				<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	code_acronym=#{codeAcronym},	</when>
+				<otherwise>code_acronym=null,</otherwise>
+			</choose>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	sort=#{sort},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	last_update_date=#{lastUpdateDate},	</if>
+			last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)">and code = #{code}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	and upper_code=#{upperCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	and code_depth=#{codeDepth}	</if>
+		</where>
+    </update>
+
+    <delete id="deleteCodeItem" parameterType="CodeItem">
+        delete from code_item
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	and code=#{code}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	and upper_code=#{upperCode}	</if>
+		</where>
+    </delete>
+</mapper>

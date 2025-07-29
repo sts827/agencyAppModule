@@ -1,0 +1,210 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <div th:fragment="modal-product">
+		<div class="modal fade func-product-modal" tabindex="1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 id="func-product-modal-title" class="schedule-title">상품선택</h4>
+						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="form-inline col-12">
+							<div class="form-inline col-10 search-body" id="customerSearchBar">
+								<div class="col-6">
+<!--/*
+									<label class="control-label col-12">메뉴선택</label>
+									<div class="col-12">
+										<input type="text" id="menuLike" name="menuLike" class="form-control col-md-12 col-xs-12" placeholder="상품명을 입력하여 주십시오.">
+									</div>
+*/-->
+								</div>
+								<div class="col-6">
+									<label class="control-label col-12">상품명</label>
+									<div class="col-12">
+										<input type="text" id="titleLike" name="titleLike" class="form-control col-md-12 col-xs-12" placeholder="상품명을 입력하여 주십시오.">
+									</div>
+								</div>
+							</div>
+							<button type="button" class="btn btn-black" id="searchCustometBtn" onclick="fnPopupProductSearch()"><i class="fa fa-search"></i> 검색</button>
+						</div>
+						<table id="product-list" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" onclick="fnSelectProduct()">확인</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" th:inline="javascript" >
+			var datatableProduct;
+			let fnSelectedProduct;
+
+			$(document).ready(function(){
+				$('.search-body').on('keydown', function(e){
+					if(e.keyCode==13){
+						fnPopupProductSearch();
+					}
+				})
+			});
+
+			fnPopupProductOpen = function(_fnSelectedProduct, exceptList = undefined, limitUrl = undefined){
+				if( _fnSelectedProduct !== undefined ){
+					fnSelectedProduct = _fnSelectedProduct;
+				} else {
+					console.info('고객선택시 콜백(callback)처리용 함수 설정이 안되어 있습니다.');
+				}
+				if( exceptList !== undefined ){
+					_g_exceptList = _exceptList;
+				}
+				if( limitUrl !== undefined ){
+					_g_limitUrl = limitUrl;
+				}
+
+				fnInitDatatableProductList( exceptList );
+				$('.func-product-modal').modal("show");
+			}
+
+			fnInitDatatableProductList = function( ){
+				if( datatableProduct !== undefined){
+					console.log( _exceptList );
+
+					datatableProduct.ajax.reload();
+					return;
+				}
+
+				datatableProduct = $("#product-list").DataTable({
+					"searching" : false
+					,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+					,"paging": true
+					,"bPaginate": true
+					,"responsive": true
+					,"language": lang_kor
+					,"ordering": false
+					,"bLengthChange" : false
+					,"bInfo":false
+					,"ajax" : {
+						"url" : "/manage/product/product-list"
+						,"method" : "get"
+						, "beforeSend": function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						}
+						,"data" : function(d) {
+							if ($('#titleLike').val() != "") {d.titleLike = $('#titleLike').val();	}
+							d.productStatus='S';
+							d.productUseYn='Y';
+							d.regacyYn='N';
+							d.deleteYn='N';
+
+							d.arrExceptList = _g_exceptList;
+							d.limitMenuUrl  = _g_limitUrl;
+						}
+					}
+					,"processing": true
+					,"serverSide": true
+					,"order" : [ [0, 'desc'] ]
+					,"createdRow": function(row, data) {}
+					,"initComplete": function(settings, json) {
+						/*
+						var api = new $.fn.dataTable.Api( settings );
+    					var state = api.state.loaded();
+    					*/
+
+    					//console.log( 'DataTables has finished its initialisation.' );
+    					//console.log( datatableProduct );
+
+						if(datatableProduct !== undefined){
+							setTimeout(function(){
+								datatableProduct.columns.adjust().draw();
+							},200);
+						}
+					}
+					,"columns": [
+						{ "name" : "productSerial", "title" : "상품번호", 	"data" : "productSerial", "className" : "dt-head-center dt-body-center","width":"110px"},
+						{ "name" : "productTourId", "title" : "고유번호", 	"data" : "productTourId", "className" : "dt-head-center dt-body-center","width":"60px", "visible":false},
+						{ "name" : "productThumbnail", "title":"썸네일",
+						  "data" :function (row, type, set) {
+							  let html = `<img class="default" src="${row['productThumbnail']}" alt="${row['productTitle']}">`;
+							  return html;
+							  },
+						  "className": "dt-head-center dt-body-center", "orderable" : false},
+						{ "name" : "productTitle", "title" : "상품명", 	"data" : "productTitle", "className" : "dt-head-center dt-body-center","width":"200px"},
+						{ "name" : "func_btns", "title":"기능",
+							"data" :
+									function (row, type, set) {
+										let html = "";
+										html += `<div class="form-inline justify-content-center">`;
+										html += `<button type='button' class='btn btn-default btn-select' data-toggle='tooltip' title='선택'>선택</button>&nbsp;`;
+										html += `</div>`;
+										return html;
+									},
+							"className": "dt-head-center dt-body-center", "orderable" : false,"width":"60px"},
+					]
+				});
+
+				datatableProduct
+					.on('click', 'tbody tr', function (e) {
+					    let tr = e.target;
+					    let row = datatableProduct.row(tr);
+					    fnForwardSelectedProduct(row.data());
+					}).on('click', 'td .btn-select', function (e) {
+						e.stopPropagation();
+					    let tr = e.target.closest('tr');
+					    let row = datatableProduct.row(tr);
+					    fnForwardSelectedProduct(row.data());
+					});
+			}
+
+			fnForwardSelectedProduct = function(data, isAlert = true){
+				if(typeof fnSelectedProduct === 'undefined'){
+					console.info('상품선택시 콜백(callback)처리용 함수 설정이 안되어 있습니다.\r\nfnPopupProductOpen 펑션 호출시 콜백(callback) 함수 설정이 필요합니다.');
+				} else {
+					var isForward;
+					if(isAlert === true){
+						isForward = confirm("해당상품을 선택하십니까?");
+					} else {
+						isForward = true;
+					}
+					if( isForward ){
+						fnSelectedProduct(data);
+
+						setTimeout(function(){
+							$('.func-product-modal').modal("hide");
+							//fnCustomerSearchBarReset();
+						},500);
+				    }
+				}
+			}
+
+			fnSelectProduct = function(Serial, Thumbnail, title){
+				if(confirm("해당상품을 선택하십니까?")){
+					var html ='';
+					html +=`<div class='form-inline'>`;
+					html +=`<input type="hidden" id="productSerial" name="productSerial" value="${Serial}">`;
+					html +=`<div class="col-5"><img calss="thumbnail" src="${Thumbnail}" alt="${title}"></div>`;
+					html +=`<div class="col-5">${title}</div>`;
+					html +=`<div class="col-2"><button type="button" class="btn btn-danger" id="deleteProductBtn" onclick="fnPopupProductRemove()"><i class="fa fa-search"></i>취소</button></div>`;
+					html +=`</div>`;
+					$('#productInfo').html(html);
+
+					$('.func-product-modal').modal("hide");
+				}
+			}
+			fnPopupProductSearch = function(){
+				datatableProduct.ajax.reload();
+			}
+
+			fnPopupProductRemove = function(){
+				if(confirm('선택된 상품을 제거 하시겠습니까?')) $('#productInfo').html('상품정보를 선택하여주십시오.');
+			}
+		</script>
+		<style>
+			img.default {width: 100%;}
+		</style>
+	</div>
+</body>
+</html>

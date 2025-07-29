@@ -1,0 +1,215 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.MenuManageMapper">
+	<!--################################### manageMenu ###################################-->
+	 <select id="selectCountMenuUser" parameterType="HashMap" resultType="Integer">
+        SELECT count(menu_id) FROM menu_user
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	and upper_menu_id=#{upperMenuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	and menu_name=#{menuName}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	and menu_url=#{menuUrl}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	and menu_type=#{menuType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSubType)" >	and menu_sub_type=#{menuSubType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	and menu_sort=#{menuSort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuAcronym)" >	and menu_acronym=#{menuAcronym}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	and menu_desc=#{menuDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(navbarYn)" >	and navbar_yn=#{navbarYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+         </where>
+    </select>
+
+	<select id="selectOneMenuUser" parameterType="HashMap" resultType="MenuUser">
+        SELECT menu_id, upper_menu_id, menu_name, menu_url, menu_type, menu_sub_type, menu_sort, menu_acronym,menu_desc, navbar_yn, use_yn,
+               main_expose_yn, main_expose_type, delete_yn, create_id, create_date, last_update_id, last_update_date
+          FROM menu_user a
+          join (SELECT @rownum:= 0) rnum
+         <where>
+         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	and upper_menu_id=#{upperMenuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	and menu_name=#{menuName}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	and menu_url=#{menuUrl}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	and menu_type=#{menuType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSubType)" >	and menu_sub_type=#{menuSubType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	and menu_sort=#{menuSort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuAcronym)" >	and menu_acronym=#{menuAcronym}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	and menu_desc=#{menuDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(navbarYn)" >	and navbar_yn=#{navbarYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeYn)" >	and main_expose_yn=#{mainExposeYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeType)" >	and main_expose_type=#{mainExposeType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			and delete_yn='N'
+         </where>
+	</select>
+
+	<select id="selectListMenuUser" parameterType="HashMap" resultType="MenuUser">
+		SELECT *
+		  FROM(
+	        SELECT @rownum:=@rownum+1 AS rownum,
+	        	   menu_id, upper_menu_id, menu_name, menu_url, menu_type, menu_sub_type, menu_sort, menu_acronym,menu_desc, navbar_yn, use_yn, delete_yn,
+	        	   main_expose_yn, main_expose_type, create_id, create_date, last_update_id, last_update_date,
+	        	   (select name from code_item where code = a.menu_type) menu_type_name,
+				   (select name from code_item where code = a.menu_sub_type) menu_sub_type_name,
+	               (select count(*) from menu_user b where b.upper_menu_id = a.menu_id) subMenuCount
+	          FROM menu_user a
+	          join (SELECT @rownum:= 0) rnum
+	         <where>
+	         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	and upper_menu_id=#{upperMenuId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	and menu_name=#{menuName}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	and menu_url=#{menuUrl}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	and menu_type=#{menuType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSubType)" >	and menu_sub_type=#{menuSubType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	and menu_sort=#{menuSort}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuAcronym)" >	and menu_acronym=#{menuAcronym}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	and menu_desc=#{menuDesc}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(navbarYn)" >	and navbar_yn=#{navbarYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeYn)" >	and main_expose_yn=#{mainExposeYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeType)" >	and main_expose_type=#{mainExposeType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+				and delete_yn='N'
+	         </where>
+
+		 	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+		    	ORDER BY
+		        <choose>
+		            <when test="sort=='menuId'" >	menu_id	</when>
+					<when test="sort=='upperMenuId'" >	upper_menu_id	</when>
+					<when test="sort=='menuName'" >	menu_name	</when>
+					<when test="sort=='menuUrl'" >	menu_url	</when>
+					<when test="sort=='menuType'" >	menu_type	</when>
+					<when test="sort=='menuSubType'" >	menu_sub_url	</when>
+					<when test="sort=='menuIcon'" >	menu_icon	</when>
+					<when test="sort=='menuSort'" >	menu_sort	</when>
+					<when test="sort=='menuAcronym'" >	menuAcronym	</when>
+					<when test="sort=='menuDesc'" >	menu_desc	</when>
+					<when test="sort=='createId'" >	create_id	</when>
+					<when test="sort=='createDate'" >	create_date	</when>
+					<when test="sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="sort=='deleteYn'" >	delete_yn	</when>
+					<when test="sort=='navbarYn'" >	navbar_yn	</when>
+					<when test="sort=='useYn'" >	use_yn	</when>
+		            <otherwise>rownum</otherwise>
+		        </choose>
+		        <choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+		    	ORDER BY <foreach item="item" index="index" collection="listSort" separator=",">
+		    	<choose>
+		            <when test="item.sort=='menuId'" >	menu_id	</when>
+					<when test="item.sort=='upperMenuId'" >	upper_menu_id	</when>
+					<when test="item.sort=='menuName'" >	menu_name	</when>
+					<when test="item.sort=='menuUrl'" >		menu_url	</when>
+					<when test="item.sort=='menuType'" >	menu_type	</when>
+					<when test="item.sort=='menuSubType'" >	menu_sub_url	</when>
+					<when test="item.sort=='menuIcon'" >	menu_icon	</when>
+					<when test="item.sort=='menuSort'" >	menu_sort	</when>
+					<when test="item.sort=='menuAcronym'" >	menuAcronym	</when>
+					<when test="item.sort=='menuDesc'" >	menu_desc	</when>
+					<when test="item.sort=='createId'" >	create_id	</when>
+					<when test="item.sort=='createDate'" >	create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="item.sort=='deleteYn'" >	delete_yn	</when>
+					<when test="item.sort=='navbarYn'" >	navbar_yn	</when>
+					<when test="item.sort=='useYn'" >	use_yn	</when>
+		        </choose>
+		    	<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+		  ) a
+
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<insert id="insertMenuUser" parameterType="MenuUser" useGeneratedKeys="true" keyProperty="menuId">
+        INSERT INTO menu_user(
+        		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	menu_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	upper_menu_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	menu_name,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	menu_url,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	menu_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSubType)" >	menu_sub_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	menu_sort,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuAcronym)" >	menu_acronym,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	menu_desc,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(navbarYn)" >	navbar_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeYn)" >	main_expose_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeType)" >	main_expose_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	delete_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id,	</if>
+                create_date)
+        VALUES (
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	#{menuId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	#{upperMenuId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	#{menuName},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	#{menuUrl},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	#{menuType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSubType)" >	#{menuSubType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	#{menuSort},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuAcronym)" >	#{menuAcronym},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	#{menuDesc},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(navbarYn)" >	#{navbarYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	#{useYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeYn)" >	#{mainExposeYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeType)" >	#{mainExposeType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	#{deleteYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	#{createId},	</if>
+                now()
+                )
+    </insert>
+
+    <update id="updateMenuUser" parameterType="MenuUser">
+        UPDATE menu_user
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	upper_menu_id=#{upperMenuId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	menu_name=#{menuName},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	menu_url=#{menuUrl},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	menu_type=#{menuType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSubType)" >	menu_sub_type=#{menuSubType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	menu_sort=#{menuSort},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuAcronym)" >	menu_acronym=#{menuAcronym},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	menu_desc=#{menuDesc},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(navbarYn)" >	navbar_yn=#{navbarYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeYn)" >	main_expose_yn=#{mainExposeYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeType)" >	main_expose_type=#{mainExposeType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	delete_yn=#{deleteYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	last_update_date=#{lastUpdateDate},	</if>
+			last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+		</where>
+    </update>
+
+    <update id="deleteMenuUser" parameterType="MenuUser">
+        UPDATE menu_user
+        <set>
+			delete_yn='Y',last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+		</where>
+    </update>
+</mapper>

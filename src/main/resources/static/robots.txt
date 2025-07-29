@@ -1,0 +1,7 @@
+User-agent: *
+Allow:/
+Disallow: /member/
+Disallow: /manage/
+Disallow: /admin/
+Disallow: /error/
+Sitemap: http://travel.wayplus.kr/sitemap.xml

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">포인트 사용(차감) 기록</h1>
+        </div>
+        <div class="manage-content filter mb-4">
+            <form id="search-form">
+            <div class="row">
+                <div class="form-inline col-md-3">
+                    <label class="col-4">기간구분</label>
+                    <select class="col-8 form-control" name="searchType">
+                        <option value="accrued" th:selected="${p != null and p.searchType != null} and ${#strings.equals(p.searchType, 'used')} ? 'selected'">사용일</option>
+                        <option value="expire" th:selected="${p != null and p.searchType != null} and ${#strings.equals(p.searchType, 'cancel')} ? 'selected'">취소일</option>
+                    </select>
+                </div>
+                <div class="form-inline col-md-4">
+                    <label class="col-2">기간</label>
+                    <input type="text" name="startDate" class="col-4 form-control datepicker" readonly="readonly"
+                           th:attr="${p != null and p.startDate != null} ? data-default=${p.startDate}"
+                           th:value="${p != null and p.startDate != null} ? ${p.startDate}" />
+                    ~
+                    <input type="text" name="endDate" class="col-4 form-control datepicker" readonly="readonly"
+                           th:attr="${p != null and p.endDate != null} ? data-default=${p.endDate}"
+                           th:value="${p != null and p.endDate != null} ? ${p.endDate}" />
+                </div>
+                <div class="form-inline col-md-3">
+                    <label class="col-3">통합검색</label>
+                    <input type="text" id="titleLike" name="searchKey" class="col-9 form-control" placeholder="회원명 또는 아이디 또는 연락처" maxlength="50"
+                           th:value="${p != null and p.searchKey != null} ? ${p.searchKey}" />
+                </div>
+                <div class="col-md-1 clearfix">
+                    <div class="btn-group float-right">
+                        <button type="button" class="btn btn-primary" onclick="fnSearchUser();"><i class="fa fa-search"></i> 검색</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        <div class="manage-content table">
+            <table id="datatable" class="table table-hover manage-table">
+                <thead>
+                    <tr>
+                        <th>사용일시</th>
+                        <th>아이디(회원명)</th>
+                        <th>사용 구분</th>
+                        <th>사용 포인트</th>
+                        <th>취소구분</th>
+                        <th>취소일시</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:if="${pointList == null or #arrays.isEmpty(pointList)}">
+                        <tr class="empty-row">
+                            <td colspan="6">포인트 내역이 없습니다.</td>
+                        </tr>
+                    </th:block>
+                    <th:block th:unless="${pointList == null or #arrays.isEmpty(pointList)}">
+                        <tr th:each="item, idx : ${pointList}">
+                            <td class="date" th:text="${item.usedDate}"></td>
+                            <td class="userid" th:utext="|${item.userEmail} <br /> ${item.userName}|"></td>
+                            <td class="date" th:text="${item.usedType}"></td>
+                            <td class="date" th:text="${#numbers.formatInteger(item.pointUsed, 1, 'COMMA')}"></td>
+                            <td class="date" th:text="${item.cancelCode}"></td>
+                            <td class="date" th:text="${item.cancelDate}"></td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+        <div class="manage-pagination">
+            <div th:replace="~{/manage/inc/manage-pagination :: paging-page}" ></div>
+        </div>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    fnSearchUser = function(){
+        document.getElementById('search-form').submit();
+    }
+
+    $(document).ready(function(){
+        $('.datepicker').daterangepicker({
+            autoUpdateInput: true,
+            singleDatePicker:true,
+            showDropdowns: true,
+            showCustomRangeLabel:false,
+            drops:"auto",
+            locale: {
+                format: 'YYYY-MM-DD',
+                applyLabel: "적용",
+                cancelLabel: "취소",
+                daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                separator:separator
+            }
+        }, function(start, end, label){});
+        for(let i=0; i<$('.datepicker').length; i++){
+            if($('.datepicker').eq(i).attr('data-default') === undefined){
+                $('.datepicker').eq(i).val('')
+            }
+        }
+    });
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

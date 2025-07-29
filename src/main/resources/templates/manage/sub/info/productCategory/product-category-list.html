@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}"/>
+<body class="hold-transition sidebar-mini layout-fixed">
+
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <div class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">상품분류관리</h1>
+        </div>
+        <section class="manage-content mb-10">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class=" float-left">
+                            <button type="button" class="btn btn-black" onclick="expandAll()"><i
+                                    class="fa fa-expand"></i> 모두 펼치기
+                            </button>
+                            <button type="button" class="btn btn-black" onclick="collapseAll()"><i
+                                    class="fa  fa-compress"></i> 모두 접기
+                            </button>
+                        </div>
+                        <div class=" float-right">
+                            <button type="button" class="btn btn-primary" onclick="fnPopupAdd()"><i class="fa fa-plus"></i>카테고리 추가 </button>
+                            <button type="button" class="btn btn-danger" onclick="fnMenuOrderUpd()"><i class="fa fa-arrows-alt-v"></i>순서 수정 </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-md-12">
+                        <h3 class="title">카테고리 목록</h3>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <table id="datatable" class="table table-menu">
+                                    <colgroup>
+                                        <col width="*">
+                                        <col width="95px">
+                                        <col width="150px">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">카테고리명</th>
+                                        <th class="text-center">사용여부</th>
+                                        <th class="text-center">기능</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="dd">
+                                        <ol class="dd-list"></ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+<!--/*
+        <div class="col-md-12 clearfix">
+			<div class="text-center">
+				<button type="button" class="btn btn-black"   onclick="preList()">목록으로</button>
+			</div>
+		</div>
+*/-->
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- popup window -->
+<!--/*
+    <div class="modal fade func-menu-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="func-menu-modal-title" class="menu-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body ">
+                    <form id="funcMenuForm" name="funcMenuForm" class="form-horizontal form-label-left">
+                        <input type="hidden" id="id" name="id"/>
+                        <input type="hidden" id="mode" name="mode"/>
+                        <input type="hidden" id="orderNum" name="orderNum"/>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12 req">카테고리명 </label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <input type="text" id="title" name="title"
+                                       class="form-control col-md-12 col-xs-12" placeholder="카테고리명 입력">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12 req">사용여부 </label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%" checked>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12 req">예약구분 </label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <input class="form-control" type="checkbox" id="reservationYn" name="reservationYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12 req">예약전환구분 </label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <input class="form-control" type="checkbox" id="reservationSwitchYn" name="reservationSwitchYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12 req">상품구분 </label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <input class="form-control" type="checkbox" id="productYn" name="productYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12 req">단체구분 </label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <input class="form-control" type="checkbox" id="groupYn" name="groupYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%">
+                            </div>
+                        </div>
+                        <div class="form-group normal">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">설명 <span
+                                    class="required">*</span></label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <textarea id="note" name="note" class="form-control col-md-12 col-xs-12"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="fnPopupSave()">확인</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+*/-->
+
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+    $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- AdminLTE App -->
+<script src="/js/manage/adminlte.js"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    let _hsMap;
+    const limit_menu_depth = 1;
+
+    $(document).ready(function () {
+        select();
+
+        $(`.func-menu-modal input[name="menuType"]`)
+            .on('click', function (e) {
+                console.log(123, $(this).val());
+
+                if ($(this).val() === 'normal')
+                    $(`.func-menu-modal .normal`).show();
+                else
+                    $(`.func-menu-modal .normal`).hide();
+
+
+            });
+
+    });
+
+    $(window).on('load', function () {
+
+    })
+
+    function expandAll() {
+        $('.dd').nestable('expandAll');
+    }
+
+    function collapseAll() {
+        $('.dd').nestable('collapseAll');
+    }
+
+    function select() {
+        $(".dd-list").html("");
+/*
+        $.ajax({
+            url: '/manage/inquiry/category-list',
+            type: "GET",
+//			dataType : "json",
+            success: function (res) {
+                if ("success" == res.result) {
+                    _hsMap = new MapCustom();
+                    var html = "";
+                    for (idx in res.data) {
+                        var item = res.data[idx];
+                        var id = item.id;
+                        _hsMap.put(id, item);
+                    }
+
+                    for (idx in res.data) {
+                        var category = res.data[idx];
+                        html += makeTbody(category, 0);
+                    }
+                    $(".dd-list").html(html);
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+*/
+/*
+        $('.dd').nestable({
+            maxDepth: limit_menu_depth   // this is important if you have the same case of the question
+        }, fnInitBootstrapToggle);
+*/
+    }
+
+    fnInitBootstrapToggle = function () {
+        console.log('fnInitBootstrapToggle');
+        setTimeout(function () {
+            $('.manage-content input[data-toggle="toggle"]')
+                .bootstrapToggle()
+                .change(function (e) {
+                    selector = '';
+                    menuId = '';
+                    useYn = 'Y';
+
+                    $.each(this.attributes, function () {
+                        if (this.name == 'data-menu-id') {
+                            menuId = this.value;
+                            selector = `input[name=useYn][data-menu-id=${menuId}]`;
+                            if (!$(selector).prop('checked')) {
+                                useYn = 'N';
+                            }
+                        }
+                    });
+                    fnMenuUseYnUpdate(menuId, useYn);
+                });
+        }, 200);
+    }
+
+    function makeTbody(item, depth) {
+        var html = "";
+        var realUrl = "";
+
+        html += "<li class='dd-item ";
+        if (depth == 0) html += "item-red";
+        else if (depth == 1) html += "item-orange";
+        else if (depth == 2) html += "item-green";
+        else if (depth == 3) html += "item-blue";
+        else if (depth == 4) html += "item-purple";
+        else if (depth == 5) html += "item-grey";
+
+        //if (item.menuType !== 'normal') html += ` dd-blockDepth `;
+
+        html += "' data-id='" + item.id + "' >";
+/*
+        if (item.listChildMenuL) {
+            html += `<button data-action="collapse" type="button">Collapse</button>`
+            html += `<button data-action="expand" type="button" style="display: none;">Expand</button>`
+        }
+*/
+        html += `<div class='dd-handle'>`;
+        html += item.title;
+        html += "</div>";
+        html += `<div class="dd-btns float-right">`;
+        html += `<div style="margin-right:2%;width:80px;text-align:center;">`;
+        html += `<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%" ${item.useYn === 'Y' ? 'checked' : ''} data-menu-id='${item.id}'>`;
+        html += `</div>`;
+
+        html += `<div style="margin-right:2%;width:150px;text-align:right;">`;
+        html += `<button type="button" class="btn btn-info" onclick="fnPopupUpd(${item.id})"><i class="fa fa-pencil-alt">수정</i></button>`;//
+		if ( item.deleteYn === 'Y' ) {
+			  html += `<button type='button' class='btn btn-danger' data-toggle='tooltip' title='복구'  onclick='fnCategoryRestore(${item.id})'><i class="fa fa-refresh">복구</i></button>`;
+		} else  {
+			  html += `<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제'  onclick='fnCategoryDel(${item.id})'><i class="fa fa-trash-alt">삭제</i></button>`;
+		}
+        html += `</div>`;
+        html += `</div>`; //dd-btns
+
+        html += "</li>";
+        return html;
+    }
+
+    preList = function(){
+		location.href = "/manage/inquiry/list?params="+getParams();
+	}
+
+    fnPopupInit = function () {
+        $('.func-menu-modal .menu-title').html('');
+        $('.func-menu-modal #mode').val('');
+        $('.func-menu-modal #id').val('');
+        $('.func-menu-modal #title').val('');
+        $('.func-menu-modal #useYn').bootstrapToggle('on');
+        $('.func-menu-modal #note').val('');
+        $('.func-menu-modal #orderNum').val('');
+    }
+
+    fnPopupAdd = function () {
+        fnPopupInit();
+
+        var menuSort = $('.dd > .dd-list > .dd-item').length;
+
+        $('.func-menu-modal .menu-title').html('카테고리 추가');
+        $('.func-menu-modal #mode').val('I');
+        $('.func-menu-modal #orderNum').val(menuSort);
+
+        $('.func-menu-modal').modal("show");
+    }
+
+    fnPopupUpd = function (id) {
+        fnPopupInit();
+        var item = _hsMap.get(id);
+
+        $('.func-menu-modal .menu-title').html('카테고리 수정');
+		$('.func-menu-modal #mode').val('U');
+        $('.func-menu-modal #id').val(item.id);
+        $('.func-menu-modal #title').val(item.title);
+        $('.func-menu-modal #note').val(item.note);
+
+		$('.func-menu-modal #useYn').bootstrapToggle( item.useYn === 'Y' ? 'on' : 'off' );
+		$('.func-menu-modal #reservationYn').bootstrapToggle( item.reservationYn === 'Y' ? 'on' : 'off' );
+		$('.func-menu-modal #reservationSwitchYn').bootstrapToggle( item.reservationSwitchYn === 'Y' ? 'on' : 'off' );
+		$('.func-menu-modal #productYn').bootstrapToggle( item.productYn === 'Y' ? 'on' : 'off' );
+		$('.func-menu-modal #groupYn').bootstrapToggle( item.groupYn === 'Y' ? 'on' : 'off' );
+
+
+
+        $('.func-menu-modal #orderNum').val(item.orderNum);
+        $('.func-menu-modal').modal("show");
+    }
+
+    fnPopupSave = function () {
+        if (confirm("저장하시겠습니까?")) {
+
+			$('.func-menu-modal input[data-toggle="toggle"]').each(function(i,e){
+			    $(`.func-menu-modal input[data-toggle="toggle"][name=${$(e).attr('name')}]`).val( $(e).is(':checked') ? 'Y' : 'N' );
+			});
+
+            $.ajax({
+                url: '/manage/inquiry/category-save',
+                type: "POST",
+                data: $(funcMenuForm).serialize(),
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                },
+                success: function (res) {
+                    if ("success" == res.result) {
+                        $('.func-menu-modal').modal("hide");
+                        select();
+                        alert("처리 되었습니다");
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        }
+    }
+
+    fnMenuUseYnUpdate = function (_Id, _useYn) {
+        console.log(_Id + ' ' + _useYn);
+
+        $.ajax({
+            url: '/manage/inquiry/category-save',
+            type: "POST",
+            data: {'mode':'U', 'id': _Id, 'useYn': _useYn},
+            dataType: "json",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+            },
+            success: function (res) {
+                if ("success" == res.result) {
+
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    }
+
+    fnMenuOrderUpd = function () {
+        if (confirm("순서 수정하시겠습니까?")) {
+            var data = $('.dd').nestable('customMenuList');
+
+            $.ajax({
+                url: '/manage/inquiry/category-order-save',
+                type: "POST",
+                data: {"order": data, "total": data.length},
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                },
+                success: function (res) {
+                    if ("success" == res.result) {
+                        select();
+                        alert("수정되었습니다");
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        }
+    }
+
+    fnCategoryDel = function (id) {
+        if (confirm("삭제하시겠습니까?")) {
+            $.ajax({
+                url: '/manage/inquiry/category-del',
+                type: "POST",
+                data: {id: id},
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                },
+                success: function (res) {
+                    if ("success" == res.result) {
+                        select();
+                        alert("처리 되었습니다");
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        }
+    }
+    fnCategoryRestore = function(id) {
+		if(confirm("복구 하시겠습니까?")){
+		  $.ajax({
+			  url : "/manage/inquiry/category-restore",
+			  type : "POST",
+			  data : {"id" : id},
+			  dataType : "json",
+			  beforeSend: function (xhr) {
+				  xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+			  },
+			  success : function(data){
+				  if( data.result === "success" ){
+					  select();
+                      alert("처리 되었습니다");
+				  }else{
+					  alert(data.message)
+				  }
+			  }
+		  })
+		}
+	  }
+
+    fnNestable = function (menuId) {
+        console.log(menuId + '-click!!!');
+
+        $(`li.dd-item[data-id="${menuId}"]`).nestable('collapseItem')
+    }
+
+</script>
+
+</body>
+</html>

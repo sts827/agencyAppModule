@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<style>
+	ul {
+		list-style-type:none;
+	}
+</style>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<!-- Preloader -->
+	<div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+
+	<!-- Navbar -->
+	<nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	<!-- /.navbar -->
+
+	<!-- Main Sidebar Container -->
+	<aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+
+	<!-- Content Wrapper. Contains page content -->
+	<div class="content-wrapper">
+		<!-- Content Header (Page header) -->
+		<div class="content-header">
+			<div class="container-fluid">
+				<div class="row mb-2">
+					<div class="col-sm-6">
+						<h1 class="m-0">연혁 관리</h1>
+					</div><!-- /.col -->
+					<div class="col-sm-6">
+						<ol class="breadcrumb float-sm-right">
+							<li class="breadcrumb-item"><a href="/manage">Home</a></li>
+							<li class="breadcrumb-item">콘텐츠 관리</li>
+							<li class="breadcrumb-item active"><a href="/manage/history/list">연혁 관리</a></li>
+						</ol>
+					</div><!-- /.col -->
+				</div><!-- /.row -->
+			</div><!-- /.container-fluid -->
+		</div>
+		<!-- /.content-header -->
+
+		<!-- Main content -->
+		<section class="content">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">
+						<form id="historyModifyForm" name="saveForm" enctype="multipart/form-data">
+							<input type="hidden" name="id" th:value="${historyContents.id}">
+							<section class="content-header">
+								<div class="container-fluid">
+									<div class="row">
+										<div class="col-md-12">
+											<div class="card search-body">
+												<div class="card-header">
+													<h3 class="card-title">연혁 수정</h3>
+												</div>
+												<div class="card-body">
+													<table class="table table-bordered">
+														<tr>
+															<th>등록일</th>
+															<td>
+																<input type="text" class="form-control date-single-time-picker" id="regDttm" name="history_date" th:value="${historyContents.history_date}" placeholder="등록일 미 입력시 현재날짜로 등록됩니다. 입력 날짜형태 : ex) 2022-02-23" >
+															</td>
+														</tr>
+														<tr>
+															<th>내용 <span class="required">*</span></th>
+															<td colspan="3"><input type="text" id="content" name="content" class="form-control col-md-12 col-xs-12" th:value="${historyContents.content}" placeholder="내용을 입력해주세요."  /></td>
+														</tr>
+														<tr>
+															<th>사용여부</th>
+															<td>
+																<label style="margin-right: 10px;">
+																	사용
+																	<input type="radio" name="use_yn" th:checked="${#strings.equals(historyContents.use_yn, 'Y')}" value="Y">
+																</label>
+																<label>
+																	사용안함
+																	<input type="radio" name="use_yn" th:checked="${#strings.equals(historyContents.use_yn, 'N')}" value="N">
+																</label>
+															</td>
+														</tr>
+													</table>
+												</div>
+												<div class="card-footer clearfix">
+													<div class="float-right">
+														<button type="button" class="btn btn-primary" onclick="modifyHistory()">저장</button>
+														<button type="button" class="btn btn-default" onclick="preList()">목록</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</section>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- /.content -->
+	</div>
+	<!-- /.content-wrapper -->
+	<footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	<!-- Control Sidebar -->
+	<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+	</aside>
+	<!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script th:inline="javascript">
+	$.widget.bridge('uibutton', $.ui.button)
+
+	modifyHistory = function () {
+		if ( $('#title').val() === '' ) {
+			alert('제목을 입력해주세요');
+			return false;
+		} else {
+			if ( $("#regDttm").val() === '' ) {
+				const today = new Date();
+				const year = today.getFullYear();
+				const month = String(today.getMonth() + 1).padStart(2, '0');
+				const day = String(today.getDate()).padStart(2, '0');
+				const formattedDate = `${year}-${month}-${day}`;
+
+				$("#regDttm").val(formattedDate);
+			}
+
+			$.ajax({
+				url : '/manage/history-modify'
+				, type : 'POST'
+				, data :  $('#historyModifyForm').serialize()
+				, beforeSend: function (xhr) {
+					xhr.setRequestHeader(
+							[[${_csrf.headerName}]], [[${_csrf.token}]]
+					);
+				}
+				, success : function(data) {
+					if (data.result === 'success') {
+						alert(data.message)
+						preList();
+					} else {
+						alert(data.message)
+					}
+				}
+				,error : function(xhr, code, errorMsg) {
+					console.log(xhr, code, errorMsg);
+				}
+			})
+		}
+	}
+	function preList(){
+		location.href = "/manage/history/list?params="+getParams();
+	}
+</script>
+<!-- AdminLTE App -->
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

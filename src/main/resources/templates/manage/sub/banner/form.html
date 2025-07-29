@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	<nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+	<aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	<section class="content-wrapper">
+		<form id="banner-form">
+		<input type="hidden" name="id" th:value="${banner != null} ? ${banner.id}" />
+		<input type="hidden" name="menuId" th:value="${banner != null} ? ${banner.menuId}" />
+		<input type="hidden" name="bannerType" value="MAIN" th:value="${bannerType}"/>
+		<div class="content-header">
+			<h1 class="m-0">배너등록</h1>
+		</div>
+		<div class="manage-content no-pd mt-4 banner-pc">
+			<div class="input-box">
+				<div class="content-header mb-3">
+					<label class="alt-input-title">PC</label>
+					<label class="alt-input-label">이미지 추천 사이즈: 2000px * 600px </label>
+				</div>
+				<div class="banner-preview">
+					<div id="banner-preview-pc" class="banner-area">
+						<img id="preview-img-pc" class="image-field" th:src="${banner != null} ? @{/upload/{url}(url=${banner.imageUrlPc})}"/>
+						<div id="preview-text-pc" class="text-field">
+							<div class="text-top"
+								 th:text="${banner != null and !#strings.isEmpty(banner.imageTextTop)} ? ${banner.imageTextTop}"
+								 th:style="${banner != null and !#strings.isEmpty(banner.imageTextTopColor)} ? |color:${banner.imageTextTopColor};|"
+								 th:styleappend="${banner != null and !#strings.isEmpty(banner.imageTextTopFont)} ? |font-family:${banner.imageTextTopFont};|"></div>
+							<div class="text-mid"
+								 th:text="${banner != null and !#strings.isEmpty(banner.imageTextMid)} ? ${banner.imageTextMid}"
+								 th:style="${banner != null and !#strings.isEmpty(banner.imageTextMidColor)} ? |color:${banner.imageTextMidColor};|"
+								 th:styleappend="${banner != null and !#strings.isEmpty(banner.imageTextMidFont)} ? |font-family:${banner.imageTextMidFont};|"></div>
+							<div class="text-bot"
+								 th:text="${banner != null and !#strings.isEmpty(banner.imageTextBot)} ? ${banner.imageTextBot}"
+								 th:style="${banner != null and !#strings.isEmpty(banner.imageTextBotColor)} ? |color:${banner.imageTextBotColor};|"
+								 th:styleappend="${banner != null and !#strings.isEmpty(banner.imageTextBotFont)} ? |font-family:${banner.imageTextBotFont};|"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="input-box">
+				<div class="row mb-3 form-inline image-field">
+					<div class="input-area-full">
+						<label class="input-label">이미지*</label>
+						<input type="file" class="form-control inline-one" id="image-pc" name="image_pc" accept="image/*" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-content no-pd mt-4 banner-mobile">
+			<div class="input-box">
+				<div class="content-header mb-3">
+					<label class="alt-input-title">Mobile</label>
+					<label class="alt-input-label">이미지 추천 사이즈: 800px * 400px </label>
+				</div>
+				<div class="banner-preview mobile">
+					<div id="banner-preview-mobile" class="banner-area">
+						<img id="preview-img-mobile" class="image-field" th:src="${banner != null} ? @{/upload/{url}(url=${banner.imageUrlMobile})}"/>
+						<div id="preview-text-mobile" class="text-field">
+							<div class="text-top"
+								 th:text="${banner != null and !#strings.isEmpty(banner.imageTextTop)} ? ${banner.imageTextTop}"
+								 th:style="${banner != null and !#strings.isEmpty(banner.imageTextTopColor)} ? |color:${banner.imageTextTopColor};|"
+								 th:styleappend="${banner != null and !#strings.isEmpty(banner.imageTextTopFont)} ? |font-family:${banner.imageTextTopFont};|"></div>
+							<div class="text-mid"
+								 th:text="${banner != null and !#strings.isEmpty(banner.imageTextMid)} ? ${banner.imageTextMid}"
+								 th:style="${banner != null and !#strings.isEmpty(banner.imageTextMidColor)} ? |color:${banner.imageTextMidColor};|"
+								 th:styleappend="${banner != null and !#strings.isEmpty(banner.imageTextMidFont)} ? |font-family:${banner.imageTextMidFont};|"></div>
+							<div class="text-bot"
+								 th:text="${banner != null and !#strings.isEmpty(banner.imageTextBot)} ? ${banner.imageTextBot}"
+								 th:style="${banner != null and !#strings.isEmpty(banner.imageTextBotColor)} ? |color:${banner.imageTextBotColor};|"
+								 th:styleappend="${banner != null and !#strings.isEmpty(banner.imageTextBotFont)} ? |font-family:${banner.imageTextBotFont};|"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="input-box">
+				<div class="row mb-3 form-inline image-field">
+					<div class="input-area-full">
+						<label class="input-label">이미지*</label>
+						<input type="file" class="form-control inline-one" id="image-mobile" name="image_mobile" accept="image/*" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-content no-pd mt-4" th:if="${bannerType ne 'main'}">
+			<div class="input-box">
+				<div class="row mb-3 form-inline">
+					<div class="input-area-half">
+						<label class="input-label">대표문구</label>
+						<input type="text" class="form-control inline-one" id="text-top" data-class="text-top" name="imageTextTop" placeholder="대표문구" th:value="${banner != null} ? ${banner.imageTextTop}" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">폰트</label>
+						<select class="form-control inline-one font-list" data-class="text-top" name="imageTextTopFont">
+							<option value="Pretendard" th:selected="${banner != null and banner.imageTextTopFont == 'Pretendard'}">Pretendard</option>
+							<option value="Noto Sans KR" th:selected="${banner != null and banner.imageTextTopFont == 'Noto Sans KR'}">Noto Sans KR</option>
+							<option value="SEBANG_Gothic_Bold" th:selected="${banner != null and banner.imageTextTopFont == 'SEBANG_Gothic_Bold'}">세방고딕_볼드</option>
+							<option value="Jalnan" th:selected="${banner != null and banner.imageTextTopFont == 'Jalnan'}">잘난체</option>
+							<option value="BMEULJIRO" th:selected="${banner != null and banner.imageTextTopFont == 'BMEULJIRO'}">을지로체</option>
+						</select>
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">색상</label>
+						<input type="color" class="form-control" id="color-code-top" data-class="text-top" data-target-id="color-text-top" name="imageTextTopColor" value="#FFFFFF" th:value="${banner != null} ? ${banner.imageTextTopColor} : '#FFFFFF'" />
+						<input type="text" class="form-control with-input-color" data-class="text-top" data-target-id="color-code-top" id="color-text-top" maxlength="9" value="#FFFFFF" th:value="${banner != null} ? ${banner.imageTextTopColor}: '#FFFFFF'" />
+					</div>
+				</div>
+				<div class="row mb-3 form-inline">
+					<div class="input-area-half">
+						<label class="input-label">중간문구</label>
+						<input type="text" class="form-control inline-one" id="text-mid" data-class="text-mid" name="imageTextMid" placeholder="중간문구" th:value="${banner != null} ? ${banner.imageTextMid}" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">폰트</label>
+						<select class="form-control inline-one font-list" data-class="text-mid" name="imageTextMidFont">
+							<option value="Pretendard" th:selected="${banner != null and banner.imageTextMidFont == 'Pretendard'}">Pretendard</option>
+							<option value="Noto Sans KR" th:selected="${banner != null and banner.imageTextMidFont == 'Noto Sans KR'}">Noto Sans KR</option>
+							<option value="Jalnan" th:selected="${banner != null and banner.imageTextMidFont == 'Jalnan'}">잘난체</option>
+							<option value="BMEULJIRO" th:selected="${banner != null and banner.imageTextTopFont == 'BMEULJIRO'}">을지로체</option>
+						</select>
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">색상</label>
+						<input type="color" class="form-control" id="color-code-mid" data-class="text-mid" data-target-id="color-text-mid" name="imageTextMidColor" value="#222222" th:value="${banner != null} ? ${banner.imageTextMidColor} : '#222222'" />
+						<input type="text" class="form-control with-input-color" data-class="text-mid" data-target-id="color-code-mid" id="color-text-mid" maxlength="9" value="#222222" th:value="${banner != null} ? ${banner.imageTextMidColor} : '#222222'" />
+					</div>
+				</div>
+				<div class="row mb-3 form-inline">
+					<div class="input-area-half">
+						<label class="input-label">하단문구</label>
+						<input type="text" class="form-control inline-one" id="text-bot" data-class="text-bot" name="imageTextBot" placeholder="중간문구" th:value="${banner != null} ? ${banner.imageTextBot}" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">폰트</label>
+						<select class="form-control inline-one font-list" data-class="text-bot" name="imageTextBotFont">
+							<option value="Pretendard" th:selected="${banner != null and banner.imageTextBotFont == 'Pretendard'}">Pretendard</option>
+							<option value="Noto Sans KR" th:selected="${banner != null and banner.imageTextBotFont == 'Noto Sans KR'}">Noto Sans KR</option>
+							<option value="Jalnan" th:selected="${banner != null and banner.imageTextMidFont == 'Jalnan'}">잘난체</option>
+							<option value="BMEULJIRO" th:selected="${banner != null and banner.imageTextTopFont == 'BMEULJIRO'}">을지로체</option>
+						</select>
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">색상</label>
+						<input type="color" class="form-control" id="color-code-bot" data-class="text-bot" data-target-id="color-text-bot" name="imageTextBotColor" value="#222222" th:value="${banner != null} ? ${banner.imageTextBotColor} : '#222222'" />
+						<input type="text" class="form-control with-input-color" data-class="text-bot" data-target-id="color-code-bot" id="color-text-bot" maxlength="9" value="#222222" th:value="${banner != null} ? ${banner.imageTextBotColor} : '#222222'" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-content no-pd mt-4">
+			<div class="input-box">
+				<div class="row mb-3 form-inline">
+					<div class="input-area-half">
+						<label class="input-label">링크 URL</label>
+						<input type="text" class="form-control inline-one" name="linkUrl" placeholder="링크 주소를 입력해주세요." th:value="${banner != null} ? ${banner.linkUrl}" />
+					</div>
+					<div class="input-area-half">
+						<label class="input-label">링크형식*</label>
+						<select class="form-control inline-one" name="linkTarget">
+							<option value="NONE" th:selected="${banner != null and banner.linkTarget == 'NONE'} ? 'selected'">없음</option>
+							<option value="_BLANK" th:selected="${banner != null and banner.linkTarget == '_BLANK'} ? 'selected'">새창</option>
+							<option value="THIS" th:selected="${banner != null and banner.linkTarget == 'THIS'} ? 'selected'">현재창</option>
+						</select>
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-quad">
+						<label class="input-label">시작일</label>
+						<input type="text" class="form-control inline-one date-time" name="startDate" id="start-date" placeholder="노출 시작일시" readonly="readonly" autocomplete="off" th:value="${banner != null} ? ${banner.startDate}" />
+						<div class="input-overlay">
+							<button type="button" class="overlay-button" onclick="fnSetNullDatetime('start-date')"><img src="/images/icon/bell.svg" /></button>
+						</div>
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">종료일</label>
+						<input type="text" class="form-control inline-one date-time" name="expireDate" id="expire-date" placeholder="노출 종료일시" readonly="readonly" autocomplete="off" th:value="${banner != null} ? ${banner.expireDate}" />
+						<div class="input-overlay">
+							<button type="button" class="overlay-button" onclick="fnSetNullDatetime('expire-date')"><img src="/images/icon/bell.svg" /></button>
+						</div>
+					</div>
+				</div>
+				<div class="row form-inline">
+					<div class="input-area-third">
+						<label class="input-label">사용여부</label>
+						<input class="form-control" type="checkbox" id="use-yn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${banner != null and banner.useYn == 'Y'} ? 'checked'" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">PC 배너</label>
+						<input class="form-control" type="checkbox" id="pc-yn" name="visibleYnPc" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${banner == null} or ${banner != null and banner.visibleYnPc == 'Y'} ? 'checked'" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">모바일 배너</label>
+						<input class="form-control" type="checkbox" id="mobile-yn" name="visibleYnMobile" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${banner == null} or ${banner != null and banner.visibleYnMobile == 'Y'} ? 'checked'" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-control">
+			<button type="button" class="btn btn-dark" onclick="history.back()">취소하기</button>
+			<button type="button" class="btn btn-primary" th:onclick="${banner != null} ? 'fnUpdateBanner()' : 'fnSaveBanner()'">저장하기</button>
+		</div>
+		</form>
+	</section>
+	<footer th:replace="~{/manage/inc/manage-footer-include :: footer}" />
+	<aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+	$(document).ready(function(){
+		fnInitUrlParam();
+
+
+		$('#pc-yn')
+			.change(function(e){
+				if($('#pc-yn').prop('checked')){
+					$('.banner-pc').show();
+				}else{
+					$('.banner-pc').hide();
+				}
+			})
+			.trigger('change');
+
+			$('#mobile-yn').change(function(e){
+				if($('#mobile-yn').prop('checked')){
+					$('.banner-mobile').show();
+				}else{
+					$('.banner-mobile').hide();
+				}
+			}).trigger('change');
+
+
+		$('#text-top, #text-mid, #text-bot').change(function(e){
+			$('.'+$(e.target).attr('data-class')).text(e.target.value);
+		});
+
+		$('.font-list').change(function(e){
+			$('.'+$(e.target).attr('data-class')).css('font-family', e.target.value);
+		});
+
+		$('#color-code-top, #color-text-top, #color-code-mid, #color-text-mid, #color-code-bot, #color-text-bot').change(function(e){
+			let item = $(e.target);
+			if(formValidCheck(item, 'input', 'is-invalid', 'hex-color')){
+				$('#'+$(item).attr('data-target-id')).val($(item).val());
+				$('.'+$(item).attr('data-class')).css('color', $(item).val());
+			}
+		});
+
+
+		$('#image-pc').change(function(e){
+			let files = e.target.files;
+			if(files.length > 0) {
+				for (let i = 0; i < files.length; i++) {
+					if (!files[i].type.startsWith("image/")) continue;
+					const img = document.getElementById("preview-img-pc");
+					img.file = files[i];
+					img.classList.add('image-field');
+
+					const reader = new FileReader();
+					reader.onload = (el) => {
+						img.src = el.target.result;
+					};
+					reader.readAsDataURL(files[i]);
+				}
+			}
+		});
+
+		$('#image-mobile').change(function(e){
+			let files = e.target.files;
+			if(files.length > 0) {
+				for (let i = 0; i < files.length; i++) {
+					if (!files[i].type.startsWith("image/")) continue;
+					const img = document.getElementById("preview-img-mobile");
+					img.file = files[i];
+					img.classList.add('image-field');
+
+					const reader = new FileReader();
+					reader.onload = (el) => {
+						img.src = el.target.result;
+					};
+					reader.readAsDataURL(files[i]);
+				}
+			}
+		});
+
+
+
+		$('.date-time').daterangepicker({
+			minDate:moment().add(-1, 'hour'),
+			autoUpdateInput: true,
+			singleDatePicker:true,
+			showDropdowns: true,
+			showCustomRangeLabel:false,
+			timePicker: true,
+			timePicker24Hour: true,
+			timePickerMinutes:true,
+			drops:"auto",
+			locale: {
+				format: 'YYYY-MM-DD HH:mm:ss',
+				applyLabel: "적용",
+				cancelLabel: "취소",
+				daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+				monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+				separator:separator
+			}
+		}, function(start, end, label){});
+
+		let item = [[${banner}]];
+		if(item == null){
+			$('#start-date').val('');
+			$('#expire-date').val('');
+		}else{
+			$('#start-date').val(item.startDate);
+			$('#expire-date').val(item.expireDate);
+		}
+	});
+
+	fnListBanner = function(){
+		var bannetType = $('input[name=bannerType]').val();
+		var menuId = $('input[name=menuId]').val();
+
+		if( bannetType === 'menuBanner' ){
+			var url = `/manage/menu/user/list-banner?bannerType=${bannetType}`;
+			if( menuId !== undefined ){
+				url += `&menuId=${menuId}`;
+			}
+
+			location.replace( url );
+		} else {
+			location.replace(`/manage/banner/list?bannerType=${bannetType}`);
+		}
+
+	}
+
+	fnInitUrlParam = function(){
+		if( searchParams.has('type') )		 $('input[name=bannerType]').val( searchParams.get('type') );
+		if( searchParams.has('menuId') )	 $('input[name=menuId]').val( searchParams.get('menuId') );
+	}
+
+	fnSetNullDatetime = function(target){
+		$('#'+target).val('');
+	}
+
+	fnSaveBanner = function(){
+		let form = document.getElementById('banner-form');
+		if($('#color-code-top') != null && !formValidCheck($('#color-code-top'), 'input', 'is-invalid', 'text')) return;
+		if($('#color-code-mid') != null && !formValidCheck($('#color-code-mid'), 'input', 'is-invalid', 'text')) return;
+		if($('#color-code-bot') != null && !formValidCheck($('#color-code-bot'), 'input', 'is-invalid', 'text')) return;
+		if ($('#pc-yn').prop('checked')) {
+			if (!formValidCheck($('#image-pc'), 'input', 'is-invalid', 'text')) return;
+		}
+		if ($('#mobile-yn').prop('checked')) {
+			if (!formValidCheck($('#image-mobile'), 'input', 'is-invalid', 'text')) return;
+		}
+
+		$.ajax({
+			url : "/manage/banner/add",
+			type : "POST",
+			enctype: 'multipart/form-data',
+			contentType : false,
+			processData : false,
+			data :  new FormData($(form)[0]),
+			dataType : "json",
+			success : function(data){
+				if( data.result === "success" ){
+					alert(data.message);
+					fnListBanner();
+				}else{
+					alert(data.message);
+					console.log(data);
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		})
+	}
+
+	fnUpdateBanner = function(){
+		let form = document.getElementById('banner-form');
+		if($('#color-code-top') != null && !formValidCheck($('#color-code-top'), 'input', 'is-invalid', 'text')) return;
+		if($('#color-code-mid') != null && !formValidCheck($('#color-code-mid'), 'input', 'is-invalid', 'text')) return;
+		if($('#color-code-bot') != null && !formValidCheck($('#color-code-bot'), 'input', 'is-invalid', 'text')) return;
+		if ($('#pc-yn').prop('checked')) {
+			if($('#preview-img-pc').attr('src').trim() == ''){
+				$('#image-pc').addClass('is-invalid').focus();
+				return;
+			}
+		}
+
+		if ($('#mobile-yn').prop('checked')) {
+			if($('#preview-img-mobile').attr('src').trim() == ''){
+				$('#image-mobile').addClass('is-invalid').focus();
+				return;
+			}
+		}
+
+		var formData = new FormData($(form)[0]);
+
+		$('input[data-toggle="toggle"]').each(function(i,e){
+		    formData.set( $(e).attr('name'), $(e).is(':checked') ? 'Y' : 'N');
+		});
+
+		$.ajax({
+			url : "/manage/banner/update",
+			type : "PUT",
+			enctype: 'multipart/form-data',
+			contentType : false,
+			processData : false,
+			data :  formData,
+			dataType : "json",
+			success : function(data){
+				if( data.result === "success" ){
+					alert(data.message);
+					fnListBanner();
+				}else{
+					alert(data.message);
+					console.log(data);
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		})
+	}
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

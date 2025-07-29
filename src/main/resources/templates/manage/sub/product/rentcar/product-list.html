@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/css/manage/product-list.css">
+<link rel="stylesheet" href="/css/manage/info.css">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<link rel="stylesheet" th:href="@{/plugin/daterangepicker/css/common.css}" href="/plugin/daterangepicker/css/common.css">
+<script src="/plugin/smooth-zoom/smooth-zoom.js"></script>
+<style>
+</style>
+<body class="hold-transition sidebar-mini layout-fixed">
+<section class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <main class="content-wrapper">
+        <div class="content-header">
+            <p class="product-page-title" th:text="|${p.menuTitle} 상품관리|"></p>
+        </div>
+        <div class="search-box">
+            <form id="product-search-form" th:action="|/manage/product/${typeCode}|" method="get">
+                <div class="row-div">
+                    <div class="quad-div">
+                        <h5>상태</h5>
+                        <th:block th:if="${not #strings.isEmpty(p.productStatus)}">
+                            <select id="product-status" name="productStatus" class="form-select">
+                                <option value="ALL">전체</option>
+                                <option value="S" th:selected="${#strings.equals(p.productStatus,'S')}">판매중</option>
+                                <option value="R" th:selected="${#strings.equals(p.productStatus,'R')}">준비중</option>
+                            </select>
+                        </th:block>
+                        <th:block th:unless="${not #strings.isEmpty(p.productStatus)}">
+                            <select id="product-status" name="productStatus" class="form-select">
+                                <option value="ALL">전체</option>
+                                <option value="S">판매중</option>
+                                <option value="R">준비중</option>
+                            </select>
+                        </th:block>
+                    </div>
+                    <div class="quad-div">
+                        <h5>검색타입</h5>
+                        <th:block th:if="${not #strings.isEmpty(p.searchType)}">
+                            <select name="searchType" id="search-type" class="form-select">
+                                <option value="title" th:selected="${#strings.equals(p.searchType,'title')}">상품명</option>
+                                <option value="tag" th:selected="${#strings.equals(p.searchType,'tag')}">상품태그</option>
+                            </select>
+                        </th:block>
+                        <th:block th:unless="${not #strings.isEmpty(p.searchType)}">
+                            <select name="searchType" id="search-type" class="form-select">
+                                <option value="title">상품명</option>
+                                <option value="tag">상품태그</option>
+                            </select>
+                        </th:block>
+                    </div>
+                    <div class="half-div">
+                        <h5>통합검색</h5>
+                        <div class="search-input-box">
+                            <th:block th:if="${not #strings.equals(p.searchKey,'')}">
+                                <input id="search-key" name="searchKey" class="search-input-text" type="text" placeholder="상품명, 검색어를 입력해주세요" th:value="${p.searchKey}">
+                            </th:block>
+                            <th:block th:unless="${not #strings.equals(p.searchKey,'')}">
+                                <input id="search-key" name="searchKey" class="search-input-text" type="text" placeholder="상품명, 검색어를 입력해주세요">
+                            </th:block>
+                            <button type="submit" id="product-search-button">
+                                <img th:src="@{/images/icons/search_button.svg}" alt="">
+                                <span>검색</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div style="margin-bottom: 30px;" id="category-list">
+            <button class="tab-btn"
+                    th:classappend="${#strings.equals(p.productMenuId,'')} ? 'active':''"
+                    th:onclick="|getProductListByMenuId(${menuId},'ALL',null)|"
+                    th:text="|전체상품|"></button>
+            <th:block th:if="${not #lists.isEmpty(categoryList)}" th:each="item : ${categoryList}">
+                <button class="tab-btn"
+                        th:classappend="${#strings.equals(p.productMenuId,item.menuId)} ? 'active':''"
+                        th:onclick="|getProductListByMenuId(${item.upperMenuId},${item.menuId},null)|"
+                        th:text="${item.menuName}" >상품항목</button>
+            </th:block>
+            <th:block th:unless="${not #lists.isEmpty(categoryList)}">
+
+            </th:block>
+        </div>
+        <div style="margin-bottom: 30px;" id="subCategory-list" >
+            <th:block th:if="${not #lists.isEmpty(subCategoryList)}">
+
+                <button class="tab-btn"
+                        th:each="item : ${subCategoryList}"
+                        th:classappend="${#strings.equals(p.productCategoryId,item.productCategoryId)} ? 'active':''"
+                        th:onclick="|getProductListByMenuId(${menuId},${item.menuId},${item.productCategoryId})|"
+                        th:text="${item.categoryTitle}"></button>
+            </th:block>
+        </div>
+
+        <div class="product-add-btn-box">
+            <button class="add-btn" th:onclick="location.href='/manage/product/'+[[${typeCode}]]+'/registration'">등록하기</button>
+            <button class="product-order-btn" onclick="showProductOrderChangeModal('popular')">순서변경</button>
+        </div>
+
+        <!--리스트-->
+        <table id="product-list-container">
+            <thead>
+                <tr>
+                    <th class="product-num">상품번호</th>
+                    <th class="product-category">분류</th>
+                    <th class="product-subCategory">카테고리</th>
+                    <th class="product-thumbnail">이미지</th>
+                    <th class="product-title">상품명</th>
+                    <th class="product-price">가격</th>
+                    <th class="product-isDisplay">상품표출</th>
+                    <th class="product-sales-date">판매기간</th>
+                    <th class="product-manage-utility">상품관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                <th:block th:if="${not #lists.isEmpty(productList)}">
+                    <th:block th:each="item : ${productList}">
+                        <tr th:if="${#strings.startsWith(item.productStatus,'R')}" class="status-ready">
+                            <!--  상품ID -->
+                            <td class="product-num" th:text="${item.productTourId}"></td>
+                            <!--  카테고리 -->
+                            <td class="product-category"th:text="${item.categoryTitle}"></td>
+                            <!--  하위카테고리 -->
+                            <td class="product-category"th:text="${item.subCategoryTitle}"></td>
+
+                            <!--  대표이미지 -->
+                            <td class="product-thumbnail">
+                                <img th:src="${item.productThumbnail}" alt="">
+                            </td>
+                            <!--  상품명 -->
+                            <td class="product-title" th:text="${item.productTitle}"></td>
+                            <!--  상품가격 -->
+                            <th:block th:if="${item.productPrice eq '가격정보없음'}">
+                                <td class="product-price" th:text="${item.productPrice}">상품가격</td>
+                            </th:block>
+                            <th:block th:unless="${item.productPrice eq '가격정보없음'}">
+                                <td class="product-price" th:text="|${#numbers.formatInteger(item.productPrice, 1, 'COMMA')}원~|">상품가격</td>
+                            </th:block>
+                            <!--  상태 -->
+                            <td class="product-isDisplay">
+                                <input id="isDisplay" type="checkbox" name="productUseYn" class="toggle isDisplay" hidden
+                                       th:value="${item.productUseYn}" th:data-product-id="${item.productTourId}">
+                                <div class="switch-box" th:onclick="changeProductUseYn(this, [[${item.productTourId}]])">
+                                    <label for="isDisplay" class="toggleSwitch">
+                                        <span class="toggleButton"></span>
+                                    </label>
+                                    <ul class="status">
+                                        <li class="show">보임</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <!--  표출기간 -->
+                            <td class="product-sales-date">
+                                <th:block th:if="!${#strings.isEmpty(item.productShowEndDate)}">
+                                    <span class="" th:utext="${#strings.substring(item.productShowStartDate,0,10)}"></span>
+                                    <span class="" th:utext="|~ ${#strings.substring(item.productShowEndDate,0,10)}|"></span>
+                                </th:block>
+                                <th:block th:unless="!${#strings.isEmpty(item.productShowEndDate)}">
+                                    <div>상시판매</div>
+                                </th:block>
+                            </td>
+                            <!-- 버튼 -->
+                            <td class="product-manage-utility">
+                                <div class="modifyAndCopy">
+                                    <button type="button" th:onclick="|modifyProductInfo(${item.productTourId}, '')|">수정</button>
+                                    <button type="button" th:onclick="|copyProductInfo(${item.productTourId})|">복사</button>
+                                </div>
+                                <div class="priceAndDelete">
+                                    <button type="button"  th:onclick="|modifyProductInfo(${item.productTourId}, 'price')|">금액</button>
+                                    <button type="button" th:onclick="|deleteProductInfo(${item.productTourId})|">삭제</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#strings.startsWith(item.productStatus,'S')}">
+                            <!--  상품ID -->
+                            <td class="product-num" th:text="${item.productTourId}"></td>
+                            <!--  카테고리 -->
+                            <td class="product-category"th:text="${item.categoryTitle}"></td>
+                            <!--  하위카테고리 -->
+                            <td class="product-category"th:text="${item.subCategoryTitle}"></td>
+                            <!--  대표이미지 -->
+                            <td class="product-thumbnail">
+                                <img th:src="${item.productThumbnail}" alt="">
+                            </td>
+                            <!--  상품명 -->
+                            <td class="product-title" th:text="${item.productTitle}"></td>
+                            <!--  상품가격 -->
+                            <th:block th:if="${item.productPrice eq '가격정보없음'}">
+                                <td class="product-price" th:text="${item.productPrice}">상품가격</td>
+                            </th:block>
+                            <th:block th:unless="${item.productPrice eq '가격정보없음'}">
+                                <td class="product-price" th:text="|${#numbers.formatInteger(item.productPrice, 1, 'COMMA')}원~|">상품가격</td>
+                            </th:block>
+                            <!--  상태 -->
+                            <td class="product-isDisplay">
+                                <input id="isDisplay" type="checkbox" name="productUseYn" class="toggle isDisplay" hidden
+                                       th:value="${item.productUseYn}">
+                                <div class="switch-box" th:onclick="changeProductUseYn(this, [[${item.productTourId}]])">
+                                    <label for="isDisplay" class="toggleSwitch">
+                                        <span class="toggleButton"></span>
+                                    </label>
+                                    <ul class="status">
+                                        <li class="show">보임</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <!--  표출기간 -->
+                            <td class="product-sales-date">
+                                <th:block th:if="!${#strings.isEmpty(item.productShowEndDate)}">
+                                    <span class="" th:utext="${#strings.substring(item.productShowStartDate,0,10)}"></span>
+                                    <span class="" th:utext="|~ ${#strings.substring(item.productShowEndDate,0,10)}|"></span>
+                                </th:block>
+                                <th:block th:unless="!${#strings.isEmpty(item.productShowEndDate)}">
+                                    <div>상시판매</div>
+                                </th:block>
+                            </td>
+                            <!-- 버튼 -->
+                            <td class="product-manage-utility">
+                                <div class="modifyAndCopy">
+                                    <button type="button" th:onclick="|modifyProductInfo(${item.productTourId}, '')|">수정</button>
+                                    <button type="button" th:onclick="|copyProductInfo(${item.productTourId})|">복사</button>
+                                </div>
+                                <div class="priceAndDelete">
+                                    <button type="button" th:onclick="|modifyProductInfo(${item.productTourId}, 'price')|">금액</button>
+                                    <button type="button" th:onclick="|deleteProductInfo(${item.productTourId})|">삭제</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </th:block>
+                </th:block>
+                <th:block th:unless="${not #lists.isEmpty(productList)}">
+                    <!-- 비어있는 리스트 -->
+                    <tr>
+                        <td class="empty-list" colspan="9">등록되거나, 수정중인 상품이 없습니다.</td>
+                    </tr>
+                </th:block>
+            </tbody>
+        </table>
+        <div class="manage-pagination">
+            <div th:replace="~{/manage/inc/manage-pagination :: paging-group}" ></div>
+        </div>
+<!--        <table id="datatable" class="table way-table table-hover" style="width:100%; table-layout:fixed;"></table>-->
+    </main>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</section>
+<!--상품 순서변경 모달-->
+<div id="product-order-change-modal-box" class="product-option-add-modal-box">
+    <div class="product-option-order-change-modal">
+        <div class="product-option-order-change-modal-inner-box">
+            <div class="product-option-add-modal-top">
+                <p class="product-option-add-text">상품 순서 변경</p>
+                <button type="button" onclick="closeProductOrderChangeModal()">
+                    <img src="/images/icon/x-black-17x17.svg" style="width: 17px; height: 17px;" alt="">
+                </button>
+            </div>
+            <div class="product-option-change-box">
+                <button class="tab-btn active" data-order-btn="popular">인기상품</button>
+                <button class="tab-btn" data-order-btn="normal" style="margin-right: 0">일반상품</button>
+            </div>
+            <div class="product-option-order-change-modal-scroll-box">
+                <div id="product-change-scroll-inner-box" class="product-option-order-change-modal-scroll-inner-box">
+                    <!--스크립트에서 처리-->
+                </div>
+            </div>
+            <div class="product-option-change-btn-group-box">
+                <button type="button" class="option-save-btn" onclick="addProductOrder()">저장</button>
+                <button type="button" class="option-close-btn" onclick="closeProductOrderChangeModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+
+        $(".isDisplay").each(function(index){
+            if($(this).val()==="Y"){
+                $(this).attr("checked",true);
+                $(this).closest(".product-isDisplay").find(".status li").text("보임");
+            }
+            else{
+                $(this).attr("checked",false);
+                $(this).closest(".product-isDisplay").find(".status li").text("숨김");
+            }
+        })
+
+        // if($(".isDisplay").val()==="Y"){
+        //     $(".isDisplay").attr("checked",true);
+        //     $(".switch-box .status li").text("보임");
+        //
+        // }
+        // else{
+        //     $(".isDisplay").attr("checked",false);
+        //     $(".switch-box .status li").text("숨김");
+        // }
+
+        $("#product-search-button").on("click",productSearchForm);
+
+        //순서변경용
+        document.querySelectorAll('[data-order-btn]').forEach((item)=>{
+            item.addEventListener('click', function () {
+                document.querySelectorAll('[data-order-btn]').forEach((item)=>{
+                    item.classList.remove('active');
+                })
+                item.classList.add('active');
+                document.querySelector('#product-change-scroll-inner-box').innerHTML = '';
+                showProductOrderChangeModal(`${this.dataset.orderBtn}`);
+            })
+        })
+
+        //공개,인기상품 여부
+        // $('.switch-box').each(function(index) {
+        //     if ( this.closest(".switch-box").previousElementSibling.value === "N") {
+        //         $(this).trigger('click');
+        //     }
+        // });
+
+        //상품수정 페이지에서 설정된 펼쳐야될 탭의 index 쿠키 삭제
+        const date = new Date();
+        date.setTime(date.getTime() - 1);
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = "tabIndex=;" + expires + ";path=/";
+    });
+
+    modifyProductInfo = function (id, linkType){
+        location.href=`/manage/product/${[[${typeCode}]]}/modify/${id}${linkType === 'price' ? '#price' : ''}`;
+    }
+
+    productSearchForm = function(){
+        // let data = formSerialize($("#product-search-form")[0]);
+        $("#product-search-form").submit();
+
+    }
+
+    copyProductInfo = function (id) {
+        $.ajax({
+            url : '/manage/product/copy-product',
+            type : "POST",
+            data : { "productTourId" : id, "type" : "copy"},
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+            },
+            success : function(data) {
+                if (data.result === "success" ) {
+                    alert(data.message);
+                    location.reload();
+                }else {
+                    alert(data.message);
+                }
+            }
+        });
+    }
+
+    deleteProductInfo = function(id){
+        if ( confirm("삭제하시겠습니까?") ) {
+            if ( id !== '' ) {
+                $.ajax({
+                    url: "/manage/product/removeProduct",
+                    data: {
+                        "productTourId": id
+                    },
+                    type: "post",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                    },
+                    success: function (data) {
+                        if ( data.result === "success" ) {
+                            alert("삭제되었습니다.");
+                        }
+                        location.href = `/manage/product/${[[${typeCode}]]}`;
+                    },
+                    error: function () {
+
+                    }
+                })
+            }
+            else {
+                location.href = `/manage/product/${[[${typeCode}]]}`;
+            }
+        }
+    }
+
+    getProductListByMenuId = function(menuId,menuCategoryId,menuSubCategoryId){
+        // TODO .. 수정 필요
+
+        $("#category-list button").removeClass("active");
+        let typeCode=[[${typeCode}]];
+        console.log("typeCode: ",typeCode);
+        if(menuCategoryId == 'ALL'){
+            location.href=`/manage/product/${typeCode}`;
+        }else{
+            if(menuSubCategoryId != null){
+                location.href=`/manage/product/${typeCode}?productMenuId=${menuCategoryId}&productCategoryId=${menuSubCategoryId}`
+            }else{
+                location.href=`/manage/product/${typeCode}?productMenuId=${menuCategoryId}`;
+            }
+        }
+
+    }
+    formSerialize = function (obj) {
+        var formData = new FormData(obj);
+        var jsonObject = {};
+
+        formData.forEach(function (value, key) {
+            if (jsonObject[key] === undefined && key != "images") {
+                jsonObject[key] = value;
+            } else if (key == "images") {
+                jsonObject[key] = [value];
+            } else {
+                if (!Array.isArray(jsonObject[key])) {
+                    jsonObject[key] = [jsonObject[key]];
+                }
+                jsonObject[key].push(value);
+            }
+        });
+        var jsonString = JSON.stringify(jsonObject);
+        console.log("jsonObject: ",jsonObject);
+        return jsonString
+    }
+
+    function showProductOrderChangeModal(type) {
+        let productType;
+        type === "popular" ? productType = "popular" : productType = "normal";
+        $.ajax({
+            url : "/manage/product/product-list"
+            , type : "GET"
+            , data : { "productType" : productType
+                        , "typeCode" : [[${typeCode}]] }
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+            }
+            , success : function (data) {
+                if ( data.result === "success" ) {
+                    const scrollBox = document.querySelector('#product-change-scroll-inner-box');
+                    for ( const item of data.data ) {
+                        scrollBox.insertAdjacentHTML('beforeend',
+                            `<div class="product-sort-item">
+                                <div class="hamburger-image-box">
+                                    <img class="hamburger-image" src="/images/icon/hamburger.svg" alt="">
+                                </div>
+                                <div class="move-image-box">
+                                    <img class="move-image" src="${item.productThumbnail}" alt="">
+                                </div>
+                                <div class="move-box">
+                                    <p class="move-box-text">${item.productTitle}</p>
+                                </div>
+                                <input type="hidden" id="product-tour-id" value="${item.productTourId}">
+                                <input type="hidden" name="order_num" value="${item.productSortOrder}">
+                             </div>`)
+                    }
+                    $('#product-change-scroll-inner-box').sortable({
+                        items: $('.product-sort-item'),
+                        start: function (a,item) {
+                            item.item[0].classList.add("active");
+                        },
+                        stop: function (a,item) {
+                            refreshOrderNumber();
+                            item.item[0].classList.remove("active");
+                        }
+                    })
+                    document.querySelector('#product-order-change-modal-box').style.display = 'flex';
+                }
+                else {
+                    alert(data.message);
+                }
+            }
+        })
+
+    }
+
+    function closeProductOrderChangeModal() {
+        document.querySelector('#product-order-change-modal-box').style.display = 'none';
+        document.querySelector('#product-change-scroll-inner-box').innerHTML = '';
+    }
+
+    function addProductOrder() {
+        const orderList = [];
+
+        const scrollBox = document.querySelector('#product-change-scroll-inner-box');
+        if ( scrollBox.children.length > 0 ) {
+            for ( const item of scrollBox.children ) {
+
+                orderList.push({
+                    productTourId : item.querySelector('#product-tour-id').value
+                    , productSortOrder : item.querySelector('input[name="order_num"]').value
+                })
+            }
+            console.log(orderList)
+            $.ajax({
+                url : "/manage/product/change-product-order"
+                , type : "POST"
+                , contentType : "application/json"
+                , data : JSON.stringify(orderList)
+                , beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                }
+                , success : function (data) {
+                    if ( data.result === "success" ) {
+                        alert(data.message);
+                        location.reload();
+                    }
+                    else {
+                        alert(data.message);
+                    }
+                }
+            })
+        }
+        else {
+            alert("옵션 개수를 확인해주세요.");
+        }
+    }
+
+    function refreshOrderNumber() {
+        const optionSortItem = document.querySelectorAll('.product-sort-item');
+        for(let i = 0; i < optionSortItem.length; i++){
+            optionSortItem[i].querySelector("input[name='order_num']").value = Number(i + 1);
+        }
+    }
+
+    function changeProductUseYn(e, id) {
+        const useValue = e.previousElementSibling.value;
+
+        let useYn;
+        useValue === "Y" ? useYn = "N" : useYn = "Y";
+        $.ajax({
+            url : '/manage/product/change-use-yn',
+            type : "POST",
+            data : { "productTourId" : id
+                    , "useYn" : useYn },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+            },
+            success : function(data) {
+                if (data.result === "success" && data.updateCount > 0 ) {
+                    let chkButton = e.previousElementSibling.checked;
+
+                    e.previousElementSibling.checked = !chkButton;
+
+                    if (!chkButton) {
+                        e.previousElementSibling.value = "Y";
+                    } else {
+                        e.previousElementSibling.value = "N";
+                    }
+
+                    e.querySelector(".status li").textContent = useValue === "Y" ? "숨김" : "보임";
+                }else {
+                    alert("상태변경에 실패하였습니다.");
+                }
+            }
+        });
+    }
+</script>
+
+<!--<script th:inline="javascript">-->
+<!--    $(function () {-->
+<!--        initDatatable();-->
+<!--    })-->
+
+<!--    const typeCode = [[${typeCode}]] //상품구분-->
+
+<!--    let datatable;-->
+<!--    initDatatable = function(){-->
+<!--        datatable = $("#datatable").removeAttr('width').DataTable({-->
+<!--            "searching" : false-->
+<!--            ,"paging": true-->
+<!--            ,"bPaginate": true-->
+<!--            ,"responsive": true-->
+<!--            ,"language": lang_kor-->
+<!--            ,"ordering":  false-->
+<!--            ,"bLengthChange" : false-->
+<!--            ,"bInfo":false-->
+<!--            ,"ajax" : {-->
+<!--                "url" : `/manage/product-list/${typeCode}`-->
+<!--                ,"type" : "GET"-->
+<!--                , "beforeSend": function (xhr) {-->
+<!--                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);-->
+<!--                }-->
+<!--                ,"data" : function(d) {-->
+<!--                    console.log("data: ",d)-->
+<!--                }-->
+<!--            }-->
+<!--            ,"processing": true-->
+<!--            ,"serverSide": true-->
+<!--            ,"order" :-->
+<!--                [ [0, 'desc'] ]-->
+<!--            ,"createdRow": function(row, data) {-->
+<!--                console.log(data)-->
+<!--                if ( data.deleteYn === "Y" ) {-->
+<!--                    $(row).css('background-color', '#DC3545');-->
+<!--                }-->
+<!--            }-->
+<!--            ,"columns": [-->
+<!--                { "width": "80px", "name" : "productTourId", "title" : "상품번호", "data" : "productTourId", "className" : "dt-head-center dt-body-center"}-->
+<!--                , { width: 80, "name" : "productCategoryId", "title" : "카테고리", "data" : "productCategoryId", "className" : "dt-head-center dt-body-center"}-->
+<!--                , { "name" : "productTitle", "title" : "이미지", "data" : "productTitle", "className" : "dt-head-center dt-body-center image-w"}-->
+<!--                , { "name" : "productTitle", "title" : "상품명", "data" : "productTitle", "className" : "dt-head-center dt-body-center title-w"}-->
+<!--                , { "name" : "productTitle3", "title" : "가격", "data" : "productTitle", "className" : "dt-head-center dt-body-center price-w"}-->
+<!--                , { "name" : "productUseYn", "title" : "상품표출", "data" : "productUseYn", "className" : "dt-head-center dt-body-center yn-w"}-->
+<!--                , { "name" : "productTitle", "title" : "판매기간", "data" : "productTitle", "className" : "dt-head-center dt-body-center period-w"}-->
+<!--                , { "name" : "func_btns", "title":"상품관리",-->
+<!--                    "data" :-->
+<!--                        function (row, type, set) {-->
+<!--                            return `<button class="product-modify-btn" style="margin-right: 7px" onclick='modifyProduct("${row["productTourId"]}")'>수정</button>-->
+<!--                                    <button class="product-copy-btn" onclick='alert("미개발")'>복사</button>-->
+<!--                                    <button class="product-price-btn" onclick='alert("미개발")'>금액</button>-->
+<!--                                    <button class="product-delete-btn" onclick='alert("미개발")'>삭제</button>`;-->
+<!--                        },-->
+<!--                    "className": "dt-head-center dt-body-center option-w", "orderable" : false}-->
+<!--            ]-->
+<!--        });-->
+<!--    }-->
+
+<!--    function modifyProduct(tourId) {-->
+<!--        console.log(tourId)-->
+<!--        location.href=`/manage/product/modify/domestic/${tourId}`;-->
+<!--    }-->
+<!--</script>-->
+
+<!-- AdminLTE App -->
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

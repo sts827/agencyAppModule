@@ -1,0 +1,97 @@
+th { border-bottom: none !important; }
+tr { background: #FFFFFF;}
+td { height: 57px; font-weight: 400; font-size: 15px; color: #444444; }
+button { background: none; border: none; }
+p { margin: 0; padding: 0 }
+select { -o-appearance: none; -webkit-appearance: none; -moz-appearance: none; appearance: none;}
+label { margin-bottom: 0}
+select {
+    position: relative; height: 35px;
+    margin-left: 10px; padding: 8px 12px;
+    font: 400 15px Pretendard; color: #444444;
+    border: 1px solid #CCCCCC; background: #FFFFFF url('/images/icon/full-arrow-down.svg') no-repeat 95% 50%;
+}
+.car-info input {
+    height: 35px;
+    padding: 0 12px;
+    border: solid 1px #CCCCCC;
+}
+.car-info {
+    padding: 30px 0 40px 0;
+    border-top: solid 1px #222222;
+}
+.car-half-hr {
+    margin: 30px 0;
+    border-top: dashed 1px #CCCCCC;
+}
+.fuel-select {
+    width: 240px;
+}
+.car-first-line {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+    font-weight: 400; font-size: 15px; color: #444444;
+}
+.car-first-line span {
+    margin-right: 25px;
+    font-weight: 500; font-size: 15px;
+    color: #222222;
+}
+.car-first-line input {
+    width: 240px;
+}
+.insurance-select {
+    width: 200px;
+}
+.car-second-line {
+    display: flex; align-items: center;
+    font-weight: 400; font-size: 15px; color: #444444;
+}
+.car-second-line span {
+    margin-right: 7px;
+    font-weight: 500; font-size: 15px;
+    color: #222222;
+}
+.insurance-label input {
+    width: 511px;
+}
+.insurance-label span {
+    margin-right: 17px;
+}
+.car-option-box {
+    display: flex;
+}
+.car-option-title {
+    min-width: 73px;
+    padding-top: 8px;
+    font-weight: 600; font-size: 15px; color: #222222;
+}
+.car-option-button-box {
+    display: flex; flex-wrap: wrap;
+}
+.car-option-button-box-item {
+    position: relative; display:flex; justify-content: center; align-items: center;
+    min-width: 180px; height: 35px;
+    margin-right: 10px; margin-bottom: 10px;
+    padding: 0 10px;
+    border: solid 1px #CCCCCC; background-color: #EEEEEE;
+}
+.add-car-option {
+    display: flex; justify-content: center; align-items: center;
+    width: 180px; height: 35px;
+    color: #FFFFFF;
+    background-color: #383838;
+}
+.delete-car-option-btn {
+    position: absolute; right: 10px;
+    height: 17px;
+}
+.car-option-add-modal {
+    width: 500px; height: 236px; background: #FFFFFF;
+}
+.car-option-add-modal-inner-box {
+    width: 500px; height: 100%; background: #FFFFFF;
+}
+.car-option-btn-group-box{
+    display: flex; justify-content: center; margin-top: 15px;
+}

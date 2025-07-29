@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+	  <div class="content-wrapper">
+	    <div class="content-header">
+	        <h1 class="m-0">장소 <th:block th:text="${mode eq 'I' ? '등록' : '수정'}"></th:block></h1>
+	    </div>
+
+	    <!-- Main content -->
+		<div class="manage-content mb-10">
+			<form id="saveForm" name="saveForm" enctype="multipart/form-data">
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+				<input type="hidden" name="params" id="params" />
+	            <input type="hidden" id="mode" name="mode" th:value="${mode}" />
+	            <input type="hidden" th:if="${mode eq 'U'}" name="tsId" th:value="${PlaceSpot.tsId}" />
+	            <input type="hidden" name="tsStnid" value="184" />
+
+
+				<h3 class="title">장소 <th:block th:text="${mode eq 'I' ? '등록' : '수정'}"></th:block></h3>
+				<div class="card-body">
+					<div class="row form-group ">
+						<label class="col-md-1 req" for="company-name">지역구분</label>
+						<select id="areaType" name="areaType" class="form-control col-md-3">
+							<option value="">선택</option>
+                    	</select>
+                    	<label class="col-md-1 req" for="company-name">장소구분</label>
+						<select id="placeType" name="placeType" class="form-control col-md-3">
+							<option value="">선택</option>
+                    	</select>
+                    	<div class="col-md-4 form-inline">
+							<label class="col-5 req" for="useYn">사용여부</label>
+							<div class="col-7">
+								<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="success" data-on="사용" data-off="미사용" data-width="100%"
+								       th:checked="${PlaceSpot != null and PlaceSpot.useYn == 'Y'} ? 'checked'">
+								<!--/*
+								th:checked="${board.useYn eq 'Y'} ? 'checked' : ${board.useYn eq null ? 'checked' : ''}"
+								*/-->
+							</div>
+						</div>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-1 req" for="company-name">관관지명</label>
+    					<div class="col-md-11 p-0">
+							<input class="form-control col-md-12 col-xs-12" type="text"  id="tsTitle" name="tsTitle" placeholder="관광지명을 입력해주세요" th:value="${PlaceSpot.tsTitle}"/>
+    					</div>
+					</div>
+					<div class="row form-inline">
+						<label class="col-md-1 req" for="company-name">주소</label>
+    					<div class="row col-11" >
+        					<div class="row col-12 form-inline  mb-10">
+	        					<input class="form-control col-5 " type="text" id="tsZipcode"  name="tsZipcode" placeholder="우편번호을 입력해주세요" th:value="${PlaceSpot.tsZipcode}" style="min-width:80px;"/>
+	        					<button class="btn btn-info col-3 " type="button"  onclick="addressOpen()" >우편번호찾기</button>
+        					</div>
+
+        					<div class="row col-12 mb-10">
+	        					<input class="form-control col-9 mb-10" type="text" id="tsRoad" name="tsRoad" placeholder="새주소(도로명) 입력해주세요" th:value="${PlaceSpot.tsRoad}"/>
+	        					<input class="form-control col-3 mb-10" type="text" id="tsDetail" name="tsDetail" placeholder="상세주소 입력 입력해주세요" th:value="${PlaceSpot.tsDetail}"/>
+        					</div>
+        					<div class="row col-12 mb-10">
+		        				<input class="form-control col-9" type="text" id="tsJibun" name="tsJibun" placeholder="지번주소 입력해주세요" th:value="${PlaceSpot.tsJibun}"/>
+			        			<input class="form-control col-3" type="text" id="tsLatitude" name="tsLatitude" placeholder="위도를 입력해주세요" th:value="${PlaceSpot.tsLatitude}"/>
+        					</div>
+        					<div class="row col-12 mb-10">
+		        				<input class="form-control col-9" type="text" id="tsExtra" name="tsExtra" placeholder="법정동이름을 입력해주세요" th:value="${PlaceSpot.tsExtra}"/>
+			        			<input class="form-control col-3" type="text" id="tsLongitude" name="tsLongitude" placeholder="경도을 입력해주세요" th:value="${PlaceSpot.tsLongitude}"/>
+        					</div>
+    					</div>
+					</div>
+					<div class="row form-inline">
+						<label class="col-md-1 req" for="company-name">사진</label>
+    					<div class="row col-11 m-0 p-0" >
+        					<div class="row col-12 m-0 p-0 form-inline">
+								<div class="row col-8  form-inline">
+									<div class="row col-12">
+										<input type="file" id="attach" name="attach" onchange="addFile(this);" multiple style="display: none;" />
+										<button type="button" onClick="uploadFile('attach');"  class="fileUpload btn btn-black"><span><i class="fa fa-plus"></i>&nbsp;첨부파일 추가</span></button>
+									</div>
+									<div class="row col-12">
+										<small>이미지 추천 사이즈 500px x 500px</small>
+									</div>
+									<div class="row col-12">
+										<div class="row col-12 slide-box">
+											<div class="row m-0 p-0" id="slide-file-list">
+<!--/*
+												<div class="slide_photo ui-state-default" id="file">
+													<div><img>1</div>
+													<button type="button" class="board_btn delete p-0" onclick="deleteFile('${i}');"><i class="way-nav-icon wi-delete"></i></button>
+												</div>
+												<div class="slide_photo ui-state-default" id="file">
+													<div><img>2</div>
+													<button type="button" class="board_btn delete p-0" onclick="deleteFile('${i}');"><i class="way-nav-icon wi-delete"></i></button>
+												</div>
+												<div class="slide_photo ui-state-default" id="file">
+													<div><img>3</div>
+													<button type="button" class="board_btn delete p-0" onclick="deleteFile('${i}');"><i class="way-nav-icon wi-delete"></i></button>
+												</div>
+												<div class="slide_photo ui-state-default" id="file">
+													<div><img>4</div>
+													<button type="button" class="board_btn delete p-0" onclick="deleteFile('${i}');"><i class="way-nav-icon wi-delete"></i></button>
+												</div>
+*/-->
+											</div>
+											<div id="slide-file-control">
+												<button type="button" class="btn btn-primary slide prev" onclick="moveToLeft()"  style="display: none;">이전</button>
+												<button type="button" class="btn btn-primary slide next" onclick="moveToRight()" style="display: none;">다음</button>
+											</div>
+										</div>
+										<div class="row col-12">
+											<small>선택으로 대표이미지 설정, 드래그로 노출 순서변경 가능합니다.</small>
+										</div>
+									</div>
+
+								</div>
+								<div class="row col-4 m-0 p-0">
+									<div class="slide_photo thumnail"><img></div>
+								</div>
+        					</div>
+    					</div>
+					</div>
+					<div class="row dline"></div>
+					<div class="row form-group ">
+						<label class="col-md-1 req" for="company-name">전화번호</label>
+    					<div class="col-md-3 p-0">
+							<input class="form-control col-md-12 col-xs-12" type="text" id="tsTel1" name="tsTel1" placeholder="전화번호을 입력해주세요" th:value="${PlaceSpot.tsTel1}"/>
+    					</div>
+
+    					<label class="col-1">홈페이지</label>
+        				<div class="col-7">
+    						<input class="form-control col-md-12 col-xs-12" type="text" id="tsHomepage"  name="tsHomepage" placeholder="홈페이지을 입력해주세요" th:value="${PlaceSpot.tsHomepage}" />
+
+   						</div>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-1 req" for="company-name">장소설명</label>
+    					<div class="col-md-11 p-0">
+							<textarea class="form-control" id="tsHelp" name="tsHelp" th:text="${PlaceSpot.tsHelp}"></textarea>
+    					</div>
+					</div>
+
+<!--/*
+    					<div class="row col-12 mb-10">
+							<label class="col-3" for="">위도·경도</label>
+							<div class="row col-9">
+								<div class="row col-9 mb-10">
+	        					</div>
+        						<small>Ex) 위경도 값이 자동으로 입력이 안될시 우측면 참조</small>
+        					</div>
+    					</div>
+    					<div class="row col-3">
+        					<p class="guide_title tac">[ 위경도 자동입력이 안될 경우 ]</p>
+        					<p class="guide_ment tac">
+        						구글맵에서 명칭 또는 주소를 검색하여 나온 위치포인트에 마우스를 우클릭하여 "이곳이 궁금한가요?"를 확인하시면 위·경도 정보를 확인할 수 있습니다.
+        					</p>
+    					</div>
+
+
+					<table class="table table-bordered">
+						<tr>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2 req">담당자</th>
+	        				<td class="col-4">
+	        					<div class="">
+	        						<input class="form-control col-md-12 col-xs-12" type="text" id="tsManager" name="tsManager" placeholder="담당자을 입력해주세요" th:value="${PlaceSpot.tsManager}"/>
+	        					</div>
+	        				</td>
+	        				<th class="col-2 req">담당자<br>전화번호</th>
+	        				<td class="col-4">
+	        					<div class="">
+		        					<input class="form-control col-md-12 col-xs-12" type="text" id="tsTel2" name="tsTel2" placeholder="담당자 연락처을 입력해주세요" th:value="${PlaceSpot.tsTel2}"/>
+		        					<small>"-" 없이 번호만 입력하세요.</small>
+	        					</div>
+	        				</td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2 req">직원수</th>
+	        				<td class="col-4">
+	        					<div class="">
+	        						<input class="form-control col-md-12 col-xs-12" type="text" id="tsEmployee" name="tsEmployee" placeholder="직원수를 입력해주세요" th:value="${PlaceSpot.tsEmployee}"/>
+	        					</div>
+	        				</td>
+	        				<th class="col-2 req">사업자등록번호</th>
+	        				<td class="col-4">
+	        					<div class="">
+		        					<input class="form-control col-md-12 col-xs-12" type="text" id="tsCompanynum" name="tsCompanynum" placeholder="사업자번호를 입력해주세요"  th:value="${PlaceSpot.tsCompanynum}"/>
+		        					<small>"-" 없이 번호만 입력하세요.</small>
+		        				</div>
+	        				</td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2 req">실내비중(%)</th>
+	        				<td class="col-4">
+	        					<div class="">
+			        				<input class="form-control col-md-12 col-xs-12" type="text" id="tsInside" name="tsInside" placeholder="실내비중을 입력해주세요"  th:value="${PlaceSpot.tsInside}"/>
+			        				<small>Ex) 야외3, 실내7= 실내70</small>
+	        					</div>
+	        				</td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2 req">주소정보</th>
+	        				<td class="col-10" colspan="3">
+
+	        				</td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2">개요</th>
+	        				<td class="col-10" colspan="3">
+	        					<div class="">
+	        						<textarea class="form-control" style="height: 100px;" rows="3" id="tsSummary" name="tsSummary" th:text="${PlaceSpot.tsSummary}"></textarea>
+	        					</div>
+	        				</td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2 req">문의 및 안내</th>
+	        				<td class="col-10" colspan="3">
+	        					<textarea class="form-control" id="tsHelp" name="tsHelp" th:text="${PlaceSpot.tsHelp}"></textarea>
+	        				</td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2">개장일</th>
+	        				<td class="col-4"><input class="form-control col-md-12 col-xs-12" type="text" id="tsBirthday" name="strTsBirthday" placeholder="개장일을 입력해주세요" th:value="${PlaceSpot.strTsBirthday}"/></td>
+	        				<th class="col-2 req">휴무일</th>
+	        				<td class="col-4"><input class="form-control col-md-12 col-xs-12" type="text" id="tsHoliday" name="tsHoliday" placeholder="휴무일을 입력해주세요"  th:value="${PlaceSpot.tsHoliday}"/></td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2 req">운영시간</th>
+							<td class="col-4">
+	        					<div class=" form-inline">
+	        						<input class="form-control col-md-5 col-xs-12" type="text" id="tsStart" name="strTsStart" placeholder="09:00:00" th:value="${PlaceSpot.strTsStart}"/>
+	        						<span>-</span>
+	        						<input class="form-control col-md-5 col-xs-12" type="text" id="tsFinish" name="strTsFinish" placeholder="18:00:00" th:value="${PlaceSpot.strTsFinish}"/>
+	        					</div>
+	        				</td>
+	        				<th class="col-2 req">수용인원</th>
+	        				<td class="col-4">
+		        				<input class="form-control col-md-12 col-xs-12" type="text" id="tsPersonnel" name="tsPersonnel" placeholder="수용가능 입력해주세요" th:value="${PlaceSpot.tsPersonnel}"/>
+	        				</td>
+						</tr>
+	        			<tr>
+	        				<th class="col-2 req">체험안내</th>
+	        				<td colspan="3">
+	        					<textarea class="form-control" id="tsExiting" name="tsExiting" th:text="${PlaceSpot.tsExiting}"></textarea>
+	        				</td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2 req">체험이용시기</th>
+	        				<td><input class="form-control col-md-12 col-xs-12" type="text" id="tsUseday" name="tsUseday" placeholder="체험이용시기을 입력해주세요" th:value="${PlaceSpot.tsUseday}"/></td>
+	        				<th class="col-2 req">체험이용시간</th>
+	        				<td><input class="form-control col-md-12 col-xs-12" type="text" id="tsUsetime" name="tsUsetime" placeholder="체험이용시간을 입력해주세요" th:value="${PlaceSpot.tsUsetime}"/></td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2">체험가능인원</th>
+	        				<td colspan="3"><input class="form-control col-md-12 col-xs-12" type="text" id="tsExitingInwon" name="tsExitingInwon" placeholder="체험가능인원을 입력해주세요" th:value="${PlaceSpot.tsExitingInwon}"/></td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2">상세정보</th>
+	        				<td class="col-10" colspan="3">
+	        					<textarea class="form-control" id="tsInfo" name="tsInfo" rows="4" th:text="${PlaceSpot.tsInfo}"></textarea>
+	        				</td>
+	        			</tr>
+	        			<tr>
+	        				<th class="col-2 req">유투브 영상코드</th>
+	        				<td class="col-10" colspan="3">
+	        					<textarea class="form-control" id="tsYoutubeCode" name="tsYoutubeCode" th:text="${PlaceSpot.tsYoutubeCode}"></textarea>
+	        				</td>
+	        			</tr>
+	        			<tr class="app_input" id="uploaded-files">
+							<th scope="row" class="file req">관광지 사진</th>
+							<td colspan="3" class="fileUpload">
+								<div class="btn-group">
+									<button type="button" onClick="uploadFile('attach');"  class="fileUpload btn btn-primary"><span><i class="fa fa-plus"></i>&nbsp;첨부파일 추가</span></button>
+									<button type="button" class="fileUpload btn btn-danger" onclick="removeFiles()"><span><i class="fa fa-minus"></i>&nbsp;전체삭제</span></button>
+									<input type="file" id="attach" name="attach" style="display: none;" onchange="addFile(this);" multiple />
+								</div>
+
+								<ul id="attach-file-list"></ul>
+								<div id="attach-hidden-files"></div>
+							</td>
+						</tr>
+		        	</table>
+*/-->
+				</div>
+			</form>
+		</div>
+		<div class="col-md-12 clearfix">
+			<div class="text-center">
+				<button type="button" class="btn btn-black"   onclick="preList()">취소하기</button>
+				<button type="button" class="btn btn-primary" onclick="save()">저장하기</button>
+				<button type="button" class="btn btn-danger"  onclick="goDelete()" th:if="${mode eq 'U'}">삭제하기</button>
+			</div>
+		</div>
+	    <!-- /.content -->
+	  </div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashboard.js"></script>
+	-->
+	<script type="text/javascript" th:inline="javascript">
+		var editorTsExiting;
+
+		$(document).ready(function() {
+			let searchParams = new URLSearchParams(window.location.search);
+			if(searchParams.has('params')){
+				parmas = searchParams.get('params');
+	        	setParams( parmas );
+			}
+			initAttachFileList();
+			$( "#slide-file-list" ).sortable();
+
+			$('#areaType').html(
+				loadMakeUpHtmlSelect('areaType', [[${PlaceSpot.areaType}]], 'areaType','areaType', 'form-control col-md-12 col-xs-12 req',true, '선택' , '')
+			);
+			$('#placeType').html(
+				loadMakeUpHtmlSelect('placeType', [[${PlaceSpot.placeType}]], 'placeType','placeType', 'form-control col-md-12 col-xs-12 req',true, '선택' , '')
+			);
+
+		});
+
+		$(window)
+			.on('load',function(){
+				initUploadFile('slide');
+	/*
+				fnMakeCkeditor( $('#tsExiting')[0],  false ).then(
+					makedEditor => {
+						editorTsExiting = makedEditor;
+					});
+	*/
+				//fnMakeCkeditor($('#tsExiting')[0],  true);
+				btnShownHide();
+			}).on('resize',function(){
+			    if( $('.slide-box').width() >= $('#slide-file-list').width() ){
+
+				} else {
+
+				}
+			});
+
+		preList = function(){
+			location.href = "/manage/place/spot/list?params="+getParams();
+		}
+
+		formCheck = function(){
+    		console.log('formCheck');
+
+    		if($("#tsTitle").val().trim().length == 0){
+    			$("#tsTitle").parent().addClass('is-invalid');
+    			$("#tsTitle").focus();
+    			alert( "관광지명을 입력하여주십시오" );
+    			return true;
+    		} else if($("#tsZipcode").val().trim().length == 0){
+    			$("#tsZipcode").parent().addClass('is-invalid');
+    			$("#tsZipcode").focus();
+    			alert( "우편번호을 입력하여주십시오" );
+    			return true;
+    		} else if($("#tsRoad").val().trim().length == 0){
+    			$("#tsRoad").parent().addClass('is-invalid');
+    			$("#tsRoad").focus();
+    			alert( "도로명 주소을 입력하여주십시오" );
+    			return true;
+    		} else if($("#tsTel1").val().trim().length == 0){
+    			$("#tsTel1").parent().addClass('is-invalid');
+    			$("#tsTel1").focus();
+    			alert( "전화번호을 입력하여주십시오" );
+    			return true;
+    		} else if($("#tsLatitude").val().trim().length == 0){
+    			$("#tsLatitude").parent().addClass('is-invalid');
+    			$("#tsLatitude").focus();
+    			alert( "위도를 입력하여주십시오" );
+    			return true;
+    		} else if($("#tsLongitude").val().trim().length == 0){
+    			$("#tsLongitude").parent().addClass('is-invalid');
+    			$("#tsLongitude").focus();
+    			alert( "경도를 입력하여주십시오" );
+    			return true;
+    		} else {
+    			$('.is-invalid').remove('is-invalid');
+    		}
+
+    		return false;
+    	}
+
+		save = function() {
+			var form = document.saveForm;
+			var nowac = "";
+
+			if($("#mode").val() == 'U'){
+				nowac = "저장";
+			}else if($("#mode").val() == 'I'){
+				nowac = "등록";
+			}
+
+			if(!formCheck()){
+				if( confirm(nowac+"하시겠습니까?")) {
+					var formData = new FormData($('#saveForm')[0]);
+
+					$('input[data-toggle="toggle"]').each(function(i,e){
+					    formData.set( $(e).attr('name'), $(e).is(':checked') ? 'Y' : 'N');
+					});
+
+					if( typeof(filesArr) !== 'undefined' ){
+						$(`.slide_photo:not(.thumnail)`).each(function(i,e){
+						    var fileId = $(e).attr('data-fileid');
+
+						    for (var j = 0; j < filesArr.length; j++) {
+						        if(filesArr[j].fileId == fileId){
+						            filesArr[j].sortOrder = i;
+						            //console.log(filesArr[j].sortOrder, filesArr[j].fileId);
+						        }
+						    }
+						});
+
+						for (var i = 0; i < filesArr.length; i++) {
+					        // 삭제되지 않은 파일만 폼데이터에 담기
+					        if (!filesArr[i].isDelete) {
+					        	formData.append("attachs", filesArr[i]);
+
+					        	var fileId = filesArr[i].fileId;
+					        	console.log(fileId, typeof fileId  )
+
+					        	if( typeof fileId != 'number' ){
+									formData.append("orders", [filesArr[i].fileId, filesArr[i].sortOrder,  filesArr[i].name] );
+								} else {
+									formData.append("orders", [filesArr[i].fileId, filesArr[i].sortOrder] );
+								}
+					        } else {
+					        	formData.append("deletes", filesArr[i].fileId);
+					        }
+
+					        if(filesArr[i].isThumnail){
+					        	if(filesArr[i].uploadFilename !== undefined){
+					        		formData.append("thumnail", filesArr[i].uploadFilename);
+					        	} else {
+					        		formData.append("thumnail", filesArr[i]);
+					        	}
+					        }
+					    }
+					}
+
+					$.ajax({
+						url : '/manage/place/spot-save',
+						type : "POST",
+						enctype: 'multipart/form-data',
+						contentType : false,
+						processData : false,
+						data : formData,
+						dataType : "json",
+						beforeSend: function (xhr) {
+								xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+						},
+						success : function(res) {
+							if (res.result === "success" ) {
+								alert(res.message);
+			                    preList();
+							}else {
+								alert(res.message);
+			                    return;
+							}
+						}
+					});
+				}
+			}
+		}
+
+		goDelete = function(id){
+			if(confirm("삭제하시겠습니까?")){
+				$.ajax({
+					url : '/manage/place/spot/delete',
+					type : "POST",
+					data : {"id" : id},
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					},
+					success : function(res){
+						if("success" == res.result){
+							alert("삭제되었습니다.");
+							datatable.ajax.reload();
+						}else{
+							alert(res.message)
+						}
+					}
+				})
+			}
+		}
+	</script>
+	<script type="text/javascript" th:inline="javascript">
+		removeFiles = function() {
+			for(var i=0; i<fileNo; i++){
+				deleteFile(i);
+			}
+		}
+		initAttachFileList = function(){
+			var html = '';
+			var thumnail = [[${PlaceSpot.tsAppend}]];
+
+			//console.log(`thumnail : ${thumnail}`);
+
+			$.ajax({
+				url : '/manage/place/spot-attchlist',
+				type : "GET",
+				data : {"id" : [[${PlaceSpot.tsId}]]},
+				dataType : "json",
+				success : function(res) {
+					if ("success" == res.result) {
+						var files = res.listAttach;
+
+						if(files !== null){
+
+							for(let i=0; i<files.length; i++){
+								var file = files[i];
+								var _thumnailUrl = `/upload/place/${file.uploadFilename}`;
+
+								filesArr.push(file);
+								filesArr[i].isDelete = false;
+//								console.log(thumnail === _thumnailUrl );
+
+								filesArr[i].isThumnail = (thumnail === _thumnailUrl );
+	// 							console.log(file);
+	 							//console.log(filesArr[i].isThumnail);
+								let htmlData = '';
+
+								htmlData += `<div class="slide_photo ${filesArr[i].isThumnail ? 'check':''}" id="file${i}" data-fileid=${file.fileId}>`;
+								htmlData += `<div ><img class="thumnail" ondblclick="setThumnail('${i}');" src="${_thumnailUrl}"></div>`;
+								htmlData += `<button type="button" class="board_btn delete p-0" onclick="deleteFile('${i}');"><i class="way-nav-icon wi-delete"></i></button>`;
+								htmlData += `</div>`;
+
+								if( filesArr[i].isThumnail ){
+									//console.log(_thumnailUrl);
+									$(`#file${i} .slide_photo`).addClass("check");
+									$('.slide_photo.thumnail img').attr('src', `${_thumnailUrl}`);
+								}
+
+					            $('#slide-file-list').append(htmlData);
+							}
+
+							fileNo = files.length;
+						}
+					}else {
+						alert(res.message);
+					}
+				},
+				complete:function(){initSlideParam("slide-file-list");}
+			});
+		}
+	</script>
+
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+    	function addressOpen(){
+		    new daum.Postcode({
+		        oncomplete: function(data) {
+		            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
+		            // 예제를 참고하여 다양한 활용법을 확인해 보세요.
+// 		            console.log(data);
+		            $('#tsZipcode').val(data.zonecode);
+		            $('#tsRoad').val(data.roadAddress);
+		            $('#tsJibun').val(data.jibunAddress);
+		            $('#tsExtra').val(data.bname);
+
+		            $.ajax({
+		            	url:'https://dapi.kakao.com/v2/local/search/address.json?query='+encodeURIComponent(data.roadAddress),
+			            type : 'GET',
+			            headers: {'Authorization' : `KakaoAK [(${DAPI_KEY})]`},
+			            dataType : 'JSON',
+			            success : function(res) {
+			            	if(res.documents.length > 0){
+			            		var addr = res.documents[0].road_address;
+					            $('#tsLatitude').val(addr.y);
+					            $('#tsLongitude').val(addr.x);
+			            	}
+			            },
+			            error : function(xhr, code, errorMsg) { },
+			            beforeSend : function() { },
+			            complete : function() { }
+			        });
+
+
+		        }
+		    }).open();
+    	}
+
+		testInput = function(){
+			$('#tsFinish').val('18:00:00');
+			$('#tsStart').val('09:00:00');
+			$('#tsCompanynum').val('129301');
+			$('#tsDetail').val('12');
+			$('#tsEmployee').val('10');
+			$('#tsExiting').val('안내');
+			$('#tsExtra').val('영평동');
+			$('#tsHelp').val('안내');
+			$('#tsHoliday').val('연중무휴');
+			$('#tsInside').val('60');
+			$('#tsJibun').val('제주특별자치도 제주시 영평동 2181');
+			$('#tsLatitude').val('38.5');
+			$('#tsLongitude').val('126.7');
+			$('#tsManager').val('테스트');
+			$('#tsPersonnel').val('10');
+			$('#tsRoad').val('제주특별자치도 제주시 첨단로 242');
+			$('#tsStnid').val('184');
+			$('#tsSummary').val('');
+			$('#tsTel1').val('101');
+			$('#tsTel2').val('12010');
+			$('#tsTitle').val('테스트');
+			$('#tsUseday').val('시기');
+			$('#tsUsetime').val('시간');
+			$('#tsYoutubeCode').val('123123');
+			$('#tsZipcode').val('63309');
+//			$('#tsAppend').val('test');
+		}
+
+		let slideWidth = 0;
+		let slideStep = 0;
+		let limitStep = 0;
+
+		initSlideParam = function(target){
+			console.log('initSlideParam');
+		//"#slide-file-list"
+			var moveTarget = $(`#${target}`);
+
+			var eleWidth = moveTarget.children(':eq(0)').outerWidth(); //180
+			//var marginRight = Number( moveTarget.children(':eq(0)').css('margin-right').replace('px','') ); //10
+			var marginRight = 10; //10
+
+			slideWidth = eleWidth + marginRight;
+
+			moveTarget.width( slideWidth * moveTarget.children().length );
+
+			if( $('.slide-box').width() <= $('#slide-file-list').width() ){
+				limitStep = Math.floor($('#slide-file-list').width() / 180) - Math.floor($('.slide-box').width() / 180);
+			}
+		}
+
+		moveToLeft = function(){
+			slideStep--;
+
+			var moveTarget = $("#slide-file-list");
+			moveTarget.animate({left:(slideWidth * slideStep * -1) + 10 }, 500);
+			btnShownHide();
+		}
+		moveToRight = function(){
+			slideStep ++;
+			var moveTarget = $("#slide-file-list");
+			moveTarget.animate({left:(slideWidth * slideStep * -1) + 10}, 500)
+			btnShownHide();
+		}
+		btnShownHide = function(){
+			if($('#slide-file-list .slide_photo').length == 0){
+				$('.slide.prev').hide();
+				$('.slide.next').hide();
+			} else if(slideStep <= 0){
+				$('.slide.prev').hide();
+				$('.slide.next').show();
+			} else if(slideStep >= limitStep){
+				$('.slide.prev').show();
+				$('.slide.next').hide();
+			} else {
+				$('.slide.prev').show();
+				$('.slide.next').show();
+			}
+		}
+
+	</script>
+
+	<style>
+		.slide-box{ border: 1px solid #e6e6e6; padding: 10px;position: relative;height: 200px; padding: 10px;overflow: hidden;}
+		#slide-file-list{ width: 728px; height: 180px;position: absolute; }
+		.slide_photo{position: relative;width: 180px;height: 180px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 10px;}
+		.slide_photo img{width: 100%; height: 100%;}
+		.slide_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+		.slide_photo.thumnail{width: 306px;height: 306px;}
+		.slide_photo.thumnail img{width: 100%; height: 100%;}
+
+		#slide-file-control .slide {position: absolute; top:80px;}
+		#slide-file-control .slide.prev {left: 5px;}
+		#slide-file-control .slide.next {right: 5px;}
+
+		.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+		.board_btn.thumnail {top: 5px;left: 5px;}
+		.board_btn.delete {top: 5px;right: 5px;}
+
+		.slide_photo.check .board_btn.delete{display: none;}
+	</style>
+
+	</body>
+</html>

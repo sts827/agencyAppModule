@@ -1,0 +1,367 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<div class="weather-load" th:fragment="tab-weather(strClass, strDataId)" th:class="${strClass}" th:id="${strDataId}">
+	<div class="cast_area hr1-fct castpro">
+		<div class="dfs-tab">
+			<div class="dfs-tab-head-wrap">
+				<ul class="dfs-tab-head">
+					<!--/*ajax에서 처리해줄거임*/-->
+				</ul>
+			</div>
+		</div>
+
+		<div class="dfs-tab-body">
+			<!-- 단기예보 타이틀 -->
+			<ul class="item-lbl" >
+				<li>시각</li>
+				<li>날씨</li>
+				<li>기온</li>
+				<li>체감온도</li>
+				<li>강수량(mm)</li>
+				<li>강수확률</li>
+				<li>바람(m/s)</li>
+				<li>습도</li>
+				<li>폭염영향</li>
+			</ul>
+			<!-- 중기예보 타이틀 -->
+			<ul class="item-lbl-midterm">
+				<li>날짜</li>
+				<li>날씨</li>
+				<li>기온</li>
+				<li>강수확률</li>
+			</ul>
+
+			<div class="dfs-slider">
+				<div class="slide-wrap" >
+					<!--/*ajax에서 처리해줄거임*/-->
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<div class="castpro cast_none"> 표시 날씨 정보가 없습니다.</div>
+
+	<script type="text/javascript" src="/js/create-dfs-slider.js"></script>
+	<script type="text/javascript" src="/js/iscroll-probe.js"></script>
+	<script type="text/javascript" src="/js/highcharts.js"></script>
+	<script type="text/javascript"  th:inline="javascript">
+		 weatherInfo = function(lat, lon){
+		 	$.ajax({
+				url: '/weather/info',
+				data:{lat:lat, lon:lon},
+				type: "GET",
+		 		dataType : "json",
+				success: function (res) {
+
+					if ("success" == res.result) {
+						console.log(res.data.list_header.length);
+						if(res.data.list_header.length === 0){
+							$('.weather').hide();
+						}else{
+							setWeatherHtml(res.data);
+							createDfsSlider();
+
+							$('.castpro').hide();
+							$(".cast_area").show()
+						}
+					} else if ("null" == res.result) {
+						$('.castpro').hide();
+						$(".cast_none").show()
+					} else {
+	                     alert(res.message);
+	                 }
+	             }
+	         });
+		};
+
+         setWeatherHtml = function(data){
+		 	var htmlHd = '';
+		 	var htmlBd = '';
+
+		 	var _info = data['date_info'];
+
+		 	for(var idx in data.list_header){
+		 		if(idx > 3) break;
+
+		 		var date = data.list_header[idx];
+		 		var dateList = data[date];
+
+		 		var tmx = _info[date+'_tmx'],
+		 		    tmn = _info[date+'_tmn'],
+		 		    dt  = _info[date+'_dt'],
+		 		    dtf = _info[date+'_dtf'],
+		 		    dow = _info[date+'_dow'],
+		 		    st  = _info[date+'_st'],
+		 		    sdt = _info[date+'_sdt'];
+		 		var dayName;
+
+		 		switch(idx){
+		 			case '0': dayName='오늘';break;
+		 			case '1': dayName='내일';break;
+		 			case '2': dayName='모레';break;
+		 			case '3': dayName='글피';break;
+		 			case '4': dayName='그글피';break;
+		 		}
+
+		 		htmlHd += `<li><a href="#" data-date="${dt}" class="${idx == 0 ? 'on':''}">${dayName}</a></li>`;
+
+		 		htmlBd += `<div class="slide">`;
+		 		htmlBd += `<h4 class="hid">${dayName}</h4>`;
+
+		 		htmlBd += `<div class="daily" data-date="${dt}" data-start-time="${sdt}시" data-start-data-time="${st}" data-experimental="">`
+		 		htmlBd += `<div class="daily-head">`
+		 		htmlBd += `<span class="date">${dtf} (${dow})</span>`;
+
+		 		if( !(tmn === undefined || tmx === undefined) ){
+		 			htmlBd += `<span class="tminmax">`;
+		 			htmlBd += `<span class="tmin">최저<span class="minval">${tmn}℃</span></span>`;
+		 			htmlBd += `<span class="tmax">최고<span class="maxval">${tmx}℃</span></span>`;
+		 			htmlBd += `</span>`;
+		 		}
+
+
+		 		htmlBd += `<ul class="table-head"><li>시각</li><li>날씨</li><li>기온<br>(체감)</li><li>강수량</li><li>강수<br>확률</li><li>바람</li><li>습도</li><li>폭염<br>영향</li></ul>`;
+		 		htmlBd += `</div>`;
+		 		htmlBd += `<div class="item-wrap">`;
+
+		 		for(var j in dateList){
+		 			var item = dateList[j];
+
+		 			htmlBd += `<ul class="item vs-item v-item-first" data-date="${item.timef1}" data-time="${item.timef2}">`;
+		 			htmlBd += `<li><span class="hid">시각: </span><span>${item.timef2}시</span></li>`;
+		 			htmlBd += `<li><span class="hid">날씨: </span><span class="wic ${item.weatherImage}" title="${item.weatherType}">${item.weatherType}</span></li>`;
+		 			htmlBd += `<li><span class="hid">기온(체감온도) </span><span class="hid feel">${item.tmp}℃<span class="chill">(${item.windChillTmp}℃)</span></span></li>`;
+		 			htmlBd += `<li><span class="hid">체감온도: </span><span>${item.windChillTmp}℃</span></li>`;
+		 			htmlBd += `<li class="pcp "><span class="hid">강수량: </span><span>${item.pcp}</span></li>`;
+		 			htmlBd += `<li><span class="hid">강수확률: </span><span>${item.pop}%</span></li>`;
+		 			htmlBd += `<li><span class="hid">바람: </span><span class="wdic sm ${item.vecEngStr}_b" title="${item.vecStr}">${item.vecStr}</span><span class="wspd">${item.wsd}<span class="unit">m/s</span></span></li>`;
+		 			htmlBd += `<li><span class="hid">습도: </span><span>${item.reh}%</span></li>`;
+		 			htmlBd += `<li><span class="hid">폭염영향: </span><span class="lvl-white lvl-show"></span></li>`;
+		 			htmlBd += `</ul>`;
+		 		}
+		 		htmlBd += `</div>`; //item-wrap
+		 		htmlBd += `</div>`; //daily
+		 		htmlBd += `</div>`;
+		 	}
+		 	htmlBd += `<div class="tchart" data-data="${data.temp_data}" ></div>`;
+
+
+		 	$('.dfs-tab-head').html(htmlHd);
+		 	$('.slide-wrap').html(htmlBd);
+		 }
+	</script>
+	<style>
+		/*날씨 탭*/
+		.dfs-tab{padding:50px 0 120px;}
+		.dfs-tab ul li{display:inline-block;width:160px;margin-right:10px;float:left;background:#DCECFF;font-size:20px;color:#0066DB;line-height:46px !important;text-align:center;cursor:pointer;border:0px !important;}
+		.dfs-tab ul li:last-child{margin-right:0px}
+		.dfs-tab ul li.active, .dfs-tab ul li:hover{}
+		.dfs-tab ul li a{display:inline-block;width:100%;height:100%;line-height:50px;font-family:SEBANG_Gothic_Regular;}
+		.dfs-tab ul li a.on, .dfs-tab ul li a:hover{background:#0066DB !important;color:#fff;}
+
+		/*날씨예보*/
+		.stopover_area{width:100%;position:relative}
+		.stopover_wrap{position: relative; display:inline-block !important;width:100%;padding:45px 0 30px;}
+		.stopover_line{border-bottom: 4px solid #ECF5FF;padding-top:140px;position:absolute;width:100%;}
+		.stopover_spot{}
+		.man_icon {position: absolute; top: 45px; left: 85px;}
+		.spot_end{right:0px;}
+		.stopover_spot_box{position: relative; width:170px !important;height:220px;bottom:0px;margin-left:45px;display:inline-block}
+		.weather_icon_bubble {position: absolute; top: 0; left: 50%; width: 178px;
+		    height: 59px; border-radius: 10px; background-color: #F1F1F1;}
+
+		.weather_icon_bubble span {
+		    font-size: 16px;
+		    display: inline-block;
+		    vertical-align: middle;
+		    padding-top: 18px;
+		    color: #0066DB;
+		}
+
+		.bubble_icon {
+		    width: 23px; height: 23px;
+		    margin-left: 25px;
+		    margin-right: 10px;
+		}
+
+		.bubble_icon img, .weather_icon img {
+		    width: 23px; height: 23px;
+		}
+
+		.weather_bubble {
+		    position: absolute; top: 160px; left: -10%;
+		    width: 200px;
+		    height: 40px;
+		    background-color: white;
+		    border: 1px solid #C9CACA; box-sizing: border-box;
+		    border-radius: 10px;
+		    text-align: center;
+		    word-break:break-all;
+		}
+
+		.weather_bubble span {
+		    font-size: 16px;
+		    display: inline-block;
+		    vertical-align: middle;
+		    padding-top: 8px;
+		    color: #3E3A39;
+
+		}
+
+		.weather_icon {margin-right: 10px;}
+
+
+		.weather_bubble::after {
+		    border-color: white transparent;
+		    border-style: solid;
+		    border-width: 0 6px 8px 6.5px;
+		    content: '';
+		    display: block;
+		    left: 94px;
+		    position: absolute;
+		    top: -7px;
+		    width: 0;
+		    z-index: 1;
+		  }
+
+		  .weather_bubble::before {
+		    border-color: #C9CACA transparent;
+		    border-style: solid;
+		    border-width: 0 6px 8px 6.5px;
+		    content: '';
+		    display: block;
+		    left: 94px;
+		    position: absolute;
+		    top: -8px;
+		    width: 0;
+		    z-index: 0;
+		  }
+
+
+		.slick-slide:first-child:before{content:'';display:inline-block;width:23px;height:27px;background:url(../icon/detail/map_go.svg);margin-top:85px; margin-left: 120px; position:absolute; z-index: 999;}
+		.slick-slide:last-child > div:after{content:'';display:inline-block;width:23px;height:27px;background:url(../icon/detail/map_go.svg);position:absolute;margin-top:85px;margin-left:-95px;}
+
+		.stopover_img{width:57px;height:70px;margin:0 auto; no-repeat;}
+		.stopover_point{width:16px;height:16px;background:#989898;box-sizing:border-box;border-radius:15px; margin:20px auto}
+		.stopover_wrap .active .stopover_img{no-repeat;}
+
+		/**/
+		.stopover_wrap .active .stopover_img{background:url('/images/icon/coruse_point_hover.svg') no-repeat !important;}
+		.stopover_wrap .active .stopover_point{border:4px solid #0066DB !important;}
+		/**/
+
+		.stopover_txt{font-size:20px;text-align:center;font-weight:600}
+		.stopover_icon{width:20px;height:auto;position:absolute;top:80px;cursor:pointer}
+		.stopover_left{margin-left:-50px;}
+		.stopover_right{right:0px;margin-right:-50px;}
+		.cast_layer{display:none;}
+
+		.cast_area{position:relative; min-height:300px; overflow:hidden; width:100%;}
+		.cast_area .dfs-tab-head-wrap { float:left; overflow:hidden; margin-top:0;}
+		.cast_area .dfs-tab {padding: 50px 0px 0px 0px; height: 51px; position:relative;border-bottom:1px solid #ccc}
+		.cast_area .dfs-tab-head { width:680px;height:53px;}
+		.cast_area .dfs-tab-body { position:relative; min-height:350px; overflow:hidden; width:100%;margin-top:50px;}
+		.cast_area .item-lbl {z-index:2; background:#fff; position:absolute; padding-top:80px; width:110px; left:0; top:0;}
+		.cast_area .item-lbl-midterm {display:none; z-index:2; background:#fff; position:absolute; padding-top:80px; width:110px; left:0; top:0;}
+		.hid{ overflow:hidden;position:absolute;width:0;height:0; left:-9999px; top:-9999px; line-height:0;}
+		.cast_area .slide {float:left; position:relative; margin-bottom:20px;}
+		.cast_area .slide .daily { float:left; position:relative;}
+		.cast_area .slide:first-of-type{margin-left:110px;}
+		.slide .daily-head { position:absolute; left:0px; top:10px;}
+		.dfs-tab-body .slide:not(.day-ten) .daily .daily-head { margin-left:23px; }
+		.dfs-tab-body .slide:not(.day-ten):first-child .daily .daily-head { margin-left:auto;}
+		.cast_area .slide .daily .daily-head .date { background-color: #0066DB; color:#fff; padding:8px 15px; display:inline; font-size:18px; font-weight:600;margin-right:5px;}
+		.cast_area .slide .daily .daily-head .date:after{content:'';position:absolute; top:27px; left:30px;width: 0;  height: 0; border-left: 9px solid transparent;  border-right: 9px solid transparent; border-top:15px solid #0066DB;}
+		.slide .daily .daily-head .table-head, .end-date, .item-date{display:none;}
+		.tminmax{font-size:18px;color:#BFBFBF;}
+		.tmin, .tmax{color:#3E3A39;}
+		.minval{color:#0066DB;font-weight:600}
+		.maxval{color:#FF2C00;font-weight:600}
+		.item-lbl li{font-size:18px;text-align:center;letter-spacing:-1px;font-weight:600}
+		.table-head li span, .item-wrap li{font-size:16px;}
+		.cast_area .slide .daily{float:left; position:relative;}
+		.item-lbl li{line-height:70px;  border-right: 2px dashed #eee;}
+		.item li{height:70px; line-height:70px;border-right: 2px dashed #eee;}
+		.item-lbl li:nth-child(3), .item li:nth-child(3){height:150px; line-height:150px;}
+		.item-lbl li:nth-child(7), .item li:nth-child(7){height:120px; line-height:120px;}
+		.item li.pcp{background:#F6F6F6}
+		.cast_area .item{float:left; width: 80px;margin-top:80px; position:relative; text-align:center;}
+		.cast_area .item.all-day{width:160px;}
+		.slide-wrap .midterm-guide-gray{ position:absolute; width:100%; top:370px; right:0; left:0; display:table; background:#F8F8F8; height:140px;}
+		.slide-wrap .midterm-guide{ position:absolute; width:100%; top:580px; right:0; left:0; display:table; background:#F8F8F8; height:260px;}
+		.slide-wrap .midterm-guide p{text-align:center; font-size:14px; line-height: 20px;display: table-cell;vertical-align: middle;}
+		.slide-wrap .tchart { position:absolute; left:110px; top:245px; height:100px; overflow:hidden;}
+		.slide-wrap .midtchart { position:absolute;  left:55px; top:245px; height:100px; overflow:hidden;}
+		.day-ten .item li:nth-child(4){padding-top:140px;}
+		.item li span.lvl-show{display:inline-block;color:#fff;line-height:30px;width:100%;background:#FF9900;color:#fff;}
+
+		/*날씨아이콘*/
+		.item li:nth-child(2) .wic{width:100%;height:100%;background-size:50px auto;display:block;margin:0 auto;}
+		.wic{text-indent:-99999px;}
+		.DB01{background:url('/images/icon/cast_icon/01_sunny.svg') no-repeat center center;}
+		.DB02{background:url('/images/icon/cast_icon/03_partlysunny.svg') no-repeat center center;}
+		.DB03{background:url('/images/icon/cast_icon/05_partlycloudy.svg') no-repeat center center;}
+		.DB04{background:url('/images/icon/cast_icon/07_cloudy.svg') no-repeat center center;}
+		.DB05{background:url('/images/icon/cast_icon/09_rainy.svg') no-repeat center center;}
+		.DB06{background:url('/images/icon/cast_icon/13_rainy_or_snowy.svg') no-repeat center center;}
+		.DB07{background:url('/images/icon/cast_icon/15_snowy_or_rainy.svg') no-repeat center center;}
+		.DB08{background:url('/images/icon/cast_icon/11_snowy.svg') no-repeat center center;}
+		.DB09{background:url('/images/icon/cast_icon/08_shower.svg') no-repeat center center;}
+		.DB010{background:url('/images/icon/cast_icon/18_raindrop.svg') no-repeat center center;}
+		.DB011{background:url('/images/icon/cast_icon/16_sometimes_snowy_or_rainy.svg') no-repeat center center;}
+		.DB012{background:url('/images/icon/cast_icon/12_sometimes_snowy.svg') no-repeat center center;}
+		.DB01_N{background:url('/images/icon/cast_icon/02_sunny_night.svg') no-repeat center center;}
+		.DB02_N{background:url('/images/icon/cast_icon/04_partlysunny_night.svg') no-repeat center center;}
+		.DB03_N{background:url('/images/icon/cast_icon/06_partlycloudy_night.svg') no-repeat center center;}
+		.DB04_N{background:url('/images/icon/cast_icon/07_cloudy.svg') no-repeat center center;}
+
+		.NB01{background:url('/images/icon/cast_icon/01_sunny.svg') no-repeat center center;}
+		.NB02{background:url('/images/icon/cast_icon/03_partlysunny.svg') no-repeat center center;}
+		.NB03{background:url('/images/icon/cast_icon/05_partlycloudy.svg') no-repeat center center;}
+		.NB04{background:url('/images/icon/cast_icon/07_cloudy.svg') no-repeat center center;}
+		.NB07{background:url('/images/icon/cast_icon/08_shower.svg') no-repeat center center;}
+		.NB08{background:url('/images/icon/cast_icon/09_rainy.svg') no-repeat center center;}
+		.NB011{background:url('/images/icon/cast_icon/11_snowy.svg') no-repeat center center;}
+		.NB012{background:url('/images/icon/cast_icon/15_snowy_or_rainy.svg') no-repeat center center;}
+		.NB013{background:url('/images/icon/cast_icon/13_rainy_or_snowy.svg') no-repeat center center;}
+		.NB014{background:url('/images/icon/cast_icon/17_storm.svg') no-repeat center center;}
+		.NB015{background:url('/images/icon/cast_icon/21_foggy.svg') no-repeat center center;}
+		.NB016{background:url('/images/icon/cast_icon/23_duststorm.svg') no-repeat center center;}
+		.NB017{background:url('/images/icon/cast_icon/22_mist.svg') no-repeat center center;}
+		.NB018{background:url('/images/icon/cast_icon/19_haze.svg') no-repeat center center;}
+		.NB020{background:url('/images/icon/cast_icon/10_sometimes_rain.svg') no-repeat center center;}
+		.NB021{background:url('/images/icon/cast_icon/12_sometimes_snowy.svg') no-repeat center center;}
+		.NB022{background:url('/images/icon/cast_icon/14_sometimes_rainy_or_snowy.svg') no-repeat center center;}
+		.NB023{background:url('/images/icon/cast_icon/16_sometimes_snowy_or_rainy.svg') no-repeat center center;}
+		.NB01_N{background:url('/images/icon/cast_icon/02_sunny_night.svg') no-repeat center center;}
+		.NB02_N{background:url('/images/icon/cast_icon/04_partlysunny_night.svg') no-repeat center center;}
+		.NB03_N{background:url('/images/icon/cast_icon/06_partlycloudy_night.svg') no-repeat center center;}
+		.NB04_N{background:url('/images/icon/cast_icon/07_cloudy.svg') no-repeat center center;}
+
+
+		/*풍향아이콘*/
+
+		.wdic{display:inline-block; width: 32px; height: 32px; background-size: 100%; text-indent: -9999px; background-repeat: no-repeat; background-position: center center; background-image:url(/images/icon/cast_icon/wind.svg)}
+		.wdic.E { transform: rotate(90deg); }
+		.wdic.E_b { transform: rotate(90deg); }
+		.wdic.N { transform: rotate(0deg); }
+		.wdic.N_b { transform: rotate(0deg); }
+		.wdic.NE { transform: rotate(45deg);}
+		.wdic.NE_b { transform: rotate(45deg); }
+		.wdic.NW { transform: rotate(315deg);}
+		.wdic.NW_b { transform: rotate(315deg);}
+		.wdic.S { transform: rotate(180deg);}
+		.wdic.S_b { transform: rotate(180deg);}
+		.wdic.SE { transform: rotate(135deg);}
+		.wdic.SE_b { transform: rotate(135deg);}
+		.wdic.SW { transform: rotate(225deg);}
+		.wdic.SW_b { transform: rotate(225deg);}
+		.wdic.W { transform: rotate(270deg);}
+		.wdic.W_b { transform: rotate(270deg);}
+		.wspd .unit{display:none;}
+		.item li:nth-child(7) .wdic{display:block; margin:0px auto;padding-top:50px;}
+		.item li:nth-child(7) .wspd{display:block;text-align:center;line-height:18px;margin-top:-15px;}
+	</style>
+</div>
+
+</html>

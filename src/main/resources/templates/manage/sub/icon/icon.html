@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<style type="text/css">
+	.btn-group{ display:block; }
+	.way-icon{ width: 100%; };
+</style>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<!-- Preloader -->
+		<div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+
+		<!-- Navbar -->
+		<nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+		<!-- /.navbar -->
+		<!-- Main Sidebar Container -->
+		<aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+		    <!-- Content Header (Page header) -->
+		    <div class="content-header">
+		      <div class="container-fluid">
+		        <div class="row mb-2">
+		          <div class="col-sm-6">
+		            <h1 class="m-0">아이콘 관리</h1>
+		          </div><!-- /.col -->
+		          <div class="col-sm-6">
+		            <ol class="breadcrumb float-sm-right">
+		              <li class="breadcrumb-item"><a href="/manage">Home</a></li>
+		              <li class="breadcrumb-item active">아이콘 관리</li>
+		            </ol>
+		          </div><!-- /.col -->
+		        </div><!-- /.row -->
+		      </div><!-- /.container-fluid -->
+		    </div>
+		    <!-- /.content-header -->
+
+		    <!-- Main content -->
+		    <section class="content">
+				<div class="container-fluid">
+					<ul class="nav nav-tabs">
+						<li class="nav-item">
+							<a class="nav-link" id="tab1" data-toggle="tab" href="#way-icons">wayplus</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" id="tab2" data-toggle="tab" href="#fa-icons">Awesome</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" id="tab3" data-toggle="tab" href="#glyphicons">Glyphicons</a>
+						</li>
+
+					</ul>
+
+					<div class="tab-content">
+						<div class="tab-pane fade" id="way-icons">
+							<h4 class="page-header">Wayplus Custom Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-mainpage');window.close();"><i class="way-icon wi-mainpage"></i>mainpage</a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-dotdotdot ');window.close();"><i class="way-icon wi-dotdotdot "></i>dotdotdot </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-bell ');window.close();"><i class="way-icon wi-bell "></i>bell </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-expand ');window.close();"><i class="way-icon wi-expand "></i>expand </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-compress ');window.close();"><i class="way-icon wi-compress "></i>compress </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-logout ');window.close();"><i class="way-icon wi-logout "></i>logout </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-dashboard ');window.close();"><i class="way-icon wi-dashboard "></i>dashboard </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-board ');window.close();"><i class="way-icon wi-board "></i>board </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-info ');window.close();"><i class="way-icon wi-info "></i>info </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-submenu ');window.close();"><i class="way-icon wi-submenu "></i>submenu </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-content-editor ');window.close();"><i class="way-icon wi-content-editor "></i>content-editor </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-mainpage ');window.close();"><i class="way-icon wi-mainpage "></i>mainpage </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-setting ');window.close();"><i class="way-icon wi-setting "></i>setting </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-members ');window.close();"><i class="way-icon wi-members "></i>members </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-payments ');window.close();"><i class="way-icon wi-payments "></i>payments </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-product ');window.close();"><i class="way-icon wi-product "></i>product </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-question ');window.close();"><i class="way-icon wi-question "></i>question </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-place ');window.close();"><i class="way-icon wi-place "></i>place </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-search ');window.close();"><i class="way-icon wi-search "></i>search </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-photo ');window.close();"><i class="way-icon wi-photo "></i>photo </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-delete ');window.close();"><i class="way-icon wi-delete "></i>delete </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-dash-reserv ');window.close();"><i class="way-icon wi-dash-reserv "></i>dash-reserv </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-dash-1on1 ');window.close();"><i class="way-icon wi-dash-1on1 "></i>dash-1on1 </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-dash-cancel ');window.close();"><i class="way-icon wi-dash-cancel "></i>dash-cancel </a>
+								<a class="btn btn-app" onclick="opener.setIcon('way-icon wi-dash-estimate ');window.close();"><i class="way-icon wi-dash-estimate "></i>dash-estimate </a>
+							</div>
+						</div>
+						<div class="tab-pane fade" id="glyphicons">
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-asterisk');window.close();"><i class="glyphicon glyphicon-asterisk"></i>asterisk</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-plus');window.close();"><i class="glyphicon glyphicon-plus"></i>plus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-euro');window.close();"><i class="glyphicon glyphicon-euro"></i>euro</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-eur');window.close();"><i class="glyphicon glyphicon-eur"></i>eur</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-minus');window.close();"><i class="glyphicon glyphicon-minus"></i>minus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-cloud');window.close();"><i class="glyphicon glyphicon-cloud"></i>cloud</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-envelope');window.close();"><i class="glyphicon glyphicon-envelope"></i>envelope</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-pencil');window.close();"><i class="glyphicon glyphicon-pencil"></i>pencil</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-glass');window.close();"><i class="glyphicon glyphicon-glass"></i>glass</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-music');window.close();"><i class="glyphicon glyphicon-music"></i>music</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-search');window.close();"><i class="glyphicon glyphicon-search"></i>search</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-heart');window.close();"><i class="glyphicon glyphicon-heart"></i>heart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-star');window.close();"><i class="glyphicon glyphicon-star"></i>star</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-star-empty');window.close();"><i class="glyphicon glyphicon-star-empty"></i>star-empty</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-user');window.close();"><i class="glyphicon glyphicon-user"></i>user</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-film');window.close();"><i class="glyphicon glyphicon-film"></i>film</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-th-large');window.close();"><i class="glyphicon glyphicon-th-large"></i>th-large</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-th');window.close();"><i class="glyphicon glyphicon-th"></i>th</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-th-list');window.close();"><i class="glyphicon glyphicon-th-list"></i>th-list</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-ok');window.close();"><i class="glyphicon glyphicon-ok"></i>ok</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-remove');window.close();"><i class="glyphicon glyphicon-remove"></i>remove</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-zoom-in');window.close();"><i class="glyphicon glyphicon-zoom-in"></i>zoom-in</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-zoom-out');window.close();"><i class="glyphicon glyphicon-zoom-out"></i>zoom-out</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-off');window.close();"><i class="glyphicon glyphicon-off"></i>off</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-signal');window.close();"><i class="glyphicon glyphicon-signal"></i>signal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-cog');window.close();"><i class="glyphicon glyphicon-cog"></i>cog</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-trash');window.close();"><i class="glyphicon glyphicon-trash"></i>trash</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-home');window.close();"><i class="glyphicon glyphicon-home"></i>home</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-file');window.close();"><i class="glyphicon glyphicon-file"></i>file</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-time');window.close();"><i class="glyphicon glyphicon-time"></i>time</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-road');window.close();"><i class="glyphicon glyphicon-road"></i>road</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-download-alt');window.close();"><i class="glyphicon glyphicon-download-alt"></i>download-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-download');window.close();"><i class="glyphicon glyphicon-download"></i>download</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-upload');window.close();"><i class="glyphicon glyphicon-upload"></i>upload</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-inbox');window.close();"><i class="glyphicon glyphicon-inbox"></i>inbox</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-play-circle');window.close();"><i class="glyphicon glyphicon-play-circle"></i>play-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-repeat');window.close();"><i class="glyphicon glyphicon-repeat"></i>repeat</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-refresh');window.close();"><i class="glyphicon glyphicon-refresh"></i>refresh</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-list-alt');window.close();"><i class="glyphicon glyphicon-list-alt"></i>list-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-lock');window.close();"><i class="glyphicon glyphicon-lock"></i>lock</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-flag');window.close();"><i class="glyphicon glyphicon-flag"></i>flag</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-headphones');window.close();"><i class="glyphicon glyphicon-headphones"></i>headphones</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-volume-off');window.close();"><i class="glyphicon glyphicon-volume-off"></i>volume-off</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-volume-down');window.close();"><i class="glyphicon glyphicon-volume-down"></i>volume-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-volume-up');window.close();"><i class="glyphicon glyphicon-volume-up"></i>volume-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-qrcode');window.close();"><i class="glyphicon glyphicon-qrcode"></i>qrcode</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-barcode');window.close();"><i class="glyphicon glyphicon-barcode"></i>barcode</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-tag');window.close();"><i class="glyphicon glyphicon-tag"></i>tag</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-tags');window.close();"><i class="glyphicon glyphicon-tags"></i>tags</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-book');window.close();"><i class="glyphicon glyphicon-book"></i>book</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-bookmark');window.close();"><i class="glyphicon glyphicon-bookmark"></i>bookmark</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-print');window.close();"><i class="glyphicon glyphicon-print"></i>print</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-camera');window.close();"><i class="glyphicon glyphicon-camera"></i>camera</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-font');window.close();"><i class="glyphicon glyphicon-font"></i>font</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-bold');window.close();"><i class="glyphicon glyphicon-bold"></i>bold</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-italic');window.close();"><i class="glyphicon glyphicon-italic"></i>italic</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-text-height');window.close();"><i class="glyphicon glyphicon-text-height"></i>text-height</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-text-width');window.close();"><i class="glyphicon glyphicon-text-width"></i>text-width</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-align-left');window.close();"><i class="glyphicon glyphicon-align-left"></i>align-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-align-center');window.close();"><i class="glyphicon glyphicon-align-center"></i>align-center</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-align-right');window.close();"><i class="glyphicon glyphicon-align-right"></i>align-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-align-justify');window.close();"><i class="glyphicon glyphicon-align-justify"></i>align-justify</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-list');window.close();"><i class="glyphicon glyphicon-list"></i>list</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-indent-left');window.close();"><i class="glyphicon glyphicon-indent-left"></i>indent-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-indent-right');window.close();"><i class="glyphicon glyphicon-indent-right"></i>indent-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-facetime-video');window.close();"><i class="glyphicon glyphicon-facetime-video"></i>facetime-video</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-picture');window.close();"><i class="glyphicon glyphicon-picture"></i>picture</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-map-marker');window.close();"><i class="glyphicon glyphicon-map-marker"></i>map-marker</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-adjust');window.close();"><i class="glyphicon glyphicon-adjust"></i>adjust</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-tint');window.close();"><i class="glyphicon glyphicon-tint"></i>tint</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-edit');window.close();"><i class="glyphicon glyphicon-edit"></i>edit</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-share');window.close();"><i class="glyphicon glyphicon-share"></i>share</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-check');window.close();"><i class="glyphicon glyphicon-check"></i>check</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-move');window.close();"><i class="glyphicon glyphicon-move"></i>move</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-step-backward');window.close();"><i class="glyphicon glyphicon-step-backward"></i>step-backward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-fast-backward');window.close();"><i class="glyphicon glyphicon-fast-backward"></i>fast-backward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-backward');window.close();"><i class="glyphicon glyphicon-backward"></i>backward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-play');window.close();"><i class="glyphicon glyphicon-play"></i>play</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-pause');window.close();"><i class="glyphicon glyphicon-pause"></i>pause</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-stop');window.close();"><i class="glyphicon glyphicon-stop"></i>stop</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-forward');window.close();"><i class="glyphicon glyphicon-forward"></i>forward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-fast-forward');window.close();"><i class="glyphicon glyphicon-fast-forward"></i>fast-forward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-step-forward');window.close();"><i class="glyphicon glyphicon-step-forward"></i>step-forward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-eject');window.close();"><i class="glyphicon glyphicon-eject"></i>eject</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-chevron-left');window.close();"><i class="glyphicon glyphicon-chevron-left"></i>chevron-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-chevron-right');window.close();"><i class="glyphicon glyphicon-chevron-right"></i>chevron-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-plus-sign');window.close();"><i class="glyphicon glyphicon-plus-sign"></i>plus-sign</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-minus-sign');window.close();"><i class="glyphicon glyphicon-minus-sign"></i>minus-sign</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-remove-sign');window.close();"><i class="glyphicon glyphicon-remove-sign"></i>remove-sign</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-ok-sign');window.close();"><i class="glyphicon glyphicon-ok-sign"></i>ok-sign</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-question-sign');window.close();"><i class="glyphicon glyphicon-question-sign"></i>question-sign</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-info-sign');window.close();"><i class="glyphicon glyphicon-info-sign"></i>info-sign</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-screenshot');window.close();"><i class="glyphicon glyphicon-screenshot"></i>screenshot</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-remove-circle');window.close();"><i class="glyphicon glyphicon-remove-circle"></i>remove-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-ok-circle');window.close();"><i class="glyphicon glyphicon-ok-circle"></i>ok-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-ban-circle');window.close();"><i class="glyphicon glyphicon-ban-circle"></i>ban-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-arrow-left');window.close();"><i class="glyphicon glyphicon-arrow-left"></i>arrow-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-arrow-right');window.close();"><i class="glyphicon glyphicon-arrow-right"></i>arrow-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-arrow-up');window.close();"><i class="glyphicon glyphicon-arrow-up"></i>arrow-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-arrow-down');window.close();"><i class="glyphicon glyphicon-arrow-down"></i>arrow-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-share-alt');window.close();"><i class="glyphicon glyphicon-share-alt"></i>share-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-resize-full');window.close();"><i class="glyphicon glyphicon-resize-full"></i>resize-full</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-resize-small');window.close();"><i class="glyphicon glyphicon-resize-small"></i>resize-small</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-exclamation-sign');window.close();"><i class="glyphicon glyphicon-exclamation-sign"></i>exclamation-sign</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-gift');window.close();"><i class="glyphicon glyphicon-gift"></i>gift</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-leaf');window.close();"><i class="glyphicon glyphicon-leaf"></i>leaf</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-fire');window.close();"><i class="glyphicon glyphicon-fire"></i>fire</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-eye-open');window.close();"><i class="glyphicon glyphicon-eye-open"></i>eye-open</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-eye-close');window.close();"><i class="glyphicon glyphicon-eye-close"></i>eye-close</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-warning-sign');window.close();"><i class="glyphicon glyphicon-warning-sign"></i>warning-sign</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-plane');window.close();"><i class="glyphicon glyphicon-plane"></i>plane</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-calendar');window.close();"><i class="glyphicon glyphicon-calendar"></i>calendar</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-random');window.close();"><i class="glyphicon glyphicon-random"></i>random</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-comment');window.close();"><i class="glyphicon glyphicon-comment"></i>comment</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-magnet');window.close();"><i class="glyphicon glyphicon-magnet"></i>magnet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-chevron-up');window.close();"><i class="glyphicon glyphicon-chevron-up"></i>chevron-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-chevron-down');window.close();"><i class="glyphicon glyphicon-chevron-down"></i>chevron-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-retweet');window.close();"><i class="glyphicon glyphicon-retweet"></i>retweet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-shopping-cart');window.close();"><i class="glyphicon glyphicon-shopping-cart"></i>shopping-cart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-folder-close');window.close();"><i class="glyphicon glyphicon-folder-close"></i>folder-close</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-folder-open');window.close();"><i class="glyphicon glyphicon-folder-open"></i>folder-open</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-resize-vertical');window.close();"><i class="glyphicon glyphicon-resize-vertical"></i>resize-vertical</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-resize-horizontal');window.close();"><i class="glyphicon glyphicon-resize-horizontal"></i>resize-horizontal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-hdd');window.close();"><i class="glyphicon glyphicon-hdd"></i>hdd</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-bullhorn');window.close();"><i class="glyphicon glyphicon-bullhorn"></i>bullhorn</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-bell');window.close();"><i class="glyphicon glyphicon-bell"></i>bell</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-certificate');window.close();"><i class="glyphicon glyphicon-certificate"></i>certificate</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-thumbs-up');window.close();"><i class="glyphicon glyphicon-thumbs-up"></i>thumbs-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-thumbs-down');window.close();"><i class="glyphicon glyphicon-thumbs-down"></i>thumbs-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-hand-right');window.close();"><i class="glyphicon glyphicon-hand-right"></i>hand-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-hand-left');window.close();"><i class="glyphicon glyphicon-hand-left"></i>hand-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-hand-up');window.close();"><i class="glyphicon glyphicon-hand-up"></i>hand-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-hand-down');window.close();"><i class="glyphicon glyphicon-hand-down"></i>hand-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-circle-arrow-right');window.close();"><i class="glyphicon glyphicon-circle-arrow-right"></i>circle-arrow-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-circle-arrow-left');window.close();"><i class="glyphicon glyphicon-circle-arrow-left"></i>circle-arrow-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-circle-arrow-up');window.close();"><i class="glyphicon glyphicon-circle-arrow-up"></i>circle-arrow-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-circle-arrow-down');window.close();"><i class="glyphicon glyphicon-circle-arrow-down"></i>circle-arrow-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-globe');window.close();"><i class="glyphicon glyphicon-globe"></i>globe</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-wrench');window.close();"><i class="glyphicon glyphicon-wrench"></i>wrench</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-tasks');window.close();"><i class="glyphicon glyphicon-tasks"></i>tasks</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-filter');window.close();"><i class="glyphicon glyphicon-filter"></i>filter</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-briefcase');window.close();"><i class="glyphicon glyphicon-briefcase"></i>briefcase</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-fullscreen');window.close();"><i class="glyphicon glyphicon-fullscreen"></i>fullscreen</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-dashboard');window.close();"><i class="glyphicon glyphicon-dashboard"></i>dashboard</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-paperclip');window.close();"><i class="glyphicon glyphicon-paperclip"></i>paperclip</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-heart-empty');window.close();"><i class="glyphicon glyphicon-heart-empty"></i>heart-empty</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-link');window.close();"><i class="glyphicon glyphicon-link"></i>link</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-phone');window.close();"><i class="glyphicon glyphicon-phone"></i>phone</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-pushpin');window.close();"><i class="glyphicon glyphicon-pushpin"></i>pushpin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-usd');window.close();"><i class="glyphicon glyphicon-usd"></i>usd</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-gbp');window.close();"><i class="glyphicon glyphicon-gbp"></i>gbp</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sort');window.close();"><i class="glyphicon glyphicon-sort"></i>sort</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sort-by-alphabet');window.close();"><i class="glyphicon glyphicon-sort-by-alphabet"></i>sort-by-alphabet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sort-by-alphabet-alt');window.close();"><i class="glyphicon glyphicon-sort-by-alphabet-alt"></i>sort-by-alphabet-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sort-by-order');window.close();"><i class="glyphicon glyphicon-sort-by-order"></i>sort-by-order</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sort-by-order-alt');window.close();"><i class="glyphicon glyphicon-sort-by-order-alt"></i>sort-by-order-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sort-by-attributes');window.close();"><i class="glyphicon glyphicon-sort-by-attributes"></i>sort-by-attributes</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sort-by-attributes-alt');window.close();"><i class="glyphicon glyphicon-sort-by-attributes-alt"></i>sort-by-attributes-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-unchecked');window.close();"><i class="glyphicon glyphicon-unchecked"></i>unchecked</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-expand');window.close();"><i class="glyphicon glyphicon-expand"></i>expand</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-collapse-down');window.close();"><i class="glyphicon glyphicon-collapse-down"></i>collapse-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-collapse-up');window.close();"><i class="glyphicon glyphicon-collapse-up"></i>collapse-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-log-in');window.close();"><i class="glyphicon glyphicon-log-in"></i>log-in</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-flash');window.close();"><i class="glyphicon glyphicon-flash"></i>flash</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-log-out');window.close();"><i class="glyphicon glyphicon-log-out"></i>log-out</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-new-window');window.close();"><i class="glyphicon glyphicon-new-window"></i>new-window</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-record');window.close();"><i class="glyphicon glyphicon-record"></i>record</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-save');window.close();"><i class="glyphicon glyphicon-save"></i>save</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-open');window.close();"><i class="glyphicon glyphicon-open"></i>open</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-saved');window.close();"><i class="glyphicon glyphicon-saved"></i>saved</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-import');window.close();"><i class="glyphicon glyphicon-import"></i>import</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-export');window.close();"><i class="glyphicon glyphicon-export"></i>export</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-send');window.close();"><i class="glyphicon glyphicon-send"></i>send</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-floppy-disk');window.close();"><i class="glyphicon glyphicon-floppy-disk"></i>floppy-disk</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-floppy-saved');window.close();"><i class="glyphicon glyphicon-floppy-saved"></i>floppy-saved</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-floppy-remove');window.close();"><i class="glyphicon glyphicon-floppy-remove"></i>floppy-remove</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-floppy-save');window.close();"><i class="glyphicon glyphicon-floppy-save"></i>floppy-save</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-floppy-open');window.close();"><i class="glyphicon glyphicon-floppy-open"></i>floppy-open</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-credit-card');window.close();"><i class="glyphicon glyphicon-credit-card"></i>credit-card</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-transfer');window.close();"><i class="glyphicon glyphicon-transfer"></i>transfer</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-cutlery');window.close();"><i class="glyphicon glyphicon-cutlery"></i>cutlery</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-header');window.close();"><i class="glyphicon glyphicon-header"></i>header</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-compressed');window.close();"><i class="glyphicon glyphicon-compressed"></i>compressed</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-earphone');window.close();"><i class="glyphicon glyphicon-earphone"></i>earphone</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-phone-alt');window.close();"><i class="glyphicon glyphicon-phone-alt"></i>phone-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-tower');window.close();"><i class="glyphicon glyphicon-tower"></i>tower</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-stats');window.close();"><i class="glyphicon glyphicon-stats"></i>stats</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sd-video');window.close();"><i class="glyphicon glyphicon-sd-video"></i>sd-video</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-hd-video');window.close();"><i class="glyphicon glyphicon-hd-video"></i>hd-video</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-subtitles');window.close();"><i class="glyphicon glyphicon-subtitles"></i>subtitles</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sound-stereo');window.close();"><i class="glyphicon glyphicon-sound-stereo"></i>sound-stereo</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sound-dolby');window.close();"><i class="glyphicon glyphicon-sound-dolby"></i>sound-dolby</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sound-5-1');window.close();"><i class="glyphicon glyphicon-sound-5-1"></i>sound-5-1</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sound-6-1');window.close();"><i class="glyphicon glyphicon-sound-6-1"></i>sound-6-1</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sound-7-1');window.close();"><i class="glyphicon glyphicon-sound-7-1"></i>sound-7-1</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-copyright-mark');window.close();"><i class="glyphicon glyphicon-copyright-mark"></i>copyright-mark</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-registration-mark');window.close();"><i class="glyphicon glyphicon-registration-mark"></i>registration-mark</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-cloud-download');window.close();"><i class="glyphicon glyphicon-cloud-download"></i>cloud-download</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-cloud-upload');window.close();"><i class="glyphicon glyphicon-cloud-upload"></i>cloud-upload</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-tree-conifer');window.close();"><i class="glyphicon glyphicon-tree-conifer"></i>tree-conifer</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-tree-deciduous');window.close();"><i class="glyphicon glyphicon-tree-deciduous"></i>tree-deciduous</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-cd');window.close();"><i class="glyphicon glyphicon-cd"></i>cd</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-save-file');window.close();"><i class="glyphicon glyphicon-save-file"></i>save-file</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-open-file');window.close();"><i class="glyphicon glyphicon-open-file"></i>open-file</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-level-up');window.close();"><i class="glyphicon glyphicon-level-up"></i>level-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-copy');window.close();"><i class="glyphicon glyphicon-copy"></i>copy</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-paste');window.close();"><i class="glyphicon glyphicon-paste"></i>paste</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-alert');window.close();"><i class="glyphicon glyphicon-alert"></i>alert</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-king');window.close();"><i class="glyphicon glyphicon-king"></i>king</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-queen');window.close();"><i class="glyphicon glyphicon-queen"></i>queen</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-pawn');window.close();"><i class="glyphicon glyphicon-pawn"></i>pawn</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-bishop');window.close();"><i class="glyphicon glyphicon-bishop"></i>bishop</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-knight');window.close();"><i class="glyphicon glyphicon-knight"></i>knight</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-baby-formula');window.close();"><i class="glyphicon glyphicon-baby-formula"></i>baby-formula</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-tent');window.close();"><i class="glyphicon glyphicon-tent"></i>tent</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-blackboard');window.close();"><i class="glyphicon glyphicon-blackboard"></i>blackboard</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-bed');window.close();"><i class="glyphicon glyphicon-bed"></i>bed</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-apple');window.close();"><i class="glyphicon glyphicon-apple"></i>apple</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-erase');window.close();"><i class="glyphicon glyphicon-erase"></i>erase</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-hourglass');window.close();"><i class="glyphicon glyphicon-hourglass"></i>hourglass</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-lamp');window.close();"><i class="glyphicon glyphicon-lamp"></i>lamp</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-duplicate');window.close();"><i class="glyphicon glyphicon-duplicate"></i>duplicate</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-piggy-bank');window.close();"><i class="glyphicon glyphicon-piggy-bank"></i>piggy-bank</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-scissors');window.close();"><i class="glyphicon glyphicon-scissors"></i>scissors</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-bitcoin');window.close();"><i class="glyphicon glyphicon-bitcoin"></i>bitcoin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-btc');window.close();"><i class="glyphicon glyphicon-btc"></i>btc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-xbt');window.close();"><i class="glyphicon glyphicon-xbt"></i>xbt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-yen');window.close();"><i class="glyphicon glyphicon-yen"></i>yen</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-jpy');window.close();"><i class="glyphicon glyphicon-jpy"></i>jpy</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-ruble');window.close();"><i class="glyphicon glyphicon-ruble"></i>ruble</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-rub');window.close();"><i class="glyphicon glyphicon-rub"></i>rub</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-scale');window.close();"><i class="glyphicon glyphicon-scale"></i>scale</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-ice-lolly');window.close();"><i class="glyphicon glyphicon-ice-lolly"></i>ice-lolly</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-ice-lolly-tasted');window.close();"><i class="glyphicon glyphicon-ice-lolly-tasted"></i>ice-lolly-tasted</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-education');window.close();"><i class="glyphicon glyphicon-education"></i>education</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-option-horizontal');window.close();"><i class="glyphicon glyphicon-option-horizontal"></i>option-horizontal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-option-vertical');window.close();"><i class="glyphicon glyphicon-option-vertical"></i>option-vertical</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-menu-hamburger');window.close();"><i class="glyphicon glyphicon-menu-hamburger"></i>menu-hamburger</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-modal-window');window.close();"><i class="glyphicon glyphicon-modal-window"></i>modal-window</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-oil');window.close();"><i class="glyphicon glyphicon-oil"></i>oil</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-grain');window.close();"><i class="glyphicon glyphicon-grain"></i>grain</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-sunglasses');window.close();"><i class="glyphicon glyphicon-sunglasses"></i>sunglasses</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-text-size');window.close();"><i class="glyphicon glyphicon-text-size"></i>text-size</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-text-color');window.close();"><i class="glyphicon glyphicon-text-color"></i>text-color</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-text-background');window.close();"><i class="glyphicon glyphicon-text-background"></i>text-background</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-object-align-top');window.close();"><i class="glyphicon glyphicon-object-align-top"></i>object-align-top</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-object-align-bottom');window.close();"><i class="glyphicon glyphicon-object-align-bottom"></i>object-align-bottom</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-object-align-horizontal');window.close();"><i class="glyphicon glyphicon-object-align-horizontal"></i>object-align-horizontal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-object-align-left');window.close();"><i class="glyphicon glyphicon-object-align-left"></i>object-align-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-object-align-vertical');window.close();"><i class="glyphicon glyphicon-object-align-vertical"></i>object-align-vertical</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-object-align-right');window.close();"><i class="glyphicon glyphicon-object-align-right"></i>object-align-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-triangle-right');window.close();"><i class="glyphicon glyphicon-triangle-right"></i>triangle-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-triangle-left');window.close();"><i class="glyphicon glyphicon-triangle-left"></i>triangle-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-triangle-bottom');window.close();"><i class="glyphicon glyphicon-triangle-bottom"></i>triangle-bottom</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-triangle-top');window.close();"><i class="glyphicon glyphicon-triangle-top"></i>triangle-top</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-console');window.close();"><i class="glyphicon glyphicon-console"></i>console</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-superscript');window.close();"><i class="glyphicon glyphicon-superscript"></i>superscript</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-subscript');window.close();"><i class="glyphicon glyphicon-subscript"></i>subscript</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-menu-left');window.close();"><i class="glyphicon glyphicon-menu-left"></i>menu-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-menu-right');window.close();"><i class="glyphicon glyphicon-menu-right"></i>menu-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-menu-down');window.close();"><i class="glyphicon glyphicon-menu-down"></i>menu-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('glyphicon glyphicon-menu-up');window.close();"><i class="glyphicon glyphicon-menu-up"></i>menu-up</a>
+							</div>
+						</div>
+						<div class="tab-pane fade show active" id="fa-icons">
+							<h4 class="page-header">Web Application Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-adjust');window.close();"><i class="fa fa-adjust"></i>adjust</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-anchor');window.close();"><i class="fa fa-anchor"></i>anchor</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-archive');window.close();"><i class="fa fa-archive"></i>archive</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-area-chart');window.close();"><i class="fa fa-area-chart"></i>area-chart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrows');window.close();"><i class="fa fa-arrows"></i>arrows</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrows-h');window.close();"><i class="fa fa-arrows-h"></i>arrows-h</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrows-v');window.close();"><i class="fa fa-arrows-v"></i>arrows-v</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-asterisk');window.close();"><i class="fa fa-asterisk"></i>asterisk</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-at');window.close();"><i class="fa fa-at"></i>at</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-automobile');window.close();"><i class="fa fa-automobile"></i>automobile</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-balance-scale');window.close();"><i class="fa fa-balance-scale"></i>balance-scale</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ban');window.close();"><i class="fa fa-ban"></i>ban</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bank');window.close();"><i class="fa fa-bank"></i>bank</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bar-chart');window.close();"><i class="fa fa-bar-chart"></i>bar-chart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bar-chart-o');window.close();"><i class="fa fa-bar-chart-o"></i>bar-chart-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-barcode');window.close();"><i class="fa fa-barcode"></i>barcode</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bars');window.close();"><i class="fa fa-bars"></i>bars</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-0');window.close();"><i class="fa fa-battery-0"></i>battery-0</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-1');window.close();"><i class="fa fa-battery-1"></i>battery-1</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-2');window.close();"><i class="fa fa-battery-2"></i>battery-2</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-3');window.close();"><i class="fa fa-battery-3"></i>battery-3</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-4');window.close();"><i class="fa fa-battery-4"></i>battery-4</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-empty');window.close();"><i class="fa fa-battery-empty"></i>battery-empty</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-full');window.close();"><i class="fa fa-battery-full"></i>battery-full</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-half');window.close();"><i class="fa fa-battery-half"></i>battery-half</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-quarter');window.close();"><i class="fa fa-battery-quarter"></i>battery-quarter</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-battery-three-quarters');window.close();"><i class="fa fa-battery-three-quarters"></i>battery-three-quarters</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bed');window.close();"><i class="fa fa-bed"></i>bed</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-beer');window.close();"><i class="fa fa-beer"></i>beer</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bell');window.close();"><i class="fa fa-bell"></i>bell</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bell-o');window.close();"><i class="fa fa-bell-o"></i>bell-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bell-slash');window.close();"><i class="fa fa-bell-slash"></i>bell-slash</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bell-slash-o');window.close();"><i class="fa fa-bell-slash-o"></i>bell-slash-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bicycle');window.close();"><i class="fa fa-bicycle"></i>bicycle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-binoculars');window.close();"><i class="fa fa-binoculars"></i>binoculars</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-birthday-cake');window.close();"><i class="fa fa-birthday-cake"></i>birthday-cake</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bolt');window.close();"><i class="fa fa-bolt"></i>bolt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bomb');window.close();"><i class="fa fa-bomb"></i>bomb</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-book');window.close();"><i class="fa fa-book"></i>book</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bookmark');window.close();"><i class="fa fa-bookmark"></i>bookmark</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bookmark-o');window.close();"><i class="fa fa-bookmark-o"></i>bookmark-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-briefcase');window.close();"><i class="fa fa-briefcase"></i>briefcase</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bug');window.close();"><i class="fa fa-bug"></i>bug</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-building');window.close();"><i class="fa fa-building"></i>building</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-building-o');window.close();"><i class="fa fa-building-o"></i>building-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bullhorn');window.close();"><i class="fa fa-bullhorn"></i>bullhorn</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bullseye');window.close();"><i class="fa fa-bullseye"></i>bullseye</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bus');window.close();"><i class="fa fa-bus"></i>bus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cab');window.close();"><i class="fa fa-cab"></i>cab</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-calculator');window.close();"><i class="fa fa-calculator"></i>calculator</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-calendar');window.close();"><i class="fa fa-calendar"></i>calendar</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-calendar-check-o');window.close();"><i class="fa fa-calendar-check-o"></i>calendar-check-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-calendar-minus-o');window.close();"><i class="fa fa-calendar-minus-o"></i>calendar-minus-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-calendar-o');window.close();"><i class="fa fa-calendar-o"></i>calendar-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-calendar-plus-o');window.close();"><i class="fa fa-calendar-plus-o"></i>calendar-plus-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-calendar-times-o');window.close();"><i class="fa fa-calendar-times-o"></i>calendar-times-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-camera');window.close();"><i class="fa fa-camera"></i>camera</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-camera-retro');window.close();"><i class="fa fa-camera-retro"></i>camera-retro</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-car');window.close();"><i class="fa fa-car"></i>car</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-square-o-down');window.close();"><i class="fa fa-caret-square-o-down"></i> caret-square-o-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-square-o-left');window.close();"><i class="fa fa-caret-square-o-left"></i> caret-square-o-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-square-o-right');window.close();"><i class="fa fa-caret-square-o-right"></i>caret-square-o-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-square-o-up');window.close();"><i class="fa fa-caret-square-o-up"></i> caret-square-o-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cart-arrow-down');window.close();"><i class="fa fa-cart-arrow-down"></i>cart-arrow-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cart-plus');window.close();"><i class="fa fa-cart-plus"></i>cart-plus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc');window.close();"><i class="fa fa-cc"></i>cc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-certificate');window.close();"><i class="fa fa-certificate"></i>certificate</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-check');window.close();"><i class="fa fa-check"></i>check</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-check-circle');window.close();"><i class="fa fa-check-circle"></i>check-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-check-circle-o');window.close();"><i class="fa fa-check-circle-o"></i>check-circle-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-check-square');window.close();"><i class="fa fa-check-square"></i>check-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-check-square-o');window.close();"><i class="fa fa-check-square-o"></i>check-square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-child');window.close();"><i class="fa fa-child"></i>child</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-circle');window.close();"><i class="fa fa-circle"></i>circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-circle-o');window.close();"><i class="fa fa-circle-o"></i>circle-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-circle-o-notch');window.close();"><i class="fa fa-circle-o-notch"></i>circle-o-notch</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-circle-thin');window.close();"><i class="fa fa-circle-thin"></i>circle-thin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-clock-o');window.close();"><i class="fa fa-clock-o"></i>clock-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-clone');window.close();"><i class="fa fa-clone"></i>clone</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-close');window.close();"><i class="fa fa-close"></i>close</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cloud');window.close();"><i class="fa fa-cloud"></i>cloud</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cloud-download');window.close();"><i class="fa fa-cloud-download"></i>cloud-download</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cloud-upload');window.close();"><i class="fa fa-cloud-upload"></i>cloud-upload</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-code');window.close();"><i class="fa fa-code"></i>code</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-code-fork');window.close();"><i class="fa fa-code-fork"></i>code-fork</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-coffee');window.close();"><i class="fa fa-coffee"></i>coffee</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cog');window.close();"><i class="fa fa-cog"></i>cog</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cogs');window.close();"><i class="fa fa-cogs"></i>cogs</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-comment');window.close();"><i class="fa fa-comment"></i>comment</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-comment-o');window.close();"><i class="fa fa-comment-o"></i>comment-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-commenting');window.close();"><i class="fa fa-commenting"></i>commenting</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-commenting-o');window.close();"><i class="fa fa-commenting-o"></i>commenting-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-comments');window.close();"><i class="fa fa-comments"></i>comments</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-comments-o');window.close();"><i class="fa fa-comments-o"></i>comments-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-compass');window.close();"><i class="fa fa-compass"></i>compass</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-copyright');window.close();"><i class="fa fa-copyright"></i>copyright</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-creative-commons');window.close();"><i class="fa fa-creative-commons"></i>creative-commons</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-credit-card');window.close();"><i class="fa fa-credit-card"></i>credit-card</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-crop');window.close();"><i class="fa fa-crop"></i>crop</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-crosshairs');window.close();"><i class="fa fa-crosshairs"></i>crosshairs</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cube');window.close();"><i class="fa fa-cube"></i>cube</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cubes');window.close();"><i class="fa fa-cubes"></i>cubes</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cutlery');window.close();"><i class="fa fa-cutlery"></i>cutlery</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-dashboard');window.close();"><i class="fa fa-dashboard"></i>dashboard</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-database');window.close();"><i class="fa fa-database"></i>database</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-desktop');window.close();"><i class="fa fa-desktop"></i>desktop</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-diamond');window.close();"><i class="fa fa-diamond"></i>diamond</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-dot-circle-o');window.close();"><i class="fa fa-dot-circle-o"></i>dot-circle-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-download');window.close();"><i class="fa fa-download"></i>download</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-edit');window.close();"><i class="fa fa-edit"></i>edit</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ellipsis-h');window.close();"><i class="fa fa-ellipsis-h"></i>ellipsis-h</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ellipsis-v');window.close();"><i class="fa fa-ellipsis-v"></i>ellipsis-v</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-envelope');window.close();"><i class="fa fa-envelope"></i>envelope</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-envelope-o');window.close();"><i class="fa fa-envelope-o"></i>envelope-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-envelope-square');window.close();"><i class="fa fa-envelope-square"></i>envelope-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-eraser');window.close();"><i class="fa fa-eraser"></i>eraser</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-exchange');window.close();"><i class="fa fa-exchange"></i>exchange</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-exclamation');window.close();"><i class="fa fa-exclamation"></i>exclamation</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-exclamation-circle');window.close();"><i class="fa fa-exclamation-circle"></i>exclamation-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-exclamation-triangle');window.close();"><i class="fa fa-exclamation-triangle"></i>exclamation-triangle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-external-link');window.close();"><i class="fa fa-external-link"></i>external-link</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-external-link-square');window.close();"><i class="fa fa-external-link-square"></i>external-link-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-eye');window.close();"><i class="fa fa-eye"></i>eye</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-eye-slash');window.close();"><i class="fa fa-eye-slash"></i>eye-slash</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-eyedropper');window.close();"><i class="fa fa-eyedropper"></i>eyedropper</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-fax');window.close();"><i class="fa fa-fax"></i>fax</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-feed');window.close();"><i class="fa fa-feed"></i>feed</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-female');window.close();"><i class="fa fa-female"></i>female</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-fighter-jet');window.close();"><i class="fa fa-fighter-jet"></i>fighter-jet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-archive-o');window.close();"><i class="fa fa-file-archive-o"></i>file-archive-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-audio-o');window.close();"><i class="fa fa-file-audio-o"></i>file-audio-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-code-o');window.close();"><i class="fa fa-file-code-o"></i>file-code-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-excel-o');window.close();"><i class="fa fa-file-excel-o"></i>file-excel-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-image-o');window.close();"><i class="fa fa-file-image-o"></i>file-image-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-movie-o');window.close();"><i class="fa fa-file-movie-o"></i>file-movie-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-pdf-o');window.close();"><i class="fa fa-file-pdf-o"></i>file-pdf-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-photo-o');window.close();"><i class="fa fa-file-photo-o"></i>file-photo-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-picture-o');window.close();"><i class="fa fa-file-picture-o"></i>file-picture-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-powerpoint-o');window.close();"><i class="fa fa-file-powerpoint-o"></i> file-powerpoint-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-sound-o');window.close();"><i class="fa fa-file-sound-o"></i>file-sound-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-video-o');window.close();"><i class="fa fa-file-video-o"></i>file-video-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-word-o');window.close();"><i class="fa fa-file-word-o"></i>file-word-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-zip-o');window.close();"><i class="fa fa-file-zip-o"></i>file-zip-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-film');window.close();"><i class="fa fa-film"></i>film</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-filter');window.close();"><i class="fa fa-filter"></i>filter</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-fire');window.close();"><i class="fa fa-fire"></i>fire</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-fire-extinguisher');window.close();"><i class="fa fa-fire-extinguisher"></i> fire-extinguisher</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-flag');window.close();"><i class="fa fa-flag"></i>flag</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-flag-checkered');window.close();"><i class="fa fa-flag-checkered"></i>flag-checkered</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-flag-o');window.close();"><i class="fa fa-flag-o"></i>flag-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-flash');window.close();"><i class="fa fa-flash"></i>flash</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-flask');window.close();"><i class="fa fa-flask"></i>flask</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-folder');window.close();"><i class="fa fa-folder"></i>folder</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-folder-o');window.close();"><i class="fa fa-folder-o"></i>folder-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-folder-open');window.close();"><i class="fa fa-folder-open"></i>folder-open</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-folder-open-o');window.close();"><i class="fa fa-folder-open-o"></i>folder-open-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-frown-o');window.close();"><i class="fa fa-frown-o"></i>frown-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-futbol-o');window.close();"><i class="fa fa-futbol-o"></i>futbol-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gamepad');window.close();"><i class="fa fa-gamepad"></i>gamepad</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gavel');window.close();"><i class="fa fa-gavel"></i>gavel</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gear');window.close();"><i class="fa fa-gear"></i>gear</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gears');window.close();"><i class="fa fa-gears"></i>gears</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gift');window.close();"><i class="fa fa-gift"></i>gift</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-glass');window.close();"><i class="fa fa-glass"></i>glass</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-globe');window.close();"><i class="fa fa-globe"></i>globe</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-graduation-cap');window.close();"><i class="fa fa-graduation-cap"></i>graduation-cap</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-group');window.close();"><i class="fa fa-group"></i>group</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-grab-o');window.close();"><i class="fa fa-hand-grab-o"></i>hand-grab-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-lizard-o');window.close();"><i class="fa fa-hand-lizard-o"></i>hand-lizard-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-paper-o');window.close();"><i class="fa fa-hand-paper-o"></i>hand-paper-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-peace-o');window.close();"><i class="fa fa-hand-peace-o"></i>hand-peace-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-pointer-o');window.close();"><i class="fa fa-hand-pointer-o"></i>hand-pointer-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-rock-o');window.close();"><i class="fa fa-hand-rock-o"></i>hand-rock-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-scissors-o');window.close();"><i class="fa fa-hand-scissors-o"></i>hand-scissors-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-spock-o');window.close();"><i class="fa fa-hand-spock-o"></i>hand-spock-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-stop-o');window.close();"><i class="fa fa-hand-stop-o"></i>hand-stop-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hdd-o');window.close();"><i class="fa fa-hdd-o"></i>hdd-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-headphones');window.close();"><i class="fa fa-headphones"></i>headphones</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-heart');window.close();"><i class="fa fa-heart"></i>heart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-heart-o');window.close();"><i class="fa fa-heart-o"></i>heart-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-heartbeat');window.close();"><i class="fa fa-heartbeat"></i>heartbeat</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-history');window.close();"><i class="fa fa-history"></i>history</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-home');window.close();"><i class="fa fa-home"></i>home</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hotel');window.close();"><i class="fa fa-hotel"></i>hotel</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hourglass');window.close();"><i class="fa fa-hourglass"></i>hourglass</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hourglass-1');window.close();"><i class="fa fa-hourglass-1"></i>hourglass-1</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hourglass-2');window.close();"><i class="fa fa-hourglass-2"></i>hourglass-2</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hourglass-3');window.close();"><i class="fa fa-hourglass-3"></i>hourglass-3</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hourglass-end');window.close();"><i class="fa fa-hourglass-end"></i>hourglass-end</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hourglass-half');window.close();"><i class="fa fa-hourglass-half"></i>hourglass-half</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hourglass-o');window.close();"><i class="fa fa-hourglass-o"></i>hourglass-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hourglass-start');window.close();"><i class="fa fa-hourglass-start"></i>hourglass-start</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-i-cursor');window.close();"><i class="fa fa-i-cursor"></i>i-cursor</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-image');window.close();"><i class="fa fa-image"></i>image</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-inbox');window.close();"><i class="fa fa-inbox"></i>inbox</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-industry');window.close();"><i class="fa fa-industry"></i>industry</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-info');window.close();"><i class="fa fa-info"></i>info</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-info-circle');window.close();"><i class="fa fa-info-circle"></i>info-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-institution');window.close();"><i class="fa fa-institution"></i>institution</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-key');window.close();"><i class="fa fa-key"></i>key</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-keyboard-o');window.close();"><i class="fa fa-keyboard-o"></i>keyboard-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-language');window.close();"><i class="fa fa-language"></i>language</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-laptop');window.close();"><i class="fa fa-laptop"></i>laptop</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-leaf');window.close();"><i class="fa fa-leaf"></i>leaf</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-legal');window.close();"><i class="fa fa-legal"></i>legal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-lemon-o');window.close();"><i class="fa fa-lemon-o"></i>lemon-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-level-down');window.close();"><i class="fa fa-level-down"></i>level-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-level-up');window.close();"><i class="fa fa-level-up"></i>level-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-life-bouy');window.close();"><i class="fa fa-life-bouy"></i>life-bouy</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-life-buoy');window.close();"><i class="fa fa-life-buoy"></i>life-buoy</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-life-ring');window.close();"><i class="fa fa-life-ring"></i>life-ring</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-life-saver');window.close();"><i class="fa fa-life-saver"></i>life-saver</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-lightbulb-o');window.close();"><i class="fa fa-lightbulb-o"></i>lightbulb-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-line-chart');window.close();"><i class="fa fa-line-chart"></i>line-chart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-location-arrow');window.close();"><i class="fa fa-location-arrow"></i>location-arrow</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-lock');window.close();"><i class="fa fa-lock"></i>lock</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-magic');window.close();"><i class="fa fa-magic"></i>magic</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-magnet');window.close();"><i class="fa fa-magnet"></i>magnet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mail-forward');window.close();"><i class="fa fa-mail-forward"></i>mail-forward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mail-reply');window.close();"><i class="fa fa-mail-reply"></i>mail-reply</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mail-reply-all');window.close();"><i class="fa fa-mail-reply-all"></i>mail-reply-all</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-male');window.close();"><i class="fa fa-male"></i>male</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-map');window.close();"><i class="fa fa-map"></i>map</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-map-marker');window.close();"><i class="fa fa-map-marker"></i>map-marker</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-map-o');window.close();"><i class="fa fa-map-o"></i>map-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-map-pin');window.close();"><i class="fa fa-map-pin"></i>map-pin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-map-signs');window.close();"><i class="fa fa-map-signs"></i>map-signs</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-meh-o');window.close();"><i class="fa fa-meh-o"></i>meh-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-microphone');window.close();"><i class="fa fa-microphone"></i>microphone</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-microphone-slash');window.close();"><i class="fa fa-microphone-slash"></i>microphone-slash</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-minus');window.close();"><i class="fa fa-minus"></i>minus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-minus-circle');window.close();"><i class="fa fa-minus-circle"></i>minus-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-minus-square');window.close();"><i class="fa fa-minus-square"></i>minus-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-minus-square-o');window.close();"><i class="fa fa-minus-square-o"></i>minus-square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mobile');window.close();"><i class="fa fa-mobile"></i>mobile</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mobile-phone');window.close();"><i class="fa fa-mobile-phone"></i>mobile-phone</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-money');window.close();"><i class="fa fa-money"></i>money</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-moon-o');window.close();"><i class="fa fa-moon-o"></i>moon-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mortar-board');window.close();"><i class="fa fa-mortar-board"></i>mortar-board</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-motorcycle');window.close();"><i class="fa fa-motorcycle"></i>motorcycle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mouse-pointer');window.close();"><i class="fa fa-mouse-pointer"></i>mouse-pointer</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-music');window.close();"><i class="fa fa-music"></i>music</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-navicon');window.close();"><i class="fa fa-navicon"></i>navicon</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-newspaper-o');window.close();"><i class="fa fa-newspaper-o"></i>newspaper-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-object-group');window.close();"><i class="fa fa-object-group"></i>object-group</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-object-ungroup');window.close();"><i class="fa fa-object-ungroup"></i>object-ungroup</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paint-brush');window.close();"><i class="fa fa-paint-brush"></i>paint-brush</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paper-plane');window.close();"><i class="fa fa-paper-plane"></i>paper-plane</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paper-plane-o');window.close();"><i class="fa fa-paper-plane-o"></i>paper-plane-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paw');window.close();"><i class="fa fa-paw"></i>paw</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pencil');window.close();"><i class="fa fa-pencil"></i>pencil</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pencil-square');window.close();"><i class="fa fa-pencil-square"></i>pencil-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pencil-square-o');window.close();"><i class="fa fa-pencil-square-o"></i>pencil-square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-phone');window.close();"><i class="fa fa-phone"></i>phone</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-phone-square');window.close();"><i class="fa fa-phone-square"></i>phone-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-photo');window.close();"><i class="fa fa-photo"></i>photo</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-picture-o');window.close();"><i class="fa fa-picture-o"></i>picture-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pie-chart');window.close();"><i class="fa fa-pie-chart"></i>pie-chart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plane');window.close();"><i class="fa fa-plane"></i>plane</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plug');window.close();"><i class="fa fa-plug"></i>plug</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plus');window.close();"><i class="fa fa-plus"></i>plus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plus-circle');window.close();"><i class="fa fa-plus-circle"></i>plus-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plus-square');window.close();"><i class="fa fa-plus-square"></i>plus-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plus-square-o');window.close();"><i class="fa fa-plus-square-o"></i>plus-square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-power-off');window.close();"><i class="fa fa-power-off"></i>power-off</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-print');window.close();"><i class="fa fa-print"></i>print</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-puzzle-piece');window.close();"><i class="fa fa-puzzle-piece"></i>puzzle-piece</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-qrcode');window.close();"><i class="fa fa-qrcode"></i>qrcode</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-question');window.close();"><i class="fa fa-question"></i>question</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-question-circle');window.close();"><i class="fa fa-question-circle"></i>question-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-quote-left');window.close();"><i class="fa fa-quote-left"></i>quote-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-quote-right');window.close();"><i class="fa fa-quote-right"></i>quote-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-random');window.close();"><i class="fa fa-random"></i>random</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-recycle');window.close();"><i class="fa fa-recycle"></i>recycle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-refresh');window.close();"><i class="fa fa-refresh"></i>refresh</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-registered');window.close();"><i class="fa fa-registered"></i>registered</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-remove');window.close();"><i class="fa fa-remove"></i>remove</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-reorder');window.close();"><i class="fa fa-reorder"></i>reorder</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-reply');window.close();"><i class="fa fa-reply"></i>reply</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-reply-all');window.close();"><i class="fa fa-reply-all"></i>reply-all</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-retweet');window.close();"><i class="fa fa-retweet"></i>retweet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-road');window.close();"><i class="fa fa-road"></i>road</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rocket');window.close();"><i class="fa fa-rocket"></i>rocket</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rss');window.close();"><i class="fa fa-rss"></i>rss</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rss-square');window.close();"><i class="fa fa-rss-square"></i>rss-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-search');window.close();"><i class="fa fa-search"></i>search</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-search-minus');window.close();"><i class="fa fa-search-minus"></i>search-minus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-search-plus');window.close();"><i class="fa fa-search-plus"></i>search-plus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-send');window.close();"><i class="fa fa-send"></i>send</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-send-o');window.close();"><i class="fa fa-send-o"></i>send-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-server');window.close();"><i class="fa fa-server"></i>server</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-share');window.close();"><i class="fa fa-share"></i>share</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-share-alt');window.close();"><i class="fa fa-share-alt"></i>share-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-share-alt-square');window.close();"><i class="fa fa-share-alt-square"></i>share-alt-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-share-square');window.close();"><i class="fa fa-share-square"></i>share-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-share-square-o');window.close();"><i class="fa fa-share-square-o"></i>share-square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-shield');window.close();"><i class="fa fa-shield"></i>shield</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ship');window.close();"><i class="fa fa-ship"></i>ship</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-shopping-cart');window.close();"><i class="fa fa-shopping-cart"></i>shopping-cart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sign-in');window.close();"><i class="fa fa-sign-in"></i>sign-in</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sign-out');window.close();"><i class="fa fa-sign-out"></i>sign-out</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-signal');window.close();"><i class="fa fa-signal"></i>signal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sitemap');window.close();"><i class="fa fa-sitemap"></i>sitemap</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sliders');window.close();"><i class="fa fa-sliders"></i>sliders</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-smile-o');window.close();"><i class="fa fa-smile-o"></i>smile-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-soccer-ball-o');window.close();"><i class="fa fa-soccer-ball-o"></i>soccer-ball-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort');window.close();"><i class="fa fa-sort"></i>sort</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-alpha-asc');window.close();"><i class="fa fa-sort-alpha-asc"></i>sort-alpha-asc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-alpha-desc');window.close();"><i class="fa fa-sort-alpha-desc"></i>sort-alpha-desc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-amount-asc');window.close();"><i class="fa fa-sort-amount-asc"></i>sort-amount-asc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-amount-desc');window.close();"><i class="fa fa-sort-amount-desc"></i>sort-amount-desc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-asc');window.close();"><i class="fa fa-sort-asc"></i>sort-asc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-desc');window.close();"><i class="fa fa-sort-desc"></i>sort-desc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-down');window.close();"><i class="fa fa-sort-down"></i>sort-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-numeric-asc');window.close();"><i class="fa fa-sort-numeric-asc"></i>sort-numeric-asc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-numeric-desc');window.close();"><i class="fa fa-sort-numeric-desc"></i> sort-numeric-desc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sort-up');window.close();"><i class="fa fa-sort-up"></i>sort-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-space-shuttle');window.close();"><i class="fa fa-space-shuttle"></i>space-shuttle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-spinner');window.close();"><i class="fa fa-spinner"></i>spinner</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-spoon');window.close();"><i class="fa fa-spoon"></i>spoon</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-square');window.close();"><i class="fa fa-square"></i>square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-square-o');window.close();"><i class="fa fa-square-o"></i>square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-star');window.close();"><i class="fa fa-star"></i>star</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-star-half');window.close();"><i class="fa fa-star-half"></i>star-half</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-star-half-empty');window.close();"><i class="fa fa-star-half-empty"></i>star-half-empty</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-star-half-full');window.close();"><i class="fa fa-star-half-full"></i>star-half-full</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-star-half-o');window.close();"><i class="fa fa-star-half-o"></i>star-half-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-star-o');window.close();"><i class="fa fa-star-o"></i>star-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sticky-note');window.close();"><i class="fa fa-sticky-note"></i>sticky-note</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sticky-note-o');window.close();"><i class="fa fa-sticky-note-o"></i>sticky-note-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-street-view');window.close();"><i class="fa fa-street-view"></i>street-view</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-suitcase');window.close();"><i class="fa fa-suitcase"></i>suitcase</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sun-o');window.close();"><i class="fa fa-sun-o"></i>sun-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-support');window.close();"><i class="fa fa-support"></i>support</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tablet');window.close();"><i class="fa fa-tablet"></i>tablet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tachometer');window.close();"><i class="fa fa-tachometer"></i>tachometer</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tag');window.close();"><i class="fa fa-tag"></i>tag</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tags');window.close();"><i class="fa fa-tags"></i>tags</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tasks');window.close();"><i class="fa fa-tasks"></i>tasks</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-taxi');window.close();"><i class="fa fa-taxi"></i>taxi</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-television');window.close();"><i class="fa fa-television"></i>television</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-terminal');window.close();"><i class="fa fa-terminal"></i>terminal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumb-tack');window.close();"><i class="fa fa-thumb-tack"></i>thumb-tack</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumbs-down');window.close();"><i class="fa fa-thumbs-down"></i>thumbs-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumbs-o-down');window.close();"><i class="fa fa-thumbs-o-down"></i>thumbs-o-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumbs-o-up');window.close();"><i class="fa fa-thumbs-o-up"></i>thumbs-o-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumbs-up');window.close();"><i class="fa fa-thumbs-up"></i>thumbs-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ticket');window.close();"><i class="fa fa-ticket"></i>ticket</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-times');window.close();"><i class="fa fa-times"></i>times</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-times-circle');window.close();"><i class="fa fa-times-circle"></i>times-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-times-circle-o');window.close();"><i class="fa fa-times-circle-o"></i>times-circle-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tint');window.close();"><i class="fa fa-tint"></i>tint</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-down');window.close();"><i class="fa fa-toggle-down"></i>toggle-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-left');window.close();"><i class="fa fa-toggle-left"></i>toggle-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-off');window.close();"><i class="fa fa-toggle-off"></i>toggle-off</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-on');window.close();"><i class="fa fa-toggle-on"></i>toggle-on</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-right');window.close();"><i class="fa fa-toggle-right"></i>toggle-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-up');window.close();"><i class="fa fa-toggle-up"></i>toggle-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-trademark');window.close();"><i class="fa fa-trademark"></i>trademark</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-trash');window.close();"><i class="fa fa-trash"></i>trash</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-trash-o');window.close();"><i class="fa fa-trash-o"></i>trash-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tree');window.close();"><i class="fa fa-tree"></i>tree</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-trophy');window.close();"><i class="fa fa-trophy"></i>trophy</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-truck');window.close();"><i class="fa fa-truck"></i>truck</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tty');window.close();"><i class="fa fa-tty"></i>tty</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tv');window.close();"><i class="fa fa-tv"></i>tv</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-umbrella');window.close();"><i class="fa fa-umbrella"></i>umbrella</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-university');window.close();"><i class="fa fa-university"></i>university</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-unlock');window.close();"><i class="fa fa-unlock"></i>unlock</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-unlock-alt');window.close();"><i class="fa fa-unlock-alt"></i>unlock-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-unsorted');window.close();"><i class="fa fa-unsorted"></i>unsorted</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-upload');window.close();"><i class="fa fa-upload"></i>upload</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-user');window.close();"><i class="fa fa-user"></i>user</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-user-plus');window.close();"><i class="fa fa-user-plus"></i>user-plus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-user-secret');window.close();"><i class="fa fa-user-secret"></i>user-secret</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-user-times');window.close();"><i class="fa fa-user-times"></i>user-times</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-users');window.close();"><i class="fa fa-users"></i>users</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-video-camera');window.close();"><i class="fa fa-video-camera"></i>video-camera</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-volume-down');window.close();"><i class="fa fa-volume-down"></i>volume-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-volume-off');window.close();"><i class="fa fa-volume-off"></i>volume-off</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-volume-up');window.close();"><i class="fa fa-volume-up"></i>volume-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-warning');window.close();"><i class="fa fa-warning"></i>warning</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-wheelchair');window.close();"><i class="fa fa-wheelchair"></i>wheelchair</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-wifi');window.close();"><i class="fa fa-wifi"></i>wifi</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-wrench');window.close();"><i class="fa fa-wrench"></i>wrench</a>
+							</div>
+							<h4 class="page-header">Hand Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-grab-o');window.close();"><i class="fa fa-hand-grab-o"></i>hand-grab-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-lizard-o');window.close();"><i class="fa fa-hand-lizard-o"></i>hand-lizard-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-o-down');window.close();"><i class="fa fa-hand-o-down"></i>hand-o-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-o-left');window.close();"><i class="fa fa-hand-o-left"></i>hand-o-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-o-right');window.close();"><i class="fa fa-hand-o-right"></i>hand-o-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-o-up');window.close();"><i class="fa fa-hand-o-up"></i>hand-o-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-paper-o');window.close();"><i class="fa fa-hand-paper-o"></i>hand-paper-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-peace-o');window.close();"><i class="fa fa-hand-peace-o"></i>hand-peace-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-pointer-o');window.close();"><i class="fa fa-hand-pointer-o"></i>hand-pointer-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-rock-o');window.close();"><i class="fa fa-hand-rock-o"></i>hand-rock-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-scissors-o');window.close();"><i class="fa fa-hand-scissors-o"></i>hand-scissors-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-spock-o');window.close();"><i class="fa fa-hand-spock-o"></i>hand-spock-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-stop-o');window.close();"><i class="fa fa-hand-stop-o"></i>hand-stop-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumbs-down');window.close();"><i class="fa fa-thumbs-down"></i>thumbs-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumbs-o-down');window.close();"><i class="fa fa-thumbs-o-down"></i>thumbs-o-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumbs-o-up');window.close();"><i class="fa fa-thumbs-o-up"></i>thumbs-o-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-thumbs-up');window.close();"><i class="fa fa-thumbs-up"></i>thumbs-up</a>
+							</div>
+							<h4 class="page-header">Transportation Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ambulance');window.close();"><i class="fa fa-ambulance"></i>ambulance</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-automobile');window.close();"><i class="fa fa-automobile"></i>automobile</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bicycle');window.close();"><i class="fa fa-bicycle"></i>bicycle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bus');window.close();"><i class="fa fa-bus"></i>bus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cab');window.close();"><i class="fa fa-cab"></i>cab</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-car');window.close();"><i class="fa fa-car"></i>car</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-fighter-jet');window.close();"><i class="fa fa-fighter-jet"></i>fighter-jet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-motorcycle');window.close();"><i class="fa fa-motorcycle"></i>motorcycle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plane');window.close();"><i class="fa fa-plane"></i>plane</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rocket');window.close();"><i class="fa fa-rocket"></i>rocket</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ship');window.close();"><i class="fa fa-ship"></i>ship</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-space-shuttle');window.close();"><i class="fa fa-space-shuttle"></i>space-shuttle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-subway');window.close();"><i class="fa fa-subway"></i>subway</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-taxi');window.close();"><i class="fa fa-taxi"></i>taxi</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-train');window.close();"><i class="fa fa-train"></i>train</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-truck');window.close();"><i class="fa fa-truck"></i>truck</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-wheelchair');window.close();"><i class="fa fa-wheelchair"></i>wheelchair</a>
+							</div>
+							<h4 class="page-header">Gender Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-genderless');window.close();"><i class="fa fa-genderless"></i>genderless</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-intersex');window.close();"><i class="fa fa-intersex"></i>intersex</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mars');window.close();"><i class="fa fa-mars"></i>mars</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mars-double');window.close();"><i class="fa fa-mars-double"></i>mars-double</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mars-stroke');window.close();"><i class="fa fa-mars-stroke"></i>mars-stroke</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mars-stroke-h');window.close();"><i class="fa fa-mars-stroke-h"></i>mars-stroke-h</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mars-stroke-v');window.close();"><i class="fa fa-mars-stroke-v"></i>mars-stroke-v</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-mercury');window.close();"><i class="fa fa-mercury"></i>mercury</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-neuter');window.close();"><i class="fa fa-neuter"></i>neuter</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-transgender');window.close();"><i class="fa fa-transgender"></i>transgender</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-transgender-alt');window.close();"><i class="fa fa-transgender-alt"></i>transgender-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-venus');window.close();"><i class="fa fa-venus"></i>venus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-venus-double');window.close();"><i class="fa fa-venus-double"></i>venus-double</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-venus-mars');window.close();"><i class="fa fa-venus-mars"></i>venus-mars</a>
+							</div>
+							<h4 class="page-header">File Type Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file');window.close();"><i class="fa fa-file"></i>file</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-archive-o');window.close();"><i class="fa fa-file-archive-o"></i>file-archive-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-audio-o');window.close();"><i class="fa fa-file-audio-o"></i>file-audio-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-code-o');window.close();"><i class="fa fa-file-code-o"></i>file-code-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-excel-o');window.close();"><i class="fa fa-file-excel-o"></i>file-excel-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-image-o');window.close();"><i class="fa fa-file-image-o"></i>file-image-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-movie-o');window.close();"><i class="fa fa-file-movie-o"></i>file-movie-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-o');window.close();"><i class="fa fa-file-o"></i>file-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-pdf-o');window.close();"><i class="fa fa-file-pdf-o"></i>file-pdf-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-photo-o');window.close();"><i class="fa fa-file-photo-o"></i>file-photo-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-picture-o');window.close();"><i class="fa fa-file-picture-o"></i>file-picture-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-powerpoint-o');window.close();"><i class="fa fa-file-powerpoint-o"></i> file-powerpoint-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-sound-o');window.close();"><i class="fa fa-file-sound-o"></i>file-sound-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-text');window.close();"><i class="fa fa-file-text"></i>file-text</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-text-o');window.close();"><i class="fa fa-file-text-o"></i>file-text-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-video-o');window.close();"><i class="fa fa-file-video-o"></i>file-video-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-word-o');window.close();"><i class="fa fa-file-word-o"></i>file-word-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-zip-o');window.close();"><i class="fa fa-file-zip-o"></i>file-zip-o</a>
+							</div>
+							<h4 class="page-header">Spinner Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-circle-o-notch');window.close();"><i class="fa fa-circle-o-notch"></i>circle-o-notch</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cog');window.close();"><i class="fa fa-cog"></i>cog</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gear');window.close();"><i class="fa fa-gear"></i>gear</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-refresh');window.close();"><i class="fa fa-refresh"></i>refresh</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-spinner');window.close();"><i class="fa fa-spinner"></i>spinner</a>
+							</div>
+							<h4 class="page-header">Form Control Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-check-square');window.close();"><i class="fa fa-check-square"></i>check-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-check-square-o');window.close();"><i class="fa fa-check-square-o"></i>check-square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-circle');window.close();"><i class="fa fa-circle"></i>circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-circle-o');window.close();"><i class="fa fa-circle-o"></i>circle-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-dot-circle-o');window.close();"><i class="fa fa-dot-circle-o"></i>dot-circle-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-minus-square');window.close();"><i class="fa fa-minus-square"></i>minus-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-minus-square-o');window.close();"><i class="fa fa-minus-square-o"></i>minus-square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plus-square');window.close();"><i class="fa fa-plus-square"></i>plus-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plus-square-o');window.close();"><i class="fa fa-plus-square-o"></i>plus-square-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-square');window.close();"><i class="fa fa-square"></i>square</a>
+							</div>
+							<h4 class="page-header">Payment Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-amex');window.close();"><i class="fa fa-cc-amex"></i>cc-amex</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-diners-club');window.close();"><i class="fa fa-cc-diners-club"></i>cc-diners-club</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-discover');window.close();"><i class="fa fa-cc-discover"></i>cc-discover</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-jcb');window.close();"><i class="fa fa-cc-jcb"></i>cc-jcb</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-mastercard');window.close();"><i class="fa fa-cc-mastercard"></i>cc-mastercard</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-paypal');window.close();"><i class="fa fa-cc-paypal"></i>cc-paypal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-stripe');window.close();"><i class="fa fa-cc-stripe"></i>cc-stripe</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-visa');window.close();"><i class="fa fa-cc-visa"></i>cc-visa</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-credit-card');window.close();"><i class="fa fa-credit-card"></i>credit-card</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-google-wallet');window.close();"><i class="fa fa-google-wallet"></i>google-wallet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paypal');window.close();"><i class="fa fa-paypal"></i>paypal</a>
+							</div>
+							<h4 class="page-header">Chart Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-area-chart');window.close();"><i class="fa fa-area-chart"></i>area-chart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bar-chart');window.close();"><i class="fa fa-bar-chart"></i>bar-chart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bar-chart-o');window.close();"><i class="fa fa-bar-chart-o"></i>bar-chart-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-line-chart');window.close();"><i class="fa fa-line-chart"></i>line-chart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pie-chart');window.close();"><i class="fa fa-pie-chart"></i>pie-chart</a>
+							</div>
+							<h4 class="page-header">Currency Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bitcoin');window.close();"><i class="fa fa-bitcoin"></i>bitcoin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-btc');window.close();"><i class="fa fa-btc"></i>btc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cny');window.close();"><i class="fa fa-cny"></i>cny</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-dollar');window.close();"><i class="fa fa-dollar"></i>dollar</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-eur');window.close();"><i class="fa fa-eur"></i>eur</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-euro');window.close();"><i class="fa fa-euro"></i>euro</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gbp');window.close();"><i class="fa fa-gbp"></i>gbp</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gg');window.close();"><i class="fa fa-gg"></i>gg</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gg-circle');window.close();"><i class="fa fa-gg-circle"></i>gg-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ils');window.close();"><i class="fa fa-ils"></i>ils</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-inr');window.close();"><i class="fa fa-inr"></i>inr</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-jpy');window.close();"><i class="fa fa-jpy"></i>jpy</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-krw');window.close();"><i class="fa fa-krw"></i>krw</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-money');window.close();"><i class="fa fa-money"></i>money</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rmb');window.close();"><i class="fa fa-rmb"></i>rmb</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rouble');window.close();"><i class="fa fa-rouble"></i>rouble</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rub');window.close();"><i class="fa fa-rub"></i>rub</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ruble');window.close();"><i class="fa fa-ruble"></i>ruble</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rupee');window.close();"><i class="fa fa-rupee"></i>rupee</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-shekel');window.close();"><i class="fa fa-shekel"></i>shekel</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sheqel');window.close();"><i class="fa fa-sheqel"></i>sheqel</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-try');window.close();"><i class="fa fa-try"></i>try</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-turkish-lira');window.close();"><i class="fa fa-turkish-lira"></i>turkish-lira</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-usd');window.close();"><i class="fa fa-usd"></i>usd</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-won');window.close();"><i class="fa fa-won"></i>won</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-yen');window.close();"><i class="fa fa-yen"></i>yen</a>
+							</div>
+							<h4 class="page-header">Text Editor Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-align-center');window.close();"><i class="fa fa-align-center"></i>align-center</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-align-justify');window.close();"><i class="fa fa-align-justify"></i>align-justify</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-align-left');window.close();"><i class="fa fa-align-left"></i>align-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-align-right');window.close();"><i class="fa fa-align-right"></i>align-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bold');window.close();"><i class="fa fa-bold"></i>bold</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chain');window.close();"><i class="fa fa-chain"></i>chain</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chain-broken');window.close();"><i class="fa fa-chain-broken"></i>chain-broken</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-clipboard');window.close();"><i class="fa fa-clipboard"></i>clipboard</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-columns');window.close();"><i class="fa fa-columns"></i>columns</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-copy');window.close();"><i class="fa fa-copy"></i>copy</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cut');window.close();"><i class="fa fa-cut"></i>cut</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-dedent');window.close();"><i class="fa fa-dedent"></i>dedent</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-eraser');window.close();"><i class="fa fa-eraser"></i>eraser</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file');window.close();"><i class="fa fa-file"></i>file</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-o');window.close();"><i class="fa fa-file-o"></i>file-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-text');window.close();"><i class="fa fa-file-text"></i>file-text</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-file-text-o');window.close();"><i class="fa fa-file-text-o"></i>file-text-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-files-o');window.close();"><i class="fa fa-files-o"></i>files-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-floppy-o');window.close();"><i class="fa fa-floppy-o"></i>floppy-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-font');window.close();"><i class="fa fa-font"></i>font</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-header');window.close();"><i class="fa fa-header"></i>header</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-indent');window.close();"><i class="fa fa-indent"></i>indent</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-italic');window.close();"><i class="fa fa-italic"></i>italic</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-link');window.close();"><i class="fa fa-link"></i>link</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-list');window.close();"><i class="fa fa-list"></i>list</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-list-alt');window.close();"><i class="fa fa-list-alt"></i>list-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-list-ol');window.close();"><i class="fa fa-list-ol"></i>list-ol</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-list-ul');window.close();"><i class="fa fa-list-ul"></i>list-ul</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-outdent');window.close();"><i class="fa fa-outdent"></i>outdent</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paperclip');window.close();"><i class="fa fa-paperclip"></i>paperclip</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paragraph');window.close();"><i class="fa fa-paragraph"></i>paragraph</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paste');window.close();"><i class="fa fa-paste"></i>paste</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-repeat');window.close();"><i class="fa fa-repeat"></i>repeat</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rotate-left');window.close();"><i class="fa fa-rotate-left"></i>rotate-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rotate-right');window.close();"><i class="fa fa-rotate-right"></i>rotate-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-save');window.close();"><i class="fa fa-save"></i>save</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-scissors');window.close();"><i class="fa fa-scissors"></i>scissors</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-strikethrough');window.close();"><i class="fa fa-strikethrough"></i>strikethrough</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-subscript');window.close();"><i class="fa fa-subscript"></i>subscript</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-superscript');window.close();"><i class="fa fa-superscript"></i>superscript</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-table');window.close();"><i class="fa fa-table"></i>table</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-text-height');window.close();"><i class="fa fa-text-height"></i>text-height</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-text-width');window.close();"><i class="fa fa-text-width"></i>text-width</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-th');window.close();"><i class="fa fa-th"></i>th</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-th-large');window.close();"><i class="fa fa-th-large"></i>th-large</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-th-list');window.close();"><i class="fa fa-th-list"></i>th-list</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-underline');window.close();"><i class="fa fa-underline"></i>underline</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-undo');window.close();"><i class="fa fa-undo"></i>undo</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-unlink');window.close();"><i class="fa fa-unlink"></i>unlink</a>
+							</div>
+							<h4 class="page-header">Directional Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angle-double-down');window.close();"><i class="fa fa-angle-double-down"></i> angle-double-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angle-double-left');window.close();"><i class="fa fa-angle-double-left"></i> angle-double-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angle-double-right');window.close();"><i class="fa fa-angle-double-right"></i>angle-double-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angle-double-up');window.close();"><i class="fa fa-angle-double-up"></i>angle-double-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angle-down');window.close();"><i class="fa fa-angle-down"></i>angle-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angle-left');window.close();"><i class="fa fa-angle-left"></i>angle-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angle-right');window.close();"><i class="fa fa-angle-right"></i>angle-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angle-up');window.close();"><i class="fa fa-angle-up"></i>angle-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-circle-down');window.close();"><i class="fa fa-arrow-circle-down"></i> arrow-circle-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-circle-left');window.close();"><i class="fa fa-arrow-circle-left"></i> arrow-circle-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-circle-o-down');window.close();"><i class="fa fa-arrow-circle-o-down"></i> arrow-circle-o-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-circle-o-left');window.close();"><i class="fa fa-arrow-circle-o-left"></i> arrow-circle-o-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-circle-o-right');window.close();"><i class="fa fa-arrow-circle-o-right"></i>arrow-circle-o-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-circle-o-up');window.close();"><i class="fa fa-arrow-circle-o-up"></i> arrow-circle-o-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-circle-right');window.close();"><i class="fa fa-arrow-circle-right"></i>arrow-circle-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-circle-up');window.close();"><i class="fa fa-arrow-circle-up"></i>arrow-circle-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-down');window.close();"><i class="fa fa-arrow-down"></i>arrow-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-left');window.close();"><i class="fa fa-arrow-left"></i>arrow-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-right');window.close();"><i class="fa fa-arrow-right"></i>arrow-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrow-up');window.close();"><i class="fa fa-arrow-up"></i>arrow-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrows');window.close();"><i class="fa fa-arrows"></i>arrows</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrows-alt');window.close();"><i class="fa fa-arrows-alt"></i>arrows-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrows-h');window.close();"><i class="fa fa-arrows-h"></i>arrows-h</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrows-v');window.close();"><i class="fa fa-arrows-v"></i>arrows-v</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-down');window.close();"><i class="fa fa-caret-down"></i>caret-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-left');window.close();"><i class="fa fa-caret-left"></i>caret-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-right');window.close();"><i class="fa fa-caret-right"></i>caret-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-square-o-down');window.close();"><i class="fa fa-caret-square-o-down"></i> caret-square-o-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-square-o-left');window.close();"><i class="fa fa-caret-square-o-left"></i> caret-square-o-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-square-o-right');window.close();"><i class="fa fa-caret-square-o-right"></i>caret-square-o-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-square-o-up');window.close();"><i class="fa fa-caret-square-o-up"></i> caret-square-o-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-caret-up');window.close();"><i class="fa fa-caret-up"></i>caret-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chevron-circle-down');window.close();"><i class="fa fa-chevron-circle-down"></i> chevron-circle-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chevron-circle-left');window.close();"><i class="fa fa-chevron-circle-left"></i> chevron-circle-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chevron-circle-right');window.close();"><i class="fa fa-chevron-circle-right"></i>chevron-circle-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chevron-circle-up');window.close();"><i class="fa fa-chevron-circle-up"></i> chevron-circle-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chevron-down');window.close();"><i class="fa fa-chevron-down"></i>chevron-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chevron-left');window.close();"><i class="fa fa-chevron-left"></i>chevron-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chevron-right');window.close();"><i class="fa fa-chevron-right"></i>chevron-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chevron-up');window.close();"><i class="fa fa-chevron-up"></i>chevron-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-exchange');window.close();"><i class="fa fa-exchange"></i>exchange</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-o-down');window.close();"><i class="fa fa-hand-o-down"></i>hand-o-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-o-left');window.close();"><i class="fa fa-hand-o-left"></i>hand-o-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-o-right');window.close();"><i class="fa fa-hand-o-right"></i>hand-o-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hand-o-up');window.close();"><i class="fa fa-hand-o-up"></i>hand-o-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-long-arrow-down');window.close();"><i class="fa fa-long-arrow-down"></i>long-arrow-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-long-arrow-left');window.close();"><i class="fa fa-long-arrow-left"></i>long-arrow-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-long-arrow-right');window.close();"><i class="fa fa-long-arrow-right"></i>long-arrow-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-long-arrow-up');window.close();"><i class="fa fa-long-arrow-up"></i>long-arrow-up</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-down');window.close();"><i class="fa fa-toggle-down"></i>toggle-down</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-left');window.close();"><i class="fa fa-toggle-left"></i>toggle-left</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-right');window.close();"><i class="fa fa-toggle-right"></i>toggle-right</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-toggle-up');window.close();"><i class="fa fa-toggle-up"></i>toggle-up</a>
+							</div>
+							<h4 class="page-header">Video Player Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-arrows-alt');window.close();"><i class="fa fa-arrows-alt"></i>arrows-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-backward');window.close();"><i class="fa fa-backward"></i>backward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-compress');window.close();"><i class="fa fa-compress"></i>compress</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-eject');window.close();"><i class="fa fa-eject"></i>eject</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-expand');window.close();"><i class="fa fa-expand"></i>expand</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-fast-backward');window.close();"><i class="fa fa-fast-backward"></i>fast-backward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-fast-forward');window.close();"><i class="fa fa-fast-forward"></i>fast-forward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-forward');window.close();"><i class="fa fa-forward"></i>forward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pause');window.close();"><i class="fa fa-pause"></i>pause</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-play');window.close();"><i class="fa fa-play"></i>play</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-play-circle');window.close();"><i class="fa fa-play-circle"></i>play-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-play-circle-o');window.close();"><i class="fa fa-play-circle-o"></i>play-circle-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-random');window.close();"><i class="fa fa-random"></i>random</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-step-backward');window.close();"><i class="fa fa-step-backward"></i>step-backward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-step-forward');window.close();"><i class="fa fa-step-forward"></i>step-forward</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-stop');window.close();"><i class="fa fa-stop"></i>stop</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-youtube-play');window.close();"><i class="fa fa-youtube-play"></i>youtube-play</a>
+							</div>
+							<h4 class="page-header">Brand Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-500px');window.close();"><i class="fa fa-500px"></i>500px</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-adn');window.close();"><i class="fa fa-adn"></i>adn</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-amazon');window.close();"><i class="fa fa-amazon"></i>amazon</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-android');window.close();"><i class="fa fa-android"></i>android</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-angellist');window.close();"><i class="fa fa-angellist"></i>angellist</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-apple');window.close();"><i class="fa fa-apple"></i>apple</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-behance');window.close();"><i class="fa fa-behance"></i>behance</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-behance-square');window.close();"><i class="fa fa-behance-square"></i>behance-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bitbucket');window.close();"><i class="fa fa-bitbucket"></i>bitbucket</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bitbucket-square');window.close();"><i class="fa fa-bitbucket-square"></i>bitbucket-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-bitcoin');window.close();"><i class="fa fa-bitcoin"></i>bitcoin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-black-tie');window.close();"><i class="fa fa-black-tie"></i>black-tie</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-btc');window.close();"><i class="fa fa-btc"></i>btc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-buysellads');window.close();"><i class="fa fa-buysellads"></i>buysellads</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-amex');window.close();"><i class="fa fa-cc-amex"></i>cc-amex</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-diners-club');window.close();"><i class="fa fa-cc-diners-club"></i>cc-diners-club</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-discover');window.close();"><i class="fa fa-cc-discover"></i>cc-discover</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-jcb');window.close();"><i class="fa fa-cc-jcb"></i>cc-jcb</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-mastercard');window.close();"><i class="fa fa-cc-mastercard"></i>cc-mastercard</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-paypal');window.close();"><i class="fa fa-cc-paypal"></i>cc-paypal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-stripe');window.close();"><i class="fa fa-cc-stripe"></i>cc-stripe</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-cc-visa');window.close();"><i class="fa fa-cc-visa"></i>cc-visa</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-chrome');window.close();"><i class="fa fa-chrome"></i>chrome</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-codepen');window.close();"><i class="fa fa-codepen"></i>codepen</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-connectdevelop');window.close();"><i class="fa fa-connectdevelop"></i>connectdevelop</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-contao');window.close();"><i class="fa fa-contao"></i>contao</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-css3');window.close();"><i class="fa fa-css3"></i>css3</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-dashcube');window.close();"><i class="fa fa-dashcube"></i>dashcube</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-delicious');window.close();"><i class="fa fa-delicious"></i>delicious</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-deviantart');window.close();"><i class="fa fa-deviantart"></i>deviantart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-digg');window.close();"><i class="fa fa-digg"></i>digg</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-dribbble');window.close();"><i class="fa fa-dribbble"></i>dribbble</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-dropbox');window.close();"><i class="fa fa-dropbox"></i>dropbox</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-drupal');window.close();"><i class="fa fa-drupal"></i>drupal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-empire');window.close();"><i class="fa fa-empire"></i>empire</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-expeditedssl');window.close();"><i class="fa fa-expeditedssl"></i>expeditedssl</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-facebook');window.close();"><i class="fa fa-facebook"></i>facebook</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-facebook-f');window.close();"><i class="fa fa-facebook-f"></i>facebook-f</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-facebook-official');window.close();"><i class="fa fa-facebook-official"></i> facebook-official</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-facebook-square');window.close();"><i class="fa fa-facebook-square"></i>facebook-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-firefox');window.close();"><i class="fa fa-firefox"></i>firefox</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-flickr');window.close();"><i class="fa fa-flickr"></i>flickr</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-fonticons');window.close();"><i class="fa fa-fonticons"></i>fonticons</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-forumbee');window.close();"><i class="fa fa-forumbee"></i>forumbee</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-foursquare');window.close();"><i class="fa fa-foursquare"></i>foursquare</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ge');window.close();"><i class="fa fa-ge"></i>ge</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-get-pocket');window.close();"><i class="fa fa-get-pocket"></i>get-pocket</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gg');window.close();"><i class="fa fa-gg"></i>gg</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gg-circle');window.close();"><i class="fa fa-gg-circle"></i>gg-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-git');window.close();"><i class="fa fa-git"></i>git</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-git-square');window.close();"><i class="fa fa-git-square"></i>git-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-github');window.close();"><i class="fa fa-github"></i>github</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-github-alt');window.close();"><i class="fa fa-github-alt"></i>github-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-github-square');window.close();"><i class="fa fa-github-square"></i>github-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gittip');window.close();"><i class="fa fa-gittip"></i>gittip</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-google');window.close();"><i class="fa fa-google"></i>google</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-google-plus');window.close();"><i class="fa fa-google-plus"></i>google-plus</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-google-plus-square');window.close();"><i class="fa fa-google-plus-square"></i>google-plus-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-google-wallet');window.close();"><i class="fa fa-google-wallet"></i>google-wallet</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-gratipay');window.close();"><i class="fa fa-gratipay"></i>gratipay</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hacker-news');window.close();"><i class="fa fa-hacker-news"></i>hacker-news</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-houzz');window.close();"><i class="fa fa-houzz"></i>houzz</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-html5');window.close();"><i class="fa fa-html5"></i>html5</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-instagram');window.close();"><i class="fa fa-instagram"></i>instagram</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-internet-explorer');window.close();"><i class="fa fa-internet-explorer"></i> internet-explorer</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ioxhost');window.close();"><i class="fa fa-ioxhost"></i>ioxhost</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-joomla');window.close();"><i class="fa fa-joomla"></i>joomla</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-jsfiddle');window.close();"><i class="fa fa-jsfiddle"></i>jsfiddle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-lastfm');window.close();"><i class="fa fa-lastfm"></i>lastfm</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-lastfm-square');window.close();"><i class="fa fa-lastfm-square"></i>lastfm-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-leanpub');window.close();"><i class="fa fa-leanpub"></i>leanpub</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-linkedin');window.close();"><i class="fa fa-linkedin"></i>linkedin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-linkedin-square');window.close();"><i class="fa fa-linkedin-square"></i>linkedin-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-linux');window.close();"><i class="fa fa-linux"></i>linux</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-maxcdn');window.close();"><i class="fa fa-maxcdn"></i>maxcdn</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-meanpath');window.close();"><i class="fa fa-meanpath"></i>meanpath</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-medium');window.close();"><i class="fa fa-medium"></i>medium</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-odnoklassniki');window.close();"><i class="fa fa-odnoklassniki"></i>odnoklassniki</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-odnoklassniki-square');window.close();"><i class="fa fa-odnoklassniki-square"></i>odnoklassniki-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-opencart');window.close();"><i class="fa fa-opencart"></i>opencart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-openid');window.close();"><i class="fa fa-openid"></i>openid</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-opera');window.close();"><i class="fa fa-opera"></i>opera</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-optin-monster');window.close();"><i class="fa fa-optin-monster"></i>optin-monster</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pagelines');window.close();"><i class="fa fa-pagelines"></i>pagelines</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-paypal');window.close();"><i class="fa fa-paypal"></i>paypal</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pied-piper');window.close();"><i class="fa fa-pied-piper"></i>pied-piper</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pied-piper-alt');window.close();"><i class="fa fa-pied-piper-alt"></i>pied-piper-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pinterest');window.close();"><i class="fa fa-pinterest"></i>pinterest</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pinterest-p');window.close();"><i class="fa fa-pinterest-p"></i>pinterest-p</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-pinterest-square');window.close();"><i class="fa fa-pinterest-square"></i>pinterest-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-qq');window.close();"><i class="fa fa-qq"></i>qq</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-ra');window.close();"><i class="fa fa-ra"></i>ra</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-rebel');window.close();"><i class="fa fa-rebel"></i>rebel</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-reddit');window.close();"><i class="fa fa-reddit"></i>reddit</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-reddit-square');window.close();"><i class="fa fa-reddit-square"></i>reddit-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-renren');window.close();"><i class="fa fa-renren"></i>renren</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-safari');window.close();"><i class="fa fa-safari"></i>safari</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-sellsy');window.close();"><i class="fa fa-sellsy"></i>sellsy</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-share-alt');window.close();"><i class="fa fa-share-alt"></i>share-alt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-share-alt-square');window.close();"><i class="fa fa-share-alt-square"></i>share-alt-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-shirtsinbulk');window.close();"><i class="fa fa-shirtsinbulk"></i>shirtsinbulk</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-simplybuilt');window.close();"><i class="fa fa-simplybuilt"></i>simplybuilt</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-skyatlas');window.close();"><i class="fa fa-skyatlas"></i>skyatlas</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-skype');window.close();"><i class="fa fa-skype"></i>skype</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-slack');window.close();"><i class="fa fa-slack"></i>slack</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-slideshare');window.close();"><i class="fa fa-slideshare"></i>slideshare</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-soundcloud');window.close();"><i class="fa fa-soundcloud"></i>soundcloud</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-spotify');window.close();"><i class="fa fa-spotify"></i>spotify</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-stack-exchange');window.close();"><i class="fa fa-stack-exchange"></i>stack-exchange</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-stack-overflow');window.close();"><i class="fa fa-stack-overflow"></i>stack-overflow</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-steam');window.close();"><i class="fa fa-steam"></i>steam</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-steam-square');window.close();"><i class="fa fa-steam-square"></i>steam-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-stumbleupon');window.close();"><i class="fa fa-stumbleupon"></i>stumbleupon</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-stumbleupon-circle');window.close();"><i class="fa fa-stumbleupon-circle"></i>stumbleupon-circle</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tencent-weibo');window.close();"><i class="fa fa-tencent-weibo"></i>tencent-weibo</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-trello');window.close();"><i class="fa fa-trello"></i>trello</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tripadvisor');window.close();"><i class="fa fa-tripadvisor"></i>tripadvisor</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tumblr');window.close();"><i class="fa fa-tumblr"></i>tumblr</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-tumblr-square');window.close();"><i class="fa fa-tumblr-square"></i>tumblr-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-twitch');window.close();"><i class="fa fa-twitch"></i>twitch</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-twitter');window.close();"><i class="fa fa-twitter"></i>twitter</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-twitter-square');window.close();"><i class="fa fa-twitter-square"></i>twitter-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-viacoin');window.close();"><i class="fa fa-viacoin"></i>viacoin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-vimeo');window.close();"><i class="fa fa-vimeo"></i>vimeo</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-vimeo-square');window.close();"><i class="fa fa-vimeo-square"></i>vimeo-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-vine');window.close();"><i class="fa fa-vine"></i>vine</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-vk');window.close();"><i class="fa fa-vk"></i>vk</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-wechat');window.close();"><i class="fa fa-wechat"></i>wechat</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-weibo');window.close();"><i class="fa fa-weibo"></i>weibo</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-weixin');window.close();"><i class="fa fa-weixin"></i>weixin</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-whatsapp');window.close();"><i class="fa fa-whatsapp"></i>whatsapp</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-wikipedia-w');window.close();"><i class="fa fa-wikipedia-w"></i>wikipedia-w</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-windows');window.close();"><i class="fa fa-windows"></i>windows</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-wordpress');window.close();"><i class="fa fa-wordpress"></i>wordpress</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-xing');window.close();"><i class="fa fa-xing"></i>xing</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-xing-square');window.close();"><i class="fa fa-xing-square"></i>xing-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-y-combinator');window.close();"><i class="fa fa-y-combinator"></i>y-combinator</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-y-combinator-square');window.close();"><i class="fa fa-y-combinator-square"></i> y-combinator-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-yahoo');window.close();"><i class="fa fa-yahoo"></i>yahoo</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-yc');window.close();"><i class="fa fa-yc"></i>yc</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-yc-square');window.close();"><i class="fa fa-yc-square"></i>yc-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-yelp');window.close();"><i class="fa fa-yelp"></i>yelp</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-youtube');window.close();"><i class="fa fa-youtube"></i>youtube</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-youtube-play');window.close();"><i class="fa fa-youtube-play"></i>youtube-play</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-youtube-square');window.close();"><i class="fa fa-youtube-square"></i>youtube-square</a>
+							</div>
+							<h4 class="page-header">Medical Icons</h4>
+							<div class="btn-group">
+								<a class="btn btn-app" onclick="pener.setIcon('fa fa-ambulance');window.close();"><i class="fa fa-ambulance"></i>ambulance</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-h-square');window.close();"><i class="fa fa-h-square"></i>h-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-heart');window.close();"><i class="fa fa-heart"></i>heart</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-heart-o');window.close();"><i class="fa fa-heart-o"></i>heart-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-heartbeat');window.close();"><i class="fa fa-heartbeat"></i>heartbeat</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-hospital-o');window.close();"><i class="fa fa-hospital-o"></i>hospital-o</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-medkit');window.close();"><i class="fa fa-medkit"></i>medkit</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-plus-square');window.close();"><i class="fa fa-plus-square"></i>plus-square</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-stethoscope');window.close();"><i class="fa fa-stethoscope"></i>stethoscope</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-user-md');window.close();"><i class="fa fa-user-md"></i>user-md</a>
+								<a class="btn btn-app" onclick="opener.setIcon('fa fa-wheelchair');window.close();"><i class="fa fa-wheelchair"></i>wheelchair</a>
+						</div>
+
+
+						</div>
+					</div>
+				</div>
+	    	</section>
+	    	<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<script src="/js/manage/adminlte.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('.nav-tabs .nav-link:eq(0)').trigger('click',null);
+		})
+	</script>
+	</body>
+</html>

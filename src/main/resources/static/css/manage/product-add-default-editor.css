@@ -1,0 +1,356 @@
+.ck-editor__editable:not(.ck-editor__nested-editable) {
+    min-height: 738px;
+}
+
+/* 해당 css는 반드시 editor에 적용되어야할 element스타일 */
+#content-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100%;
+    /* height: 2000px; */
+    /* transform-origin: 50% 10%; */
+    /* transform: scale(0.65); */
+    /*margin-bottom: 100px;*/
+    margin-top: 80px;
+    overflow: hidden;
+}
+
+#content-container .slides {
+	position: relative;
+    width: 100%
+}
+
+#container-wrapper{
+    position:relative;
+}
+#content-container .slides .slide {
+    /*height: 660px;*/
+    /*height:1000px;*/
+    /*TODO.. 상품 에디터 수정 필요*/
+    height:1000px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #FFFFFF;
+    border-bottom: solid 1px #CCCCCC;
+    position: relative;
+}
+
+#content-container .slides .slide.edit-style {
+    box-shadow: inset 0px 0px 0px 4px #10FE0C;
+}
+
+#content-container li.slide:last-child {
+    border-style: none;
+}
+
+#title-area {
+    position: relative;
+}
+
+#content-area {
+    position: relative;
+}
+
+#bottom-area {
+    position: relative;
+}
+
+p {
+    white-space: nowrap;
+    user-select: none;
+}
+
+.component-item {
+    pointer-events: auto;
+    overflow: hidden;
+}
+
+[contenteditable] {
+    outline: 0px solid transparent;
+}
+
+/* .component-item.edit-content {
+    border: dashed 1px red;
+    padding: 12px 0%;
+} */
+
+.component-item.edit-style {
+    box-shadow: inset 0px 0px 0px 4px #10FE0C;
+}
+
+.component-item.edit-style[contenteditable=true] {
+    box-shadow: inset 0px 0px 0px 4px #FE0E0C;
+}
+
+.component-item.dragging {
+    border: dashed 1px #CCCCCC;
+    /* transition: top 0.18s, left 0.18s; */
+    /* 이동할 때 0.3초의 애니메이션 효과 적용 */
+}
+
+.component-item.active {
+    pointer-events: none;
+}
+/*
+.component-item:hover {
+    cursor: move;
+}
+*/
+
+.component-item img{
+    width:100%;
+    height:100%;
+}
+/*   ///// card-container ////
+ 아래 .card-container는 추후 수정 필요 */
+.component-item div.card-container{
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    flex-direction: column;
+    align-items: center;
+}
+
+.component-item div.card-container .image-box{
+    width:inherit;
+    height:230px;
+    background-size:cover;
+    background-repeat:no-repeat;
+    background-position:center;
+    background-color:transparent;
+}
+
+.component-item div.card-container .text{
+    font-family: "Pretendard-Regular";
+    font-weight:500;
+    font-size:20px;
+    text-align: center;
+    paddig:8px 12px;
+}
+/*   /////////// */
+
+
+#edit-utility-item {
+    display: none;
+}
+
+#edit-utility-item.active {
+    display: block;
+    width: 280px;
+    height: fit-content;
+}
+
+.bg-wrapper {
+    transform: translate(-50%, -50%);
+    background-color: #efefef;
+}
+
+#util-buttons {
+    position: fixed;
+    top: 50%;
+    left: 27%;
+    transform: translate(-50%, -50%);
+    margin:0;
+    border-radius:5px;
+    /* bottom: 50px;
+    left: 50%;
+    transform: translate(-50%,-50%); */
+}
+#util-buttons li{
+    cursor:pointer;
+    margin-bottom:14px;
+    text-align: center;
+    width:30px;
+    height:30px;
+    line-height:30px;
+    border-radius:5px;
+}
+#util-buttons li:hover{
+    background-color:rgba(255,255,255,1);
+    transition:all ease-in-out .35s;
+}
+#util-buttons li:last-child{
+    margin-bottom:0px;
+}
+#util-buttons li.slide-add{
+    background-repeat:no-repeat;
+    background-size:cover;
+    background-position:center;
+    padding:2px 4px;
+}
+#util-buttons li.slide-remove{
+    background-repeat:no-repeat;
+    background-size:cover;
+    background-position:center;
+    padding:2px 4px;
+}
+#util-buttons li img{
+    width:100%;
+    height:100%;
+}
+
+#buttons li {
+    /* display:inline-block; */
+    width: 35px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border: solid 2px #0062D4;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background-color: #0062D4;
+}
+
+#buttons li:last-child {
+    /* display:inline-block; */
+    width: 35px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border: solid 2px #383838;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background-color: #383838;
+}
+
+#buttons button {
+    border-style: none;
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    color: #FFFFFF;
+}
+
+#buttons li:hover {
+    border: solid 1px #FFFFFF;
+    transition: all ease-in-out .35s;
+}
+
+.show-modal {
+    display: none;
+}
+
+.show-modal.active {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index:9999;
+    width: 100%;
+    height: 200%;
+    background-color: rgba(85, 85, 85, 0.9);
+}
+
+.show-modal.active .data-wrapper {
+    width: 960px;
+    /*height: 500px;*/
+    margin: 0 auto;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #FFFFFF;
+}
+
+.show-modal.active .data-wrapper header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #FFFFFF;
+    border-bottom: solid 1px #222222;
+    margin-bottom: 20px;
+    padding: 20px 30px;
+}
+
+.show-modal.active .data-wrapper .data {
+    /* height:313px; */
+    width: 100%;
+    padding:10px 70px;
+    background-color: #F9F9F9;
+}
+.show-modal.active .data-wrapper .data .template{
+}
+
+.show-modal.active .data-wrapper .data .template li.selected{
+    border:solid 1px #0a58ca;
+}
+
+
+.show-modal.active .data-wrapper .data .template li:hover{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    cursor:pointer;
+    top:-10px;
+    transition:all ease-in-out .35s;
+}
+
+.show-modal.active .data-wrapper .data .template li .template-thumbnail{
+    height:260px;
+}
+
+.show-modal.active .data-wrapper .data .template li .template-thumbnail img{
+    width:100%;
+    height:100%;
+    aspect-ratio: 4 /3;
+}
+.template-title{
+    font-family:"Pretendard-Regular";
+    font-size:18px;
+    text-align: center;
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.show-modal.active .data-wrapper .template li{
+    overflow: hidden;
+}
+
+.show-modal.active .data-wrapper header .cancel-btn {
+    cursor: pointer;
+}
+
+.show-modal.active .data-wrapper .select-button {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.show-modal.active .data-wrapper .select-button li {
+    display: inline-block;
+    width: 75px;
+    height: 35px;
+    line-height: 35px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.show-modal.active .data-wrapper .select-button li.add {
+    background-color: #0062D4;
+    border-radius: 5px;
+    color: #FFFFFF;
+}
+
+.show-modal.active .data-wrapper .select-button li.cancel {
+    background-color: #383838;
+    border-radius: 5px;
+    color: #FFFFFF;
+}
+
+.show-modal.active .data-wrapper .select-button li:last-child {
+    margin-right: 0;
+}
+
+#editor-section .toolbox{
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#editor-section .toolbox-items{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}

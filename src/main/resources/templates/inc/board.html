@@ -1,0 +1,116 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="board-script">
+	<script type="text/javascript" th:inline="javascript" >
+		goView = function(id) {
+			location.href = `/board_view?id=${id}`;
+		}
+	</script>
+</head>
+<body>
+	<section class="content-wrapper" th:fragment="board-list">
+<!--/*
+        <div class="content-header">
+            <h1 class="m-0">팝업관리</h1>
+        </div>
+        <div class="manage-tab-header">
+            <ul class="tab-list">
+                <li class="tab-item" th:classappend="${p == null} or ${p != null and p.type == 'layer'} ? 'active'" data-id="layer" onclick="location.href='/manage/main/popup/list?type=layer'">공지팝업</li>
+                <li class="tab-item" th:classappend="${p != null and p.type == 'notice-bar'} ? 'active'" data-id="notice-bar" onclick="location.href='/manage/main/popup/list?type=notice-bar'">상단팝업</li>
+            </ul>
+        </div>
+        <div class="manage-content filter">
+            <form id="search-form">
+            <input type="hidden" id="popup-type" name="type" value="layer" th:value="${p != null} ? ${p.type} : 'layer'" />
+            <div class="row">
+                <div class="form-inline col-md-2">
+                    <label class="col-3">상태</label>
+                    <select class="col-9 form-control" name="useYn">
+                        <option value="ALL" th:selected="${p != null} and ${#strings.equals(p.useYn, 'ALL')}">전체</option>
+                        <option value="Y" th:selected="${p != null} and ${#strings.equals(p.useYn, 'Y')}">노출</option>
+                        <option value="N" th:selected="${p != null} and ${#strings.equals(p.useYn, 'N')}">숨김</option>
+                    </select>
+                </div>
+                <div class="form-inline col-md-5">
+                    <label class="col-2">팝업명</label>
+                    <input type="text" id="titleLike" name="searchKey" class="col-10 form-control" placeholder="팝업명 입력" maxlength="50" th:value="${p != null} ? ${p.searchKey}" />
+                </div>
+                <div class="col-md-1 clearfix">
+                    <div class="btn-group float-right">
+                        <button type="button" class="btn btn-primary" onclick="fnSearchNotice();"><i class="fa fa-search"></i> 검색</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        <div class="manage-control middle">
+            <button type="button" class="btn btn-primary" onclick="fnWritePopup()">신규등록</button>
+            <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modal-popup-sort">순서변경</button>
+        </div>
+*/-->
+        <div class="table">
+            <table id="datatable" class="table table-hover manage-table">
+                <thead>
+                    <tr>
+                        <th>순서</th>
+                        <th>제목</th>
+                        <th>조회수</th>
+                        <th>등록일</th>
+                        <th>기능</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:if="${boardList == null or #arrays.isEmpty(boardList)}">
+                    <tr class="empty-row">
+                        <td colspan="7">등록된 게시글이 없습니다.</td>
+                    </tr>
+                    </th:block>
+                    <th:block th:unless="${boardList == null or #arrays.isEmpty(boardList)}">
+                    </th:block>
+                        <tr th:each="item, idx : ${boardList}" >
+                            <td class="no" th:text="${((paging.currentPageNumber-1)*5)+idx.count}">순서</td>
+                            <td class="name" th:text="${item.title}">제목</td>
+                            <td class="name" th:text="${item.viewCount}">조회수</td>
+                            <td class="date" th:text="${item.createDate}">등록일</td>
+                            <td>
+	                            <button type="button" class="btn btn-primary" th:onclick="goView([[${item.id}]])">보기</button>
+                            </td>
+                        </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="manage-pagination">
+            <div th:replace="~{/inc/pagination :: paging}" ></div>
+        </div>
+    </section>
+
+	<section class="content-wrapper" th:fragment="board-view">
+        <div class="table">
+			<div>
+				<h1>게시글 보기</h1>
+				<div th:text="${content.title}"></div>
+				<div>
+					<div th:text="${content.createDate}"></div>
+					<div th:text="${content.viewCount}"></div>
+				</div>
+				<div th:utext="${content.content}"></div>
+
+				<div th:if="${attachList}">
+					<div th:each="file : ${attachList}">
+						<div>
+							<div th:text="${file.originFilename}"></div>
+							<div th:text="${file.fileSize}"></div>
+						</div>
+<!--/*
+						<div class="board_photo" id="file${i}">
+							<div><img src="${_thumnailUrl}"></div>
+							<button type="button" class="board_btn thumnail ${filesArr[i].isThumnail ? 'check' : ''} p-0" onclick="setThumnail('${i}');"><i class="way-nav-icon"></i></button>
+							<button type="button" class="board_btn delete p-0" onclick="deleteFile('${i}');"><i class="way-nav-icon wi-delete"></i></button>
+						</div>
+*/-->
+					</div>
+				</div>
+			</div>
+        </div>
+    </section>
+</body>
+</html>

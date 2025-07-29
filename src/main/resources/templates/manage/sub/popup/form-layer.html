@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+	<style rel="stylesheet">
+		.ck.ck-editor {display:inline-block; width: 358px;}
+		.ck-editor__editable {height: 400px; }
+	</style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	<nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+	<aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	<section class="content-wrapper">
+		<form id="notice-popup-form">
+		<input type="hidden" name="id" th:value="${popup != null} ? ${popup.id}" />
+		<input type="hidden" name="timeKey" th:value="${popup != null} ? ${popup.timeKey}" />
+		<input type="hidden" name="noticeType" value="layer" />
+		<div class="content-header">
+			<h1 class="m-0">팝업등록</h1>
+		</div>
+		<div class="manage-content filter">
+			<div class="row m-0 form-inline">
+				<div class="input-area-full">
+					<label class="input-label">팝업유형*</label>
+					<select id="content-type" name="contentType" class="form-control inline-one">
+						<option value="image" th:selected="${popup != null and popup.contentType == 'image'} ? 'selected'">이미지형</option>
+						<option value="text" th:selected="${popup != null and popup.contentType == 'text'} ? 'selected'">텍스트형</option>
+					</select>
+				</div>
+			</div>
+			<div>
+				<label class="alt-input-label">팝업유형(이미지 등록형, 텍스트 입력형)을 선택해주세요.</label>
+			</div>
+		</div>
+		<div class="manage-content no-pd mt-4">
+			<div class="row m-0">
+				<div class="input-box left">
+					<div class="popup-preview" id="preview">
+						<img id="preview-img" class="image-field" th:src="${popup != null} ? @{/upload/{url}(url=${popup.imageUrlPc})}" th:styleappend="${popup != null and popup.contentType == 'text'} ? 'display:none;'" />
+						<div id="preview-text" class="text-field" th:styleappend="${popup == null} or ${popup != null and popup.contentType == 'image'} ? 'display:none;':'display:block;'">
+							<textarea class="form-control inline-one" name="noticeText" id="notice" placeholder="내용을 입력해주세요." th:utext="${popup != null} ? ${popup.noticeText}"></textarea>
+						</div>
+					</div>
+					<div class="popup-preview-control">
+						<div class="item one-now">닫기</div>
+						<div class="item one-day" style="display:none;">오늘 하루 닫기</div>
+						<div class="item one-week">일주일간 닫기</div>
+					</div>
+					<div class="popup-preview-control">
+						<label class="alt-input-label m-0">메인화면의 80% 크기입니다.</label>
+					</div>
+				</div>
+				<div class="input-box right">
+					<div class="row mb-3 form-inline image-field" th:styleappend="${popup != null and popup.contentType == 'text'} ? 'display:none;'">
+						<div class="input-area-full">
+							<label class="input-label">이미지*</label>
+							<input type="file" class="form-control inline-one" id="image" name="image" accept="image/*" />
+						</div>
+					</div>
+					<div class="row mb-3 form-inline">
+						<div class="input-area-full">
+							<label class="input-label">팝업명*</label>
+							<input type="text" class="form-control inline-one" id="title" name="titleText" placeholder="팝엄명을 입력해주세요." required="required" th:value="${popup != null} ? ${popup.titleText}" />
+						</div>
+					</div>
+					<div class="row mb-3 form-inline">
+						<div class="input-area-half">
+							<label class="input-label">링크형식*</label>
+							<select class="form-control inline-one" name="linkTarget">
+								<option value="_BLANK" th:selected="${popup != null and popup.linkTarget == '_BLANK'} ? 'selected'">새창</option>
+								<option value="THIS" th:selected="${popup != null and popup.linkTarget == 'THIS'} ? 'selected'">현재창</option>
+							</select>
+						</div>
+						<div class="input-area-half">
+							<label class="input-label">팝업노출</label>
+							<select class="form-control inline-one" name="visibleCode">
+								<option value="ALL" th:selected="${popup != null and popup.visibleYnPc == 'Y' and popup.visibleYnMobile == 'Y'} ? 'selected'">전체</option>
+								<option value="PC" th:selected="${popup != null and popup.visibleYnPc == 'Y' and popup.visibleYnMobile == 'N'} ? 'selected'">PC만</option>
+								<option value="MOBILE" th:selected="${popup != null and popup.visibleYnPc == 'N' and popup.visibleYnMobile == 'Y'} ? 'selected'">모바일만</option>
+							</select>
+						</div>
+					</div>
+					<div class="row mb-3 form-inline">
+						<div class="input-area-full">
+							<label class="input-label">링크 URL</label>
+							<input type="text" class="form-control inline-one" name="linkUrl" placeholder="링크 주소를 입력해주세요." th:value="${popup != null} ? ${popup.linkUrl}" />
+						</div>
+					</div>
+					<div class="row form-inline">
+						<div class="input-area-half">
+							<label class="input-label">시작일</label>
+							<input type="text" class="form-control inline-one date-time" name="startDate" id="start-date" placeholder="노출 시작일시" readonly="readonly" autocomplete="off" th:value="${popup != null} ? ${popup.startDate}" />
+							<div class="input-overlay">
+								<button type="button" class="overlay-button" onclick="fnSetNullDatetime('start-date')"><img src="/images/icon/bell.svg" /></button>
+							</div>
+						</div>
+						<div class="input-area-half">
+							<label class="input-label">종료일</label>
+							<input type="text" class="form-control inline-one date-time" name="expireDate" id="expire-date" placeholder="노출 종료일시" readonly="readonly" autocomplete="off" th:value="${popup != null} ? ${popup.expireDate}" />
+							<div class="input-overlay">
+								<button type="button" class="overlay-button" onclick="fnSetNullDatetime('expire-date')"><img src="/images/icon/bell.svg" /></button>
+							</div>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="alt-input-label">시작일, 종료일 미지정시 상시 노출됩니다.</label>
+					</div>
+					<div class="row mb-3 form-inline">
+						<div class="input-area-third">
+							<label class="input-label">노출여부</label>
+							<input class="form-control" type="checkbox" id="use-yn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${popup != null and popup.useYn == 'Y'} ? 'checked'" />
+						</div>
+						<div class="input-area-third">
+							<label class="input-label tri-second">하루동안</label>
+							<input class="form-control" type="checkbox" id="one-day-yn" name="oneDayYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${popup != null and popup.oneDayYn == 'Y'} ? 'checked'" />
+						</div>
+						<div class="input-area-third">
+							<label class="input-label tri-third">일주일간</label>
+							<input class="form-control" type="checkbox" id="one-week-yn" name="oneWeekYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${popup == null} or ${popup != null and popup.oneWeekYn == 'Y'} ? 'checked'" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-control">
+			<button type="button" class="btn btn-dark" onclick="history.back()">취소하기</button>
+			<button type="button" class="btn btn-primary" th:onclick="${popup != null} ? 'fnUpdateNoticePopup()' : 'fnSaveNoticePopup()'">저장하기</button>
+		</div>
+		</form>
+	</section>
+	<footer th:replace="~{/manage/inc/manage-footer-include :: footer}" />
+	<aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+	$(document).ready(function(){
+
+		$('#content-type').change(function(e){
+			switch($(e.target).val()){
+				case 'text':
+					$('.image-field').hide();
+					$('.text-field').show();
+					break;
+				case 'image':
+				default:
+					$('.text-field').hide();
+					$('.image-field').show();
+					break;
+			}
+		});
+
+		$('#image').change(function(e){
+			let files = e.target.files;
+			if(files.length > 0) {
+				for (let i = 0; i < files.length; i++) {
+					if (!files[i].type.startsWith("image/")) continue;
+					const img = document.getElementById("preview-img");
+					img.file = files[i];
+					img.classList.add('image-field');
+
+					const reader = new FileReader();
+					reader.onload = (el) => {
+						img.src = el.target.result;
+					};
+					reader.readAsDataURL(files[i]);
+				}
+			}
+		});
+
+		$('#one-day-yn').change(function(e){
+			if($(e.target).prop('checked')){
+				$('.one-day').show();
+			}else{
+				$('.one-day').hide();
+			}
+		});
+		$('#one-week-yn').change(function(e){
+			if($(e.target).prop('checked')){
+				$('.one-week').show();
+			}else{
+				$('.one-week').hide();
+			}
+		});
+
+		$('.date-time').daterangepicker({
+			minDate:moment().add(-1, 'hour'),
+			autoUpdateInput: true,
+			singleDatePicker:true,
+			showDropdowns: true,
+			showCustomRangeLabel:false,
+			timePicker: true,
+			timePicker24Hour: true,
+			timePickerMinutes:true,
+			drops:"auto",
+			locale: {
+				format: 'YYYY-MM-DD HH:mm:ss',
+				applyLabel: "적용",
+				cancelLabel: "취소",
+				daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+				monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+				separator:separator
+			}
+		}, function(start, end, label){});
+		let item = [[${popup}]];
+		if(item == null){
+			$('#start-date').val('');
+			$('#expire-date').val('');
+		}else{
+			$('#start-date').val(item.startDate);
+			$('#expire-date').val(item.expireDate);
+		}
+	});
+
+	let editor;
+	ClassicEditor.create(document.querySelector('#notice'),
+		{
+			language: 'ko',
+			toolbar: ['fontFamily', 'fontSize', 'fontColor', '|', 'bold', 'italic', 'alignment', 'bulletedList', 'numberedList', 'blockQuote'],
+			fontFamily: {
+				options: ['Noto Sans KR', 'Noto Serif KR', 'SEBANG_Gothic_Bold', 'Pretendard', 'NanumGothic', 'NanumMyeongjo', 'NanumSquare'],
+				supportAllValues: true
+			},
+			fontSize: {
+				options: ['12px','13px','14px','15px','16px','18px','20px','24px','28px','32px','36px', '48px'],
+				supportAllValues: true
+			},
+			ImageCaption:false,
+		}
+	)
+	.then( newEditor => { editor = newEditor; } )
+	.catch( error => { console.log(error); } );
+
+	fnSetNullDatetime = function(target){
+		$('#'+target).val('');
+	}
+
+	fnSaveNoticePopup = function(){
+		editor.updateSourceElement();
+		let form = document.getElementById('notice-popup-form');
+		if(!formValidCheck($('#title'), 'input', 'is-invalid', 'text')) return;
+		switch (form.contentType.value){
+			case 'text':
+				if(!formValidCheck($('#notice'), 'input', 'is-invalid', 'text')) return;
+				break;
+			case 'image': default:
+				if(!formValidCheck($('#image'), 'input', 'is-invalid', 'text')) return;
+				break;
+		}
+
+		$.ajax({
+			url : "/manage/main/popup/add",
+			type : "POST",
+			enctype: 'multipart/form-data',
+			contentType : false,
+			processData : false,
+			data :  new FormData($(form)[0]),
+			dataType : "json",
+			success : function(data){
+				if( data.result === "success" ){
+					alert(data.message);
+					location.replace('/manage/main/popup/list');
+				}else{
+					alert(data.message);
+					console.log(data);
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		})
+	}
+
+	fnUpdateNoticePopup = function(){
+		editor.updateSourceElement();
+		let form = document.getElementById('notice-popup-form');
+		if(!formValidCheck($('#title'), 'input', 'is-invalid', 'text')) return;
+		switch (form.contentType.value){
+			case 'text':
+				if(!formValidCheck($('#notice'), 'input', 'is-invalid', 'text')) return;
+				break;
+			case 'image': default:
+				if($('#preview-img').attr('src') === '')
+					if(!formValidCheck($('#image'), 'input', 'is-invalid', 'text')) return;
+				break;
+		}
+
+		$.ajax({
+			url : "/manage/main/popup/update",
+			type : "PUT",
+			enctype: 'multipart/form-data',
+			contentType : false,
+			processData : false,
+			data :  new FormData($(form)[0]),
+			dataType : "json",
+			success : function(data){
+				if( data.result === "success" ){
+					alert(data.message);
+					location.replace('/manage/main/popup/list');
+				}else{
+					alert(data.message);
+					console.log(data);
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		})
+	}
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

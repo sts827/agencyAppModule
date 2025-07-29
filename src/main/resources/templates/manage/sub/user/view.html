@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	<nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+	<aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	<section class="content-wrapper">
+		<div class="content-header">
+			<h1 class="m-0">회원 정보 관리</h1>
+		</div>
+		<div class="manage-content mb-5">
+		<form id="user-info-form">
+			<input type="hidden" name="userTokenId" th:value="${user.userTokenId}" />
+			<h3 class="title">기본정보</h3>
+			<div class="container-fluid p-0 mb-3">
+				<div class="row form-inline mb-3">
+					<div class="input-area-third">
+						<label class="input-label">회원ID*</label>
+						<input type="text" class="form-control inline-one" name="userEmail" id="user-email" th:value="${user.userEmail}" readonly="readonly" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">가입일자</label>
+						<input type="text" class="form-control inline-one" th:value="${user.userJoinDate}" readonly="readonly" />
+					</div>
+					<div class="input-area-third" th:switch="${user.userJoinType}">
+						<label class="input-label">가입유형</label>
+						<input type="text" class="form-control inline-one" th:case="kakao" value="카카오" readonly="readonly" />
+						<input type="text" class="form-control inline-one" th:case="naver" value="네이버" readonly="readonly" />
+						<input type="text" class="form-control inline-one" th:case="google" value="구글" readonly="readonly" />
+						<input type="text" class="form-control inline-one" th:case="facebook" value="페이스북" readonly="readonly" />
+						<input type="text" class="form-control inline-one" th:case="offline" value="오프라인" readonly="readonly" />
+						<input type="text" class="form-control inline-one" th:case="*" value="홈페이지" readonly="readonly" />
+
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-third" th:switch="${user.accountStatus}">
+						<label class="input-label">회원상태</label>
+						<input type="text" class="form-control inline-one" id="account-status" th:case="ban" value="탈퇴대기(관리자)" readonly="readonly" />
+						<input type="text" class="form-control inline-one" id="account-status" th:case="withdraw" value="탈퇴대기(사용자)" readonly="readonly" />
+						<input type="text" class="form-control inline-one" id="account-status" th:case="inactive" value="정지중" readonly="readonly" />
+						<input type="text" class="form-control inline-one" id="account-status" th:case="active" value="사용중" readonly="readonly" />
+						<input type="text" class="form-control inline-one" id="account-status" th:case="*" th:value="${user.accountStatus}" readonly="readonly" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">최종로그인</label>
+						<input type="text" class="form-control inline-one" th:value="${user.lastLoginDate}" readonly="readonly" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">비밀번호</label>
+						<input type="text" class="form-control inline-one" th:value="${user.lastPasswordDate}" readonly="readonly" />
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-third">
+						<label class="input-label">회원명</label>
+						<input type="text" class="form-control inline-one" id="user-name" name="userName" th:value="${user.userName}" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">연락처</label>
+						<input type="text" class="form-control inline-one" id="user-mobile" name="userMobile" th:value="${user.userMobile}" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">고객등급</label>
+						<select class="form-control inline-one" name="customerGrade">
+							<option value="일반고객" th:selected="${customer == null or #strings.isEmpty(customer.customerGrade)} or ${customer != null and #strings.equals(customer.customerGrade, '일반고객')} ? 'selected'">일반고객</option>
+							<option value="우수고객" th:selected="${customer != null and #strings.equals(customer.customerGrade, '우수고객')} ? 'selected'">우수고객</option>
+						</select>
+
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-full">
+						<label class="input-label">고객메모</label>
+						<textarea class="form-control inline-one" name="customerNote" th:text="${customer != null && !#strings.isEmpty(customer.customerNote)} ? ${customer.customerNote}: ''" rows="5"></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="container-fluid p-0">
+				<div class="manage-control">
+					<button type="button" class="btn btn-dark" onclick="history.back()">뒤로가기</button>
+					<button type="button" class="btn btn-primary" th:onclick="fnUpdateCustomerInfo()">수정하기</button>
+					<button type="button" class="btn btn-control btn-danger"
+							th:attr="data-status=${user.accountStatus}"
+							th:onclick="fnUpdateUserAccountStatus(this, [[${user.userEmail}]], [[${user.userTokenId}]])"
+							th:text="${#strings.equals(user.accountStatus, 'active')} ? '회원탈퇴처리':'회원복구처리'"
+							th:if="!${#strings.equals(user.accountStatus, 'inactive')}">회원처리</button>
+				</div>
+			</div>
+		</form>
+		</div>
+<!--/*
+		<div class="manage-content mb-5">
+		<form id="user-counsel-form">
+			<input type="hidden" name="page" value="1" />
+			<input type="hidden" name="userTokenId" th:value="${user.userTokenId}" />
+			<input type="hidden" name="userEmail" th:value="${user.userEmail}" />
+			<h3 class="title">상담정보</h3>
+			<div class="manage-content counsel-write">
+				<div class="row form-inline mb-2">
+					<div class="input-area-quad">
+						<label class="input-label">상담유형</label>
+						<select class="form-control inline-one" name="requestCategory">
+							<option value="N">구분없음</option>
+						</select>
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">세부유형</label>
+						<select class="form-control inline-one" name="requestSubCategory">
+							<option value="N">구분없음</option>
+						</select>
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">고객명</label>
+						<input type="text" class="form-control inline-one" name="requestName" id="request-name" th:value="${user.userName}" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">연락처</label>
+						<input type="text" class="form-control inline-one" name="requestTel" id="request-tel" th:value="${user.userMobile}" />
+					</div>
+				</div>
+				<div class="row form-inline mb-2">
+					<div class="input-area-quad">
+						<label class="input-label">상담일자</label>
+						<input type="text" class="form-control inline-one date" name="requestDate" id="request-date" th:value="${#dates.format(#dates.createNowForTimeZone('Asia/Seoul'), 'yyyy.MM.dd')}" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">상담시간</label>
+						<input type="text" class="form-control inline-one time" name="requestTime" id="request-time" th:value="${#dates.format(#dates.createNowForTimeZone('Asia/Seoul'), 'HH:mm')}" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">고객관계</label>
+						<select class="form-control inline-one" name="requestRelation" id="request-relation">
+							<option selected="selected">본인</option>
+							<option>배우자</option>
+							<option>형제·자매</option>
+							<option>부모</option>
+							<option>자녀</option>
+							<option>기타</option>
+						</select>
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-full">
+						<label class="input-label">요청내용</label>
+						<textarea class="form-control inline-one" name="requestText" rows="3"></textarea>
+					</div>
+				</div>
+
+				<div class="row form-inline mb-2">
+					<div class="input-area-full">
+						<label class="input-label">응대내용</label>
+						<textarea class="form-control inline-one" name="responseText" rows="3"></textarea>
+					</div>
+				</div>
+				<div class="row form-inline mb-2">
+					<div class="input-area-quad">
+						<label class="input-label">응대일자</label>
+						<input type="text" class="form-control inline-one date" name="responseDate" id="response-date" th:value="${#dates.format(#dates.createNowForTimeZone('Asia/Seoul'), 'yyyy.MM.dd')}" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">응대시간</label>
+						<input type="text" class="form-control inline-one time" name="responseTime" id="response-time" th:value="${#dates.format(#dates.createNowForTimeZone('Asia/Seoul'), 'HH:mm')}" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">응대자</label>
+						<input type="text" class="form-control inline-one time" name="responseName" id="response-name" th:value="${session.login.userName}" readonly="readonly" />
+					</div>
+					<div class="input-area-quad">
+						<label class="input-label">처리코드</label>
+						<select class="form-control inline-one" name="responseCategory">
+							<option value="FINISH">완료</option>
+							<option value="CHECK">재확인</option>
+						</select>
+					</div>
+				</div>
+				<div class="container-fluid">
+					<div class="manage-control p-0">
+						<button type="button" class="btn btn-dark" th:onclick="fnToggleCounselForm('close')">취소</button>
+						<button type="button" class="btn btn-primary" th:onclick="fnSaveCounsel()">상담이력 저장</button>
+					</div>
+				</div>
+			</div>
+			<div class="container-fluid">
+				<div class="manage-control text-right">
+					<button type="button" class="btn btn-danger" id="btn-new-counsel" th:onclick="fnToggleCounselForm('open')">새 상담이력</button>
+				</div>
+				<div class="manage-content table">
+					<table class="table table-hover manage-table" id="counsel-table">
+						<thead>
+							<tr>
+								<th>상담일시<br />응대일시</th>
+								<th>고객명</th>
+								<th>연락처</th>
+								<th>요청내용</th>
+								<th>응대내용</th>
+								<th>상담사</th>
+								<th>수정/삭제</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			</form>
+		</div>
+*/-->
+
+		<div class="manage-tab-header m-0">
+			<ul class="tab-list flex">
+				<li class="tab-item tab-btn active"        data-id="counsel"                      th:onclick="fnTabSeleced(this)">상담이력문의</li>
+				<li class="tab-item tab-btn " data-id="inquiry" data-category-id="1" th:onclick="fnTabSeleced(this)">1:1문의</li>
+				<li class="tab-item tab-btn"        data-id="inquiry" data-category-id="2" th:onclick="fnTabSeleced(this)">상품문의</li>
+				<li class="tab-item tab-btn"        data-id="reservation"                  th:onclick="fnTabSeleced(this)">예약문의</li>
+<!--/*
+				<li class="tab-item tab-btn"        data-id="payment"                      th:onclick="fnTabSeleced(this)">결재내역</li>
+*/-->
+			</ul>
+		</div>
+
+		<div class="manage-content">
+			<div th:replace="~{/manage/inc/manage-tab-inquiry :: tab-inquiry('1',${user.userEmail} )}"/>
+			<div th:replace="~{/manage/inc/manage-tab-inquiry :: tab-inquiry('2',${user.userEmail} )}"/>
+			<div th:replace="~{/manage/inc/manage-tab-reservation :: tab-reservation(${user.userEmail} )}"/>
+	        <div th:replace="~{/manage/inc/manage-tab-counsel :: tab-conusel('')}"/>
+<!--/*
+			<div th:replace="~{/manage/inc/manage-tab-payment :: tab-payment(${user.userEmail} )}"/>
+*/-->
+		</div>
+	</section>
+	<footer th:replace="~{/manage/inc/manage-footer-include :: footer}" />
+	<aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+	let userId = [[${user.userEmail}]];
+/*
+	fnToggleCounselForm = function(type){
+		switch (type){
+			case 'open':
+				$('.counsel-write').show();
+				$('#btn-new-counsel').hide();
+				break;
+			case 'close':
+				$('.counsel-write').hide();
+				$('#btn-new-counsel').show();
+				break;
+		}
+	}
+*/
+	fnTabSeleced =function( e ){
+		$('.tab-btn').removeClass('active');
+		$('.tab-content').hide();
+
+		var id = $(e).data('id');
+		var cid = $(e).data('category-id');
+
+		$(e).addClass('active');
+
+		var selector = `.tab-content[data-id='${id}']`;
+		if(cid !== undefined){
+			selector += `[data-category-id='${cid}']`;
+		}
+
+		$(selector).show();
+	}
+
+	fnUpdateUserAccountStatus = function(item, email, token){
+		let type = $(item).attr('data-status');
+		let message, status;
+		switch (type){
+			case 'active':
+				message = '삭제하시겠습니까?';
+				status = 'ban';
+				break;
+			case 'withdraw':
+			case 'ban':
+				message = '복구하시겠습니까?';
+				status = 'active';
+				break;
+		}
+
+		if(confirm(message)){
+			$.ajax({
+				url : "/manage/user/account",
+				type : "PUT",
+				data :  `userEmail=${email}&userTokenId=${token}&status=${status}`,
+				dataType : "json",
+				success : function(data){
+					if( data.result !== "success" ){
+						alert('오류가 발생했습니다.');
+						console.log(data);
+					}else{
+						switch (type){
+							case 'active':
+								$(item).attr('data-status', 'ban');
+								$(item).text('회원복구처리');
+								$('#account-status').val('탈퇴대기(관리자)');
+								break;
+							case 'withdraw':
+							case 'ban':
+								$(item).attr('data-status', 'active');
+								$(item).text('회원탈퇴처리');
+								$('#account-status').val('사용중');
+								break;
+						}
+					}
+				},
+				error : function(xhr, code, errorMsg) { },
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(
+							[[${_csrf.headerName}]], [[${_csrf.token}]]
+					);
+				},
+				complete : function() { }
+			});
+		}
+	}
+
+	fnUpdateCustomerInfo = function(){
+		let form = $('#user-info-form');
+		formValidCheck($('#user-email'), 'input', 'is-invalid', 'email');
+		formValidCheck($('#user-mobile'), 'input', 'is-invalid', 'mobile');
+		if($(form).find('.is-invalid').length > 0){
+			alert('고객정보를 정확히 입력해주세요.');
+			return;
+		}
+
+		$.ajax({
+			url : "/manage/user/info",
+			type : "PUT",
+			data :  $(form).serialize(),
+			dataType : "json",
+			success : function(data){
+				if( data.result !== "success" ){
+					alert('오류가 발생했습니다.');
+					console.log(data);
+				}else{
+					alert('저장됐습니다.');
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		});
+	}
+
+/*
+	fnGetCounselList = function(page){
+		let form = $('#user-counsel-form');
+		$.ajax({
+			url : "/manage/user/counsel-list",
+			type : "GET",
+			data :  $(form).serialize(),
+			dataType : "json",
+			success : function(data){
+				if( data === null || data.result !== "success" ){
+					alert('오류가 발생했습니다.');
+				}else{
+					let table = $('#counsel-table');
+					if(data.paging === undefined || data.paging.totalItemCount === 0
+						|| data.list === undefined || data.list.length === 0){
+						$(table).find('tbody').empty().append(`<tr class="empty-row"><td colspan="7">상담이력이 없습니다.</td></tr>`);
+					}else{
+						$(table).find('tbody').empty();
+						for(let i=0; i<data.list.length; i++){
+							let row = `<tr>
+											<td>${data.list[i].requestDate}</td>
+											<td>${data.list[i].requestName}</td>
+											<td>${data.list[i].requestTel}</td>
+											<td>${data.list[i].requestText}</td>
+											<td>${data.list[i].responseText}</td>
+											<td>${data.list[i].responseName}</td>
+											<td>
+												<button class="btn btn-primary">저장</button>
+												<button class="btn btn-danger">삭제</button>
+											</td>
+									   </tr>`;
+							$(table).find('tbody').append(row);
+						}
+					}
+
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		});
+	}
+
+	fnSaveCounsel = function(){
+		let form = $('#user-counsel-form');
+		let row = `<tr>
+						<td>${form.find('input[name=requestDate]').val()}
+							${form.find('input[name=requestTime]').val()}
+						</td>
+						<td>${form.find('input[name=requestName]').val()}</td>
+						<td>${form.find('input[name=requestTel]').val()}</td>
+						<td>${form.find('textarea[name=requestText]').val()}</td>
+						<td>${form.find('textarea[name=responseText]').val()}</td>
+						<td>${form.find('input[name=responseName]').val()}</td>
+						<td>
+							<button class="btn btn-primary">저장</button>
+							<button class="btn btn-danger">삭제</button>
+						</td>
+				   </tr>`;
+		$('#counsel-table').find('tbody').prepend(row);
+
+		$.ajax({
+			url : "/manage/user/counsel",
+			type : "POST",
+			data :  $(form).serialize(),
+			dataType : "json",
+			success : function(data){
+				if( data === null || data.result !== "success" ){
+					alert('오류가 발생했습니다.');
+				}else{
+					alert('저장됐습니다.');
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		});
+	}
+
+	fnToggleCounselForm = function(type){
+		switch (type){
+			case 'open':
+				$('.counsel-write').show();
+				$('#btn-new-counsel').hide();
+				break;
+			case 'close':
+				$('.counsel-write').hide();
+				$('#btn-new-counsel').show();
+				break;
+		}
+	}
+*/
+	$(document).ready(function(){
+		//if(userId !== undefined && userId !== null) fnGetCounselList(1);
+
+		$('.date').datetimepicker(_datetimepickerKor);
+
+		$('.tab-btn.active').trigger('click');
+	});
+
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

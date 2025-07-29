@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">시스템 사용자 관리</h1>
+        </div>
+        <div class="manage-control middle" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+            <button type="button" class="btn btn-primary" onclick="fnAdministratorAdd()">사용자 등록</button>
+        </div>
+        <div class="manage-content table">
+            <table id="datatable" class="table table-hover manage-table">
+                <thead>
+                    <tr>
+                        <th>아이디</th>
+                        <th>관리자명</th>
+                        <th>연락처</th>
+                        <th>등급</th>
+                        <th>가입일</th>
+                        <th>회원관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:if="${administratorList == null or #arrays.isEmpty(administratorList)}">
+                        <tr class="empty-row">
+                            <td colspan="6">등록된 시스템 사용자가 없습니다.</td>
+                        </tr>
+                    </th:block>
+                    <th:block th:unless="${administratorList == null or #arrays.isEmpty(administratorList)}">
+                        <tr th:each="item, idx : ${administratorList}">
+                            <td class="userid" th:text="${item.userEmail}"></td>
+                            <td class="name" th:text="${item.userName}"></td>
+                            <td class="tel" th:text="${item.userMobile}"></td>
+                            <td class="control">
+                                <th:block th:switch="${item.userRole}">
+                                    <span class="box-label" th:classappend="google" th:case="MASTER">소유자</span>
+                                    <span class="box-label" th:classappend="facebook" th:case="ADMIN">관리자</span>
+                                    <span class="box-label" th:classappend="kakao" th:case="MANAGER">매니저</span>
+                                </th:block>
+                            </td>
+                            <td class="period" th:text="${item.userJoinDate}"></td>
+                            <td class="control">
+                                <button type="button" class="btn btn-control btn-gray"
+                                        th:onclick="fnViewAdministrator([[${item.userEmail}]])">
+                                    보기
+                                </button>
+                                <button type="button" class="btn btn-control btn-dark"
+                                        th:onclick="fnWithdrawAdministrator(this, [[${item.userEmail}]], [[${item.userTokenId}]])"
+                                        th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')} and !${#strings.equals(session.login.userEmail, item.userEmail)}">
+                                    삭제
+                                </button>
+                            </td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+        <div class="manage-pagination">
+            <div th:replace="~{/manage/inc/manage-pagination :: paging-page}" ></div>
+        </div>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    fnAdministratorAdd = function(){
+        location.href = `/admin/administrator/add`;
+    }
+
+    fnViewAdministrator = function(email){
+        location.href = `/admin/administrator/view?userEmail=${email}`;
+    }
+
+    fnWithdrawAdministrator = function(item, email, token){
+        if(confirm('정말 탈퇴처리 하시겠습니까?')){
+            $.ajax({
+                url : "/admin/administrator/withdraw",
+                type : "PUT",
+                data :  `userEmail=${email}&userTokenId=${token}`,
+                dataType : "json",
+                success : function(data){
+                    if( data.result !== "success" ){
+                        alert('오류가 발생했습니다.');
+                        console.log(data);
+                    }else{
+                        $(item).parent().parent().remove();
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            });
+        }
+    }
+
+
+    $(document).ready(function(){
+
+    });
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

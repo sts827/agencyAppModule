@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <!-- Preloader -->
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+
+	  <!-- Navbar -->
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <!-- /.navbar -->
+
+	  <!-- Main Sidebar Container -->
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+		<!-- Content Header (Page header) -->
+		<div class="content-header">
+		  <div class="container-fluid">
+			<div class="row mb-2">
+			  <div class="col-sm-6">
+				<h1 class="m-0">메뉴 관리</h1>
+			  </div><!-- /.col -->
+			  <div class="col-sm-6">
+				<ol class="breadcrumb float-sm-right">
+				  <li class="breadcrumb-item"><a href="/manage">Home</a></li>
+				  <li class="breadcrumb-item active">메뉴 관리</li>
+				</ol>
+			  </div><!-- /.col -->
+			</div><!-- /.row -->
+		  </div><!-- /.container-fluid -->
+		</div>
+		<!-- /.content-header -->
+
+		<!-- Main content -->
+		<section class="content menu">
+		  <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<h3 class="card-title">메뉴목록</h3>
+						</div>
+						<div class="card-body">
+							<div class="">
+								<div class=" float-left">
+									<button type="button" class="btn btn-black" onclick="expandAll()"><i class="fa fa-expand"></i> 모두 펼치기</button>
+									<button type="button" class="btn btn-black" onclick="collapseAll()"><i class="fa fa-compress"></i> 모두 접기</button>
+<!--									<button type="button" class="btn btn-default" onclick="select()"><i class="fa fa-undo"></i> 초기화</button>-->
+								</div>
+								<div class=" float-right">
+									<button type="button" class="btn btn-primary" onclick="fnMenuAdd()"><i class="fa fa-plus"></i>최상위 메뉴 추가</button>
+									<button type="button" class="btn btn-danger" onclick="fnMenuOrderUpd()"><i class="fa fa-arrows-alt-v"></i>순서 수정</button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<table id="datatable" class="table table-menu">
+									<colgroup>
+										<col width="*">
+										<col width="105px">
+										<col width="255px">
+										<col width="95px">
+										<col width="95px">
+										<col width="235px">
+										<col width="205px">
+									</colgroup>
+									<thead>
+										<tr>
+											<th class="text-center">메뉴명</th>
+											<th class="text-center">유형</th>
+											<th class="text-center">URL</th>
+											<th class="text-center">사용여부</th>
+											<th class="text-center">네비바여부</th>
+											<th class="text-center">관리</th>
+											<th class="text-center">기능</th>
+										</tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+							</div>
+							<div class="row">
+								<div class="col-md-12 col-sm-12 col-xs-12">
+									<div class="dd" id="dd-MenuList">
+										<ol class="dd-list" id="dd-list"></ol>
+									</div>
+								</div>
+							</div>
+						</div>
+<!--
+						<div class="card-footer">
+							<div class="btn-group float-left">
+								<button type="button" class="btn btn-success" onclick="expandAll()"><i class="fa fa-expand"></i> 모두 펼치기</button>
+								<button type="button" class="btn btn-primary" onclick="collapseAll()"><i class="fa  fa-compress"></i> 모두 접기</button>
+								<button type="button" class="btn btn-default" onclick="select()"><i class="fa fa-undo"></i> 초기화</button>
+							</div>
+							<div class="btn-group float-right">
+								<button type="button" class="btn btn-primary" onclick="fnMenuAdd()"><i class="fa fa-plus"></i>최상위 메뉴 추가</button>
+								<button type="button" class="btn btn-danger" onclick="fnMenuOrderUpd()"><i class="fa fa-arrows-alt-v"></i>순서 수정</button>
+							</div>
+						</div>
+-->
+					</div>
+				</div>
+			</div>
+		  </div>
+		</section>
+		<!-- /.content -->
+	</div>
+	<!-- /.content-wrapper -->
+
+	<!-- popup window -->
+	<div class="modal fade func-menu-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 id="func-menu-modal-title" class="menu-title"></h4>
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form id="funcMenuForm" name="funcMenuForm" class="form-horizontal form-label-left">
+						<input type="hidden" id="menuId" name="menuId" />
+						<input type="hidden" id="upperMenuId" name="upperMenuId" />
+						<input type="hidden" id="menuIcon" name="menuIcon" value="far fa-circle"/>
+						<input type="hidden" id="menuAcronym" name="menuAcronym" />
+						<input type="hidden" id="oldMenuUrl" name="oldMenuUrl" />
+						<input type="hidden" id="menuSort" name="menuSort"/>
+
+						<div class="form-group upperMenu" id="upperMenuTxtDiv" style="display: none;">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">상위 메뉴</label>
+							<div class="col-md-6 col-sm-6 col-xs-12 upperMenuName" id="upperMenuName"></div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12 req">메뉴명 </label>
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<input type="text" id="menuName" name="menuName" class="form-control col-md-12 col-xs-12 req" placeholder="메뉴명 입력">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12 req">메뉴유형 </label>
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<div class="form-inline" id="divMenuType"></div>
+								<small>선택된 유형에 따라 기본 구조가 변경됩니다.</small>
+							</div>
+						</div>
+						<div class="form-group" id="menuSubType" style="display: none;">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12 req">메뉴세부유형</label>
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<div class="form-inline" id="divMenuSubType">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12 req">메뉴URL </label>
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<input type="text" id="menuUrl" name="menuUrl" class="form-control col-md-12 col-xs-12 req" placeholder="메뉴URL 입력">
+								<div class="form-group">
+									<small>URL 경로 형식에 맞춰 입력 하십시오,가능 예) '/abc', 'abc/abc' 가능, 불가능 예) 'abc/abc', 'abc' 불가능</small>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">메뉴 설명</label>
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<textarea class="form-control" rows="3" id="menuDesc" name="menuDesc" placeholder="메뉴설명 입력"></textarea>
+							</div>
+						</div>
+						
+						<!--/*
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">메인화면 노출여부</label>-->
+							<div class="col-md-12 col-sm-12 col-xs-12" id="mainExposeYn">
+							</div>
+						</div>
+						*/-->
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">메인화면 노출유형</label>
+							<div class="col-md-12 col-sm-12 col-xs-12" id="divMainExpose">
+							</div>
+						</div>
+					</div>
+				</form>
+					<div class="line bold mb-10"></div>
+
+					<div class="form-group">
+						<div class="row mb-10">
+							<div class="form-inline col-6">
+								<label class="control-label col-md-3 col-sm-3 col-xs-12 req">사용여부</label>
+								<div class="col-md-9 col-sm-9 col-xs-12">
+									<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="success" data-on="사용" data-off="미사용" data-width="100%" checked>
+								</div>
+							</div>
+							<div class="form-inline col-6">
+								<label class="control-label col-md-3 col-sm-3 col-xs-12">네비바여부</label>
+								<div class="col-md-9 col-sm-9 col-xs-12">
+									<input class="form-control" type="checkbox" id="navbarYn" name="navbarYn" data-toggle="toggle" data-onstyle="success" data-on="사용" data-off="미사용" data-width="100%">
+								</div>
+							</div>
+						</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" onclick="fnMenuSave()">확인</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- popup window -->
+	<div class="modal fade func-productCategory-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 id="func-menu-modal-title" class="productCategory-title"></h4>
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+					</button>
+				</div>
+					<div class="modal-body">
+						<div class="row">
+						<div class="col-md-12">
+							<div class=" float-right">
+								<button type="button" class="btn btn-primary" onclick="fnPcAdd()"><i class="fa fa-plus"></i>분류 추가 </button>
+								<button type="button" class="btn btn-danger" onclick="fnPcOrderUpd()"><i class="fa fa-arrows-alt-v"></i>순서 수정 </button>
+							</div>
+						</div>
+					</div>
+					<div class="row mt-5">
+						<div class="col-md-12">
+							<h3 class="title">상품분류 목록</h3>
+							<div class="container-fluid">
+								<div class="row">
+									<table id="datatable-pc" class="table table-menu">
+										<colgroup>
+											<col width="*">
+											<col width="85px">
+											<col width="95px">
+											<col width="150px">
+										</colgroup>
+										<thead>
+										<tr>
+											<th class="text-center">카테고리명</th>
+											<th class="text-center">상품개수</th>
+											<th class="text-center">사용여부</th>
+											<th class="text-center">기능</th>
+										</tr>
+										</thead>
+										<tbody></tbody>
+									</table>
+								</div>
+								<div class="row">
+									<div class="col-md-12 col-sm-12 col-xs-12">
+										<div class="dd" id="dd-pc-list">
+											<ol class="dd-list" id="pc-list"></ol>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+
+	<script type="text/javascript" th:inline="javascript">
+		let _hsMap;
+		const limit_menu_depth = 2;
+
+		$(document).ready(function() {
+			select();
+		});
+
+		$(window).on('load',function(){
+
+		})
+
+		function expandAll() {
+			$('#dd-MenuList').nestable('expandAll');
+		}
+
+		function collapseAll() {
+			$('#dd-MenuList').nestable('collapseAll');
+		}
+
+		function select() {
+			$("#dd-list").html("");
+			$.ajax({
+				url : '/manage/menu/user-list',
+				type : "GET",
+	//			dataType : "json",
+				success : function(res) {
+					if ("success" == res.result) {
+						_hsMap = new MapCustom();
+						var html = "";
+						for(idx in res.list) {
+							var menu = res.list[idx];
+							var menuId = menu.menuId;
+							_hsMap.put(menuId, menu);
+						}
+
+						for(idx in res.data) {
+							var menu = res.data[idx];
+
+							html += makeTbody(menu, 0);
+						}
+						$("#dd-list").html(html);
+					}else {
+						alert(res.message);
+					}
+				}
+			});
+			$('#dd-MenuList').nestable({}, fnInitBootstrapToggle);
+		}
+
+		fnInitBootstrapToggle = function(){
+			console.log('fnInitBootstrapToggle');
+			setTimeout(function(){
+				$('.content input[data-toggle="toggle"]')
+					.bootstrapToggle()
+					.change(function(e){
+						var target = $(e.target);
+						selector = '';
+						_menuId = $(target).attr('data-menu-id');
+						_name = $(target).attr('name');
+						_yn = 'Y';
+
+						selector = `input[name=${_name}][data-menu-id=${_menuId}]`;
+						if(!$(selector).prop('checked')) _yn = 'N';3
+
+						console.log(_menuId, _name, _yn);
+
+						fnMenuYnUpdate(_menuId, _name, _yn);
+					});
+			},200);
+		}
+
+		function makeTbody(menu, depth) {
+			var html = "";
+			var realUrl = "";
+
+			if(menu.menuUrl != null ){
+				realUrl = menu.menuUrl;
+			}
+
+			html += "<li class='dd-item ";
+	/*
+			if(depth == 0) html += "item-red";
+			else if(depth == 1) html += "item-orange";
+			else if(depth == 2) html += "item-green";
+			else if(depth == 3) html += "item-blue";
+			else if(depth == 4) html += "item-purple";
+			else if(depth == 5) html += "item-grey";
+	*/
+			html += "' data-id='"+menu.menuId+"'>";
+			if(menu.listChildMenuL){
+				html += `<button data-action="collapse" type="button">Collapse</button>`
+				html += `<button data-action="expand" type="button" style="display: none;">Expand</button>`
+			}
+			html += `<div class='dd-handle'>`;
+			html += menu.menuName;
+			html += "</div>";
+	/*
+			html += `<div class="dd-icons">`;
+			if(menu.listChildMenuL !== null){
+				//html += `<i class="icon-custom-menu-open" data-action="expand" onclick="fnNestable(${menu.menuId})"></i>`;
+				html += `<button data-action="collapse" type="button">Collapse</button>`
+				html += `<button data-action="expand" type="button" style="display: none;">Expand</button>`
+			}
+			html += "</div>";
+	*/
+			html += `<div class="dd-btns float-right">`;
+			html += `<div style="margin-right:5px;width:100px;text-align:center;">${menu.menuTypeName}</div>`;
+	/*			if(menu.listChildMenuL !== null){
+					switch(menu.menuType){
+						case 'board':	html +=  '게시판형';break;
+						case 'product':	html +=  '상품형'; break;
+						case 'contents':	html +=  '콘텐츠형';break;
+						case 'ready':	html +=  '준비중'; break;
+						case 'link':	html +=  '링크';  break;
+						case 'program':	html +=  '프로그램';break;
+					}
+				}
+			html += ``;*/
+			html += `<div style="margin-right:5px;width:250px;text-align:left;">${menu.menuUrl}</div>`;
+			html += `<div style="margin-right:5px;width:90px;text-align:center;">`;
+			html +=  `<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="95%" ${menu.useYn === 'Y' ? 'checked' :''} data-menu-id='${menu.menuId}'>`;
+			//th:checked="${menu.useYn eq 'Y'} ? 'checked' : ${menu.useYn eq null ? 'checked' : ''}"
+			//th:checked="${menu.useYn eq 'Y'} ? 'checked' : ${menu.useYn eq null ? 'checked' : ''}"
+			html += `</div>`;
+			html += `<div style="margin-right:5px;width:90px;text-align:center;">`;
+			html +=  `<input class="form-control" type="checkbox" id="navbarYn" name="navbarYn"`;
+			html +=  ` data-toggle="toggle" data-onstyle="info" data-on="사용" data-off="미사용" data-width="95%" ${menu.navbarYn === 'Y' ? 'checked' :''} data-menu-id='${menu.menuId}'>`;
+			//${depth > 0 ?'disabled':''}
+			html += `</div>`;
+			html += `<div class="form-inline btn-bar " style="margin-right:5px;width:230px;text-align:center;">`;
+			html +=  `<button type="button" class="btn btn-gray" onclick="fnMoveBanner('menuBanner','${menu.menuId}')" >베너관리</button>`;
+			//html +=  `<button type="button" class="btn btn-gray" ${menu.menuType != 'product' ? 'disabled':'' }" onclick="fnMoveProduct(${menu.menuId})">상품관리</button>`;
+			//html +=  `<button type="button" class="btn btn-gray" ${menu.menuType != 'product' || depth == 0  ? 'disabled':'' }" ${depth !=0? `onclick="fnProductCategoryOpen(${menu.menuId})"`:'' }>상품분류관리</button>`;
+			if(menu.menuType == 'product' ){
+				html +=  `<button type="button" class="btn btn-gray" onclick="fnMoveProduct(${menu.menuId})">상품관리</button>`;
+				if( depth != 0  ){
+					html +=  `<button type="button" class="btn btn-gray" onclick="fnProductCategoryOpen(${menu.menuId})">상품분류관리</button>`;
+				}
+			}
+			html += `</div>`;
+			html += `<div style="margin-right:5px;width:200px;text-align:right;">`;
+			if(depth < (limit_menu_depth-1) )
+			html +=  `<button type="button" class="btn btn-primary" onclick="fnMenuWithUpperAdd(${menu.menuId})"><i class="fa fa-plus">추가</i></button>`; //
+			html +=  `<button type="button" class="btn btn-info" onclick="fnMenuUpd(${menu.menuId}, ${depth})"><i class="fa fa-pencil-alt">수정</i></button>`;//
+			html +=  `<button type="button" class="btn btn-danger" onclick="fnMenuDel(${menu.menuId})"><i class="fa fa-trash-alt">삭제</i></button>`;//
+			html += `</div>`;
+	/*
+	*/
+			html +=`</div>`;
+
+			if(menu.listChildMenuL != null){
+				if(menu.listChildMenuL.length > 0) {
+					html += "<ol class='dd-list'>";
+					for(idx in menu.listChildMenuL) {
+						var childMenu = menu.listChildMenuL[idx];
+						html += makeTbody(childMenu, parseInt(depth)+1);
+					}
+					html += "</ol>";
+				}
+			}
+			html += "</li>";
+			return html;
+		}
+
+		fnMnueInit = function(depth){
+			$('.func-menu-modal .upperMenu').hide();
+			$('.func-menu-modal .menu-title').html('');
+			$('.func-menu-modal #menuId').val('');
+			$('.func-menu-modal #upperMenuId').val('');
+			$('.func-menu-modal #menuName').val('');
+			//$('.func-menu-modal input[name="menuType"]:selected').prop('selected',false);
+			$(`.func-menu-modal select[name="menuType"] option:selected`).prop('selected', true);
+			$('.func-menu-modal #menuUrl').val('');
+			$('.func-menu-modal #oldMenuUrl').val('');
+			$('.func-menu-modal #menuDesc').val('');
+			$('.func-menu-modal #menuSort').val('');
+
+	/*
+	loadMakeUpHtmlInput('radio', 'menuType', '', 'menuType', 'custom-control-input custom-control-input-primary custom-control-input-outline',
+						true, 'custom-control-label',
+						false, 'custom-control custom-radio mr-05') );
+	*/
+			eventStr = `onClick='fnSubMenyTypeInit(this)'`;
+			//if(depth == 0) eventStr = '';
+
+			$('#divMenuType').html(
+				loadMakeUpHtmlSelect('menuType', '', 'menuType','menuType', 'form-control col-md-12 col-xs-12 req',true, '선택' , '', eventStr)
+			);
+
+			$('#divMainExpose').html(
+				loadMakeUpHtmlSelect('mainExposeType', '', 'mainExposeType','mainExposeType', 'form-control col-md-12 col-xs-12',true, '미사용')
+			);
+
+			// $("#mainExposeYn").html(
+			// 		loadMakeUpHtmlSelect('mainExposeYn', '', 'mainExposeYn','mainExposeYn', 'form-control col-md-12 col-xs-12',true, '미사용')
+			// )
+
+			$('#menuSubType').hide();
+		}
+
+		fnSubMenyTypeInit = function(obj){
+			var subMenuType = $('option:selected',obj ).val();
+
+			//console.log( $('option:selected',obj ).val() );
+
+			$('#menuSubType').show();
+			eventStr = `onClick='fnSubMenyTypeSeleted(this)'`;
+
+			$('#divMenuSubType').html(
+				loadMakeUpHtmlSelect(subMenuType, '', 'menuSubType','menuSubType', 'form-control col-md-12 col-xs-12 req',true, '선택' , '', eventStr)
+			);
+			//console.log('test');
+		}
+
+		fnSubMenyTypeSeleted = function(obj){
+			var option = $('option:selected',obj );
+
+			var dataAcronym = $(option).attr('data-acronym');
+			if(dataAcronym !== undefined){
+				$('.func-menu-modal #menuAcronym').val( dataAcronym );
+			} else {
+				$('.func-menu-modal #menuAcronym').val( '');
+			}
+		}
+
+		fnMenuWithUpperAdd = function(upperId, depth){
+			fnMnueInit(depth);
+
+			if(upperId !== undefined){
+				var menu = _hsMap.get(upperId);
+				var menuSort = $(`li[data-id="${upperId}"] > .dd-list > .dd-item`).length;
+
+				$('.func-menu-modal .upperMenuName').html(`${menu.menuName}`);
+				$('.func-menu-modal #upperMenuId').val(`${menu.menuId}`);
+				$('.func-menu-modal #menuSort').val(menuSort);
+				$('.func-menu-modal .upperMenu').show();
+			}
+			$('.func-menu-modal .menu-title').html('하위 메뉴 추가');
+
+			$('.func-menu-modal').modal("show");
+		}
+
+		fnMenuAdd = function(){
+			fnMnueInit(0);
+			var menuSort = $('#dd-MenuList > .dd-list > .dd-item').length;
+
+			$('.func-menu-modal .menu-title').html('최상위 메뉴 추가');
+			$('.func-menu-modal #menuSort').val(menuSort);
+			$('.func-menu-modal').modal("show");
+		}
+
+		fnMenuUpd = function( menuId, depth ){
+			fnMnueInit(depth);
+
+			var menu = _hsMap.get( menuId );
+
+			$('.func-menu-modal .menu-title').html('메뉴 수정');
+
+			$('.func-menu-modal #menuId').val( menu.menuId );
+			$('.func-menu-modal #upperMenuId').val( menu.upperId );
+			$('.func-menu-modal #menuName').val( menu.menuName);
+
+			//$(`.func-menu-modal input[name="menuType"][value='${menu.menuType}']`).prop('selected',true).trigger('click');
+			$(`.func-menu-modal select[name="menuType"] option[value='${menu.menuType}']`).prop('selected', true).trigger('click');
+
+			$(`.func-menu-modal select[name="mainExposeType"] option[value='${menu.mainExposeType}']`).prop('selected', true).trigger('click');
+			//if(depth > 0){
+				//console.log(menu);
+				setTimeout(function(){
+					$(`.func-menu-modal select[name="menuSubType"] option[value='${menu.menuSubType}']`).prop('selected', true);
+				},50);
+			//}
+
+	//		$('.func-menu-modal #menuType').val( menu.menuType);
+			$('.func-menu-modal #menuUrl').val( menu.menuUrl );
+			$('.func-menu-modal #oldMenuUrl').val( menu.menuUrl );
+			$('.func-menu-modal #menuDesc').val( menu.menuDesc );
+
+			$('.func-menu-modal #useYn').bootstrapToggle( menu.useYn==='Y'?'on':'off' );
+			$('.func-menu-modal #navbarYn').bootstrapToggle( menu.navbarYn==='Y'?'on':'off' );
+			//${menu.useYn === 'Y' ? 'checked' :''}z
+
+			$('.func-menu-modal').modal("show");
+		}
+
+		fnMenuSave = function(){
+			$('.is-invalid').removeClass('is-invalid');
+
+			var dubplicate
+
+			if(!formValidCheck($('#menuUrl'), 'input', 'is-invalid', 'url')){
+				alert('메뉴 URL 입력 형식을 확인하여주십시오.');
+				return;
+			} else if( $('#oldMenuUrl').val() !== $('#menuUrl').val() && fnDuplicateCheck( $('#menuUrl').val(), $('#upperMenuId').val()) ){
+				$('#menuUrl').addClass('is-invalid');
+				alert('메뉴URL이 사용중복 URL입니다.');
+				return;
+			} else {
+				if(checkForm('funcMenuForm') && confirm("저장하시겠습니까?")) {
+					var _data = $('#funcMenuForm').serialize();
+
+					$('.func-menu-modal input[data-toggle="toggle"]').each(function(i,e){
+						addStr = `&${$(e).attr('name')}=${$(e).is(':checked') ? 'Y' : 'N'}`;
+						_data+=addStr;
+						//console.log( addStr);
+					});
+
+					$.ajax({
+						url : '/manage/menu/user-save',
+						type : "POST",
+						data : _data,
+						dataType : "json",
+						beforeSend: function (xhr) {
+							xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+						},
+						success : function(res) {
+							if ("success" == res.result) {
+								$('.func-menu-modal').modal("hide");
+								select();
+								alert("처리 되었습니다");
+							}else {
+								alert(res.message);
+							}
+						}
+					});
+				}
+			}
+		}
+
+		fnDuplicateCheck = function(menuUrl, upperMenuId = undefined){
+			var _data = { 'menuUrl': menuUrl };
+
+			if(upperMenuId !== undefined ){
+				_data.upperMenuId = upperMenuId;
+			}
+
+			dubplicate = false;
+			$.ajax({
+				url : '/manage/menu/user-duplicate',
+				type : "POST",
+				data : _data,
+				dataType : "json",
+				async:false,
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+				},
+				success : function(res) {
+					if ("success" == res.result) {
+						if(res.count > 0){
+							dubplicate = true;
+						} else {
+							dubplicate = false;
+						}
+					}else {
+						alert(res.message);
+					}
+				}
+			});
+			return dubplicate;
+		}
+
+		fnMoveBanner = function(bannerType, menuId){
+			var url = `/manage/menu/user/list-banner?bannerType=${bannerType}&menuId=${menuId}`
+
+			window.open(url, "_tabBanner");
+		}
+		fnMoveProduct = function(menuId){
+			var menu = _hsMap.get(menuId);
+			var cmenu ;
+			//console.log(menu.upperMenuId, menu.upperMenuId !== undefined);
+
+			if(menu.upperMenuId !== undefined){
+				cmenu = menu;
+				menu = _hsMap.get(menu.upperMenuId);
+			}
+
+			var url = "/manage/"+menu.menuType+menu.menuUrl + "?productMenuId="+menuId;
+
+			window.open(url, "_tabProduct");
+
+		}
+
+		fnMenuYnUpdate = function(_menuId, _type, _yn){
+			//console.log(_menuId +' '+ _useYn);
+			var data = {};
+
+			if( _type == 'useYn'){
+				data = {'menuId':_menuId, useYn:_yn};
+			} else if( _type == 'navbarYn' ) {
+				data = {'menuId':_menuId, 'navbarYn':_yn};
+			} else {
+				return;
+			}
+
+			$.ajax({
+				url : '/manage/menu/user-save',
+				type : "POST",
+				data : data,
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+				},
+				success : function(res) {
+					if ("success" == res.result) {
+
+					}else {
+						alert(res.message);
+					}
+				}
+			});
+		}
+
+		fnMenuOrderUpd = function() {
+			if(confirm("순서 수정하시겠습니까?")) {
+				var data = $('#dd-MenuList').nestable('customMenuList');
+				$.ajax({
+					url : '/manage/menu/user-order-save',
+					type : "POST",
+					data : {"order" : data, "total":data.length },
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+					},
+					success : function(res) {
+						if ("success" == res.result) {
+							select();
+							alert("수정되었습니다");
+						}else {
+							alert(res.message);
+						}
+					}
+				});
+			}
+		}
+		fnMenuDel = function( menuId ){
+			if(confirm("삭제하시겠습니까?")) {
+				$.ajax({
+					url : '/manage/menu/user-del',
+					type : "POST",
+					data : {menuId:menuId},
+					dataType : "json",
+					beforeSend: function (xhr) {
+							xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+					},
+					success : function(res) {
+						if ("success" == res.result) {
+							select();
+							alert("처리 되었습니다");
+						}else {
+							alert(res.message);
+						}
+					}
+				});
+			}
+		}
+
+		fnNestable = function(menuId){
+			console.log(menuId + '-click!!!');
+
+			$(`li.dd-item[data-id="${menuId}"]`).nestable('collapseItem')
+		}
+		showIconWindow = function() {
+			window.open("/manage/icon", "Icons", "width=800px, height=800px, toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no");
+		}
+		setIcon = function(icon) {
+			var form = document.funcMenuForm;
+			form.menuIcon.value=icon;
+			$("#iconI").attr("class",icon);
+		}
+
+	</script>
+	<script type="text/javascript" th:inline="javascript">
+		let _selectedMenuId;
+		fnProductCategoryOpen = function(menuId){
+			_selectedMenuId = menuId;
+			fnPcSelect(_selectedMenuId);
+			$('.func-productCategory-modal').modal("show");
+		}
+
+		fnPcSelect = function(menuId){
+			$.ajax({
+				url : '/manage/product/getProductCategory',
+				type : "GET",
+				data:{"productMenuId":menuId, "useYn":'Y', "deleteYn":'N'},
+				//dataType : "json",
+				success : function(res) {
+					if ("success" == res.result) {
+						var html = "";
+
+						for(idx in res.categories) {
+							var pc = res.categories[idx];
+							html += makePcTbody(pc, 0);
+						}
+						$("#pc-list").html(html);
+					}else {
+						alert(res.message);
+					}
+				}
+			});
+			$('#dd-pc-list').nestable({}, fnInitPcBootstrapToggle);
+		}
+
+		fnInitPcBootstrapToggle = function(){
+			console.log('fnInitBootstrapToggle');
+			setTimeout(function(){
+				$('#dd-pc-list input[data-toggle="toggle"]')
+					.bootstrapToggle()
+/*					.change(function(e){
+						var target = $(e.target);
+						selector = '';
+						_menuId = $(target).attr('data-menu-id');
+						_name = $(target).attr('name');
+						_yn = 'Y';
+
+						selector = `input[name=${_name}][data-menu-id=${_menuId}]`;
+						if(!$(selector).prop('checked')) _yn = 'N';3
+
+						console.log(_menuId, _name, _yn);
+
+						fnMenuYnUpdate(_menuId, _name, _yn);
+					})*/
+					;
+			},200);
+		}
+
+		makePcTbody = function(pc, depth) {
+			var html = "";
+			var realUrl = "";
+			var pcId = pc.productCategoryId;
+
+			html += `<li class='dd-item `;
+			html += `' data-id='${pcId}'>`;
+			html += `<div class='dd-handle ${pc.deleteYn === 'Y' ? 'del':''}'>${pc.categoryTitle}</div>`;
+			html += `<div class="dd-btns float-right">`;
+
+			html +=  `<div class="modeInfo" style="margin-right:5px;width:80px;text-align:center;">${pc.productCount}개 </div>`;
+			html +=  `<div class="modeInfo" style="margin-right:5px;width:90px;text-align:center;">`;
+			html +=    `<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="95%" ${pc.useYn === 'Y' ? 'checked' :''} data-product-categrory-id='${pcId}'>`;
+			html +=  `</div>`;
+			html +=  `<div class="modeInfo" style="margin-right:5px;width:125px;text-align:right;">`;
+			html +=    `<button type="button" class="btn btn-info" onclick="fnPcUpd(this)"><i class="fa fa-pencil-alt">수정</i></button>`;//
+			if(pc.deleteYn === 'N'){
+			html +=    `<button type="button" class="btn btn-danger" ${pc.productCount == 0? `onclick="fnPcDel(${pcId})"` : 'disabled'}  ><i class="fa fa-trash-alt">삭제</i></button>`;//
+			} else {
+			html +=    `<button type='button' class='btn btn-danger' onclick='fnPcResotre(${pcId}' ><i class='fa fa-undo'>복구</i></button>`;
+			}
+			html +=  `</div>`;
+
+			html +=  `<div class="modeUpd" style="margin-right:5px;width:180px;text-align:center;display:none;">`;
+			html +=   `<input type="text" class="form-control" name="categoryTitle" value="" placeholder="카테고리 이름을 입력해주세요">`;
+			html +=  `</div>`;
+
+			html +=  `<div class="modeUpd" style="margin-right:5px;width:125px;text-align:right;display:none;">`;
+			html +=   `<button type="button" class="btn btn-primary" onclick="fnPcSave(this)"><i class="fa fa-pencil-alt">저장</i></button>`;
+			html +=   `<button type="button" class="btn btn-danger" onclick="fnPcCancel(this)"><i class="fa fa-trash-alt">취소</i></button>`;
+			html +=  `</div>`;
+			html += `</div>`; //dd-btns
+			html += "</li>";
+			return html;
+		}
+
+		fnPcAdd = function(){
+			var html =``;
+			html += `<li class="dd-item " data-mode="new">`;
+			html += `<div class="dd-handle"></div>`;
+			html += `<div class="dd-btns float-right">`;
+			//html += `<input type="text" class="form-control" name="categoryTitle" value="" placeholder="카테고리 이름을 입력해주세요">`;
+			html +=  `<div style="margin-right:5px;width:190px;text-align:center;">`;
+			html +=   `<input type="text" class="form-control" name="categoryTitle" value="" placeholder="카테고리 이름을 입력해주세요">`;
+			html +=  `</div>`;
+			html += `<div style="margin-right:5px;width:125px;text-align:right;">`;
+			html += `<button type="button" class="btn btn-primary" onclick="fnPcSave(this)"><i class="fa fa-pencil-alt">저장</i></button>`;
+			html += `<button type="button" class="btn btn-danger" onclick="fnPcCancel(this)"><i class="fa fa-trash-alt">취소</i></button>`;
+			html += `</div>`;
+			html += `</div>`;
+			html += `</li>`;
+
+			$('#pc-list').append(html)
+		}
+
+		fnPcUpd = function(target){
+			var btns    = $(target).closest('.dd-btns');
+			var eLli    = $(target).closest('li');
+			var ipTitle = $(`.modeUpd input[name='categoryTitle']`, eLli);
+
+			btns.css('width','320').css('justify-content','space-between');
+
+			$('.modeInfo', eLli).hide();
+			$('.modeUpd', eLli).show();
+
+			var categoryTitle = $(eLli).children('.dd-handle').text();
+
+			$(ipTitle).val($(eLli).children('.dd-handle').text());
+		}
+
+		fnPcCancel = function(target){
+			var btns    = $(target).closest('.dd-btns');
+			var eLli    = $(target).closest('li');
+			var ipTitle = $(target).closest(`input[name='categoryTitle']`);
+
+			if(eLli.attr('data-mode') === 'new'){
+				eLli.remove();
+			} else {
+				$('.modeInfo', eLli).show();
+				$('.modeUpd', eLli).hide();
+
+				btns.css('width','').css('justify-content','');
+			}
+		}
+
+		fnPcSave = function(target){
+			var eLli    = $(target).closest('li');
+
+			var id, sortOrder;
+			var title = $(`input[name='categoryTitle']`,eLli).val();
+
+			if(eLli.attr('data-mode') !== 'new')
+				id = eLli.attr('data-id');
+
+			$("#pc-list").children().each(function(i,e){
+				if( e == eLli[0]) sortOrder = i;
+			});
+
+			var isSorting = (($("#pc-list").children().length-1) === sortOrder);
+			console.log(isSorting);
+
+			$.ajax({
+				url : '/manage/product/category-save',
+				type : "POST",
+				data : {'productMenuId':_selectedMenuId,'productCategoryId':id, 'categoryTitle':title,'sortOrder':sortOrder },
+				dataType : "json",
+				async:true,
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+				},
+				success : function(res) {
+					if ("success" == res.result) {
+						if(isSorting){
+							fnPcSelect(_selectedMenuId);
+							alert(res.message);
+						}
+					}else {
+						alert(res.message);
+					}
+				}
+			});
+
+			if(!isSorting){
+				console.log('순서를 변경합니다.');
+				fnPcOrderUpd(false, sortOrder);
+			}
+		}
+
+		fnPcOrderUpd = function(isAlert = true, sortOrder = undefined){
+			var doing = true;
+
+			if( isAlert )
+				doing = (isAlert && confirm("순서 수정하시겠습니까?"));
+
+			var data = $('#dd-pc-list').nestable('customMenuList');
+
+			if(sortOrder !== undefined){
+				var afterAdd = false;
+
+				for(var i in data){
+					var _data = data[i];
+
+					afterAdd = (_data.menuSort === sortOrder || afterAdd);
+
+					console.log(_data.menuId, _data.menuSort, sortOrder);
+
+					if( afterAdd ) _data.menuSort +=1
+
+					if(_data.menuId === undefined)
+						delete _data[i];
+				}
+			}
+
+			$.ajax({
+				url : '/manage/product/category-order-save',
+				type : "POST",
+				data : { "productMenuId":_selectedMenuId, "order" : data, "total":data.length },
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+				},
+				success : function(res) {
+					if ("success" == res.result) {
+						fnPcSelect(_selectedMenuId);
+						alert("수정되었습니다");
+					}else {
+						alert(res.message);
+					}
+				}
+			});
+
+		}
+
+		fnPcDel = function(id){
+			if(confirm("삭제하시겠습니까?")){
+				$.ajax({
+					url : '/manage/product/category-del',
+					type : "POST",
+					data : { 'productCategoryId':id },
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+					},
+					success : function(res) {
+						if ("success" == res.result) {
+							fnPcSelect(_selectedMenuId);
+							alert(res.message);
+						}else {
+							alert(res.message);
+						}
+					}
+				});
+			}
+		}
+
+		fnPcResotre = function(id){
+			if(confirm("복구하시겠습니까?")){
+				$.ajax({
+					url : '/manage/product/category-resotre',
+					type : "POST",
+					data : { 'productCategoryId':id },
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+					},
+					success : function(res) {
+						if ("success" == res.result) {
+							fnPcSelect(_selectedMenuId);
+							alert(res.message);
+						}else {
+							alert(res.message);
+						}
+					}
+				});
+			}
+		}
+
+	</script>
+	<style>
+		.dd-btns .btn-bar .btn{font-size: 0.75rem;}
+	</style>
+
+	</body>
+</html>

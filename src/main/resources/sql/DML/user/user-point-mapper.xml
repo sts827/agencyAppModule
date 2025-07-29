@@ -1,0 +1,401 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.user.UserPointMapper">
+
+    <select id="selectUserPointSettingListCount" parameterType="HashMap" resultType="Integer">
+        SELECT count(*) FROM user_point_set
+        WHERE delete_yn = 'N'
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+            AND expire_date &gt; #{startDate}
+        </if>
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+            AND expire_date &lt; #{endDate}
+        </if>
+    </select>
+
+    <select id="selectUserPointSettingList" parameterType="HashMap" resultType="UserPointSet">
+        SELECT id, accrued_code,
+               accrued_reason, accrued_type,
+               accrued_point, expired_day,
+               start_date, expire_date,
+               use_yn, create_id, create_date,
+               last_update_id, last_update_date
+          FROM user_point_set
+         WHERE delete_yn = 'N'
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+            AND expire_date &gt; #{startDate}
+        </if>
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+            AND expire_date &lt; #{endDate}
+        </if>
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+            LIMIT #{itemStartPosition}, #{pagePerSize}
+        </if>
+    </select>
+
+    <select id="selectUserPointSettingById" parameterType="String" resultType="UserPointSet">
+        SELECT id, accrued_code,
+               accrued_reason, accrued_type,
+               accrued_point, expired_day,
+               start_date, expire_date,
+               use_yn, create_id, create_date,
+               last_update_id, last_update_date
+          FROM user_point_set
+         WHERE delete_yn = 'N' AND id = #{value}
+    </select>
+
+    <update id="updateUserPointSetting" parameterType="UserPointSet">
+        UPDATE user_point_set
+           SET accrued_point = #{accruedPoint},
+               expired_day = #{expiredDay},
+               start_date = #{startDate},
+               expire_date = #{expireDate},
+               use_yn = #{useYn},
+               last_update_id = #{lastUpdateId},
+               last_update_date = now()
+         WHERE id = #{id} AND accrued_code = #{accruedCode}
+               AND delete_yn = 'N'
+    </update>
+
+    <select id="selectUserPointRecordListCount" parameterType="HashMap" resultType="Integer">
+        SELECT count(*) FROM user_point_record
+         WHERE delete_yn = 'N'
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(accruedType)">
+                <if test="accruedType != 'ALL'">
+                   AND accrued_type = #{accruedType}
+                </if>
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userEmail)">
+                   AND user_email = #{userEmail}
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType)">
+                   <choose>
+                       <when test="searchType == 'accrued'">
+                           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                                AND accrued_date &gt; #{startDate}
+                           </if>
+                           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                               AND accrued_date &lt; #{endDate}
+                           </if>
+                       </when>
+                       <when test="searchType == 'expire'">
+                           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                               AND expire_date &gt; #{startDate}
+                           </if>
+                           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                               AND expire_date &lt; #{endDate}
+                           </if>
+                       </when>
+                   </choose>
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+                   AND (
+                        user_email LIKE CONCAT('%', #{searchKey}, '%')
+                        OR user_email IN (SELECT user_email FROM user WHERE user.user_name LIKE CONCAT('%', #{searchKey}, '%'))
+                       )
+               </if>
+    </select>
+
+    <select id="selectUserPointRecordList" parameterType="HashMap" resultType="UserPointRecord">
+        SELECT id, upr.user_email, user.user_name,
+               accrued_id, accrued_type,
+               accrued_date, expire_date,
+               point_remain, point_accrued, point_used, point_expired,
+               create_id, create_date, last_update_id, last_update_date
+          FROM user_point_record upr LEFT JOIN user ON upr.user_email = user.user_email
+         WHERE delete_yn = 'N'
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(accruedType)">
+            <if test="accruedType != 'ALL'">
+                AND accrued_type = #{accruedType}
+            </if>
+        </if>
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userEmail)">
+            AND upr.user_email = #{userEmail}
+        </if>
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(used) and used == 'true'">
+           AND upr.point_remain > 0 AND (upr.expire_date IS NULL OR upr.expire_date &gt; now())
+        </if>
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType)">
+            <choose>
+                <when test="searchType == 'accrued'">
+                    <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                        AND accrued_date &gt; #{startDate}
+                    </if>
+                    <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                        AND accrued_date &lt; #{endDate}
+                    </if>
+                </when>
+                <when test="searchType == 'expire'">
+                    <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                        AND expire_date &gt; #{startDate}
+                    </if>
+                    <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                        AND expire_date &lt; #{endDate}
+                    </if>
+                </when>
+            </choose>
+        </if>
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+            AND (
+                    upr.user_email LIKE CONCAT('%', #{searchKey}, '%')
+                    OR user.user_name LIKE CONCAT('%', #{searchKey}, '%')
+                )
+        </if>
+        <choose>
+            <when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(used) and used == 'true'">
+                ORDER BY CASE WHEN expire_date IS NULL THEN STR_TO_DATE('9999-12-31', '%Y-%m-%d') ELSE expire_date END
+            </when>
+            <otherwise>
+                ORDER BY id DESC
+            </otherwise>
+        </choose>
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+            LIMIT #{itemStartPosition}, #{pagePerSize}
+        </if>
+    </select>
+
+    <select id="selectUserPointAccruedListCount" parameterType="HashMap" resultType="Integer">
+        SELECT count(*) FROM user_point_accrued_log
+         <where>
+           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType)">
+               <choose>
+                   <when test="searchType == 'accrued'">
+                       <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                            AND accrued_date &gt; #{startDate}
+                       </if>
+                       <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                           AND accrued_date &lt; #{endDate}
+                       </if>
+                   </when>
+                   <when test="searchType == 'expire'">
+                       <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                           AND expire_date &gt; #{startDate}
+                       </if>
+                       <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                           AND expire_date &lt; #{endDate}
+                       </if>
+                   </when>
+               </choose>
+           </if>
+           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+               AND (
+                    user_email LIKE CONCAT('%', #{searchKey}, '%')
+                    OR user_email IN (SELECT user_email FROM user WHERE user.user_name LIKE CONCAT('%', #{searchKey}, '%'))
+                   )
+           </if>
+         </where>
+    </select>
+
+    <select id="selectUserPointAccruedList" parameterType="HashMap" resultType="UserPointAccrued">
+        SELECT id, upal.user_email, user.user_name,
+               accrued_date, accrued_code, accrued_type,
+               expire_date, point_accrued,
+               create_id, create_date, cancel_code, cancel_id, cancel_date
+          FROM user_point_accrued_log upal LEFT JOIN user ON upal.user_email = user.user_email
+         <where>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType)">
+                <choose>
+                    <when test="searchType == 'accrued'">
+                        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                            AND accrued_date &gt; #{startDate}
+                        </if>
+                        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                            AND accrued_date &lt; #{endDate}
+                        </if>
+                    </when>
+                    <when test="searchType == 'expire'">
+                        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                            AND expire_date &gt; #{startDate}
+                        </if>
+                        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                            AND expire_date &lt; #{endDate}
+                        </if>
+                    </when>
+                </choose>
+            </if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+                AND (
+                        user.user_email LIKE CONCAT('%', #{searchKey}, '%')
+                        OR user.user_name LIKE CONCAT('%', #{searchKey}, '%')
+                    )
+            </if>
+         </where>
+        ORDER BY id DESC
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+            LIMIT #{itemStartPosition}, #{pagePerSize}
+        </if>
+    </select>
+
+    <select id="selectUserPointUsedListCount" parameterType="HashMap" resultType="Integer">
+        SELECT count(*) FROM user_point_used_log
+         <where>
+           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType)">
+               <choose>
+                   <when test="searchType == 'used'">
+                       <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                           AND used_date &gt; #{startDate}
+                       </if>
+                       <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                           AND used_date &lt; #{endDate}
+                       </if>
+                   </when>
+                   <when test="searchType == 'cancel'">
+                       <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                           AND cancel_date &gt; #{startDate}
+                       </if>
+                       <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                           AND cancel_date &lt; #{endDate}
+                       </if>
+                   </when>
+               </choose>
+           </if>
+           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+               AND (
+                    user_email LIKE CONCAT('%', #{searchKey}, '%')
+                    OR user_email IN (SELECT user_email FROM user WHERE user.user_name LIKE CONCAT('%', #{searchKey}, '%'))
+                   )
+           </if>
+         </where>
+    </select>
+
+    <select id="selectUserPointUsedList" parameterType="HashMap" resultType="UserPointUsed">
+        SELECT id, upul.user_email, user.user_name,
+               used_date, used_type,
+               point_used, detail_record,
+               create_id, create_date, cancel_code, cancel_id, cancel_date
+          FROM user_point_used_log upul LEFT JOIN user ON upul.user_email = user.user_email
+         <where>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType)">
+                <choose>
+                    <when test="searchType == 'used'">
+                        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                            AND used_date &gt; #{startDate}
+                        </if>
+                        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                            AND used_date &lt; #{endDate}
+                        </if>
+                    </when>
+                    <when test="searchType == 'cancel'">
+                        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                            AND cancel_date &gt; #{startDate}
+                        </if>
+                        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(endDate)">
+                            AND cancel_date &lt; #{endDate}
+                        </if>
+                    </when>
+                </choose>
+            </if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+                AND (
+                        upul.user_email LIKE CONCAT('%', #{searchKey}, '%')
+                        OR user.user_name LIKE CONCAT('%', #{searchKey}, '%')
+                    )
+            </if>
+         </where>
+        ORDER BY id DESC
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+            LIMIT #{itemStartPosition}, #{pagePerSize}
+        </if>
+    </select>
+
+
+
+
+    <select id="selectUserPointSetByTypeCode" parameterType="String" resultType="UserPointSet">
+        SELECT id, accrued_code, accrued_reason, accrued_type, accrued_point, expired_day,
+               start_date, expire_date, use_yn
+          FROM user_point_set
+         WHERE delete_yn = 'N' AND use_yn = 'Y' AND accrued_code = #{value}
+           AND (start_date IS NULL OR start_date &lt; now())
+           AND (expire_date IS NULL OR expire_date &gt; now())
+    </select>
+
+    <select id="selectUserPointCreateLogCount" parameterType="UserPointAccrued" resultType="Integer">
+        SELECT count(*) FROM user_point_accrued_log
+         WHERE user_email = #{userEmail} AND DATE_FORMAT(accrued_date, '%Y-%m-%d') = #{accruedDate}
+           <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(accruedCode)">
+           AND accrued_code = #{accruedCode}
+           </if>
+    </select>
+
+    <insert id="insertPointAccruedLog" parameterType="UserPointAccrued" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_point_accrued_log
+           SET user_email = #{userEmail},
+               accrued_date = now(),
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(accruedCode)">
+               accrued_code = #{accruedCode},
+               </if>
+               accrued_type = #{accruedType},
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+               expire_date = #{expireDate},
+               </if>
+               point_accrued = #{pointAccrued},
+               create_id = #{createId},
+               create_date = now()
+    </insert>
+
+    <insert id="insertPointRecord" parameterType="UserPointRecord">
+        INSERT INTO user_point_record
+           SET user_email = #{userEmail},
+               accrued_id = #{accruedId},
+               accrued_type = #{accruedType},
+               accrued_date = now(),
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+                   expire_date = #{expireDate},
+               </if>
+               point_remain = #{pointRemain},
+               point_accrued = #{pointAccrued},
+               create_id = #{createId},
+               create_date = now()
+    </insert>
+
+    <update id="updateUserPointAccruedCancel" parameterType="UserPointAccrued">
+        UPDATE user_point_accrued_log
+           SET cancel_code = #{cancelCode}, cancel_id = #{cancelId}, cancel_date = now()
+         WHERE id = #{id}
+    </update>
+
+    <update id="updateUserPointRecordDelete" parameterType="UserPointRecord">
+        UPDATE user_point_record
+           SET delete_yn = #{deleteYn}, delete_code = #{deleteCode},
+               delete_id = #{deleteId}, delete_date = now()
+         WHERE id = #{id} AND accrued_id = #{accruedId}
+    </update>
+
+    <select id="selectCodeItemList" parameterType="String" resultType="CodeItem">
+        SELECT code, upper_code, name, code, upper_code, name, code_desc, code_depth, code_acronym, sort, use_yn
+          FROM code_item
+         WHERE upper_code = #{value} AND use_yn = 'Y'
+         ORDER BY sort
+    </select>
+
+    <select id="selectUserPointRecordSummary" parameterType="HashMap" resultType="UserPointRecord">
+        SELECT user_email,
+               SUM(point_remain) point_remain,
+               SUM(point_accrued) point_accrued,
+               SUM(point_used) point_used,
+               SUM(point_expired) point_expired
+          FROM user_point_record
+         WHERE user_email = #{userEmail} AND delete_yn = 'N'
+         GROUP BY user_email
+    </select>
+
+    <update id="updateUserPointRecordUsed" parameterType="UserPointRecord">
+        UPDATE user_point_record
+           SET point_remain = #{pointRemain}, point_used = #{pointUsed},
+               last_update_id = #{lastUpdateId}, last_update_date = now()
+         WHERE user_email = #{userEmail} AND id = #{id} AND accrued_id = #{accruedId}
+    </update>
+
+    <insert id="insertPointUsedLog" parameterType="UserPointUsed">
+        INSERT INTO user_point_used_log
+           SET user_email = #{userEmail},
+               used_type = #{usedType},
+               used_date = now(),
+               point_used = #{pointUsed},
+               detail_record = #{detailRecord},
+               create_id = #{createId},
+               create_date = now()
+    </insert>
+</mapper>

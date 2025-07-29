@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <!-- Preloader -->
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+
+	  <!-- Navbar -->
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <!-- /.navbar -->
+
+	  <!-- Main Sidebar Container -->
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+	      <div class="container-fluid">
+	        <div class="row mb-2">
+	          <div class="col-sm-6">
+	            <h1 class="m-0">접속통계</h1>
+	          </div><!-- /.col -->
+	          <div class="col-sm-6">
+	            <ol class="breadcrumb float-sm-right">
+	              <li class="breadcrumb-item"><a href="/manage">Home</a></li>
+	              <li class="breadcrumb-item active">접속통계</li>
+	            </ol>
+	          </div><!-- /.col -->
+	        </div><!-- /.row -->
+	      </div><!-- /.container-fluid -->
+	    </div>
+	    <!-- /.content-header -->
+
+	    <!-- Main content -->
+	    <section class="content">
+	      <div class="container-fluid">
+
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10 search-body">
+						<div class="manage-content mb-10-header">
+							<h3 class="manage-content mb-10-title">검색조건</h3>
+						</div>
+						<div class="manage-content mb-10 search-body">
+							<div class="row search_box">
+								<div class="form-group col-md-4">
+									<label>조회기간</label>
+									<input type="text" class="form-control date-picker" id="daterange" name="daterange" placeholder="YYYY-MM-DD" readonly="readonly" />
+								</div>
+								<div class="form-group col-md-4">
+				                	<label>조회기간</label>
+				                	<div class="btn-group float-right">
+					                	<button type="button" class="btn btn-primary" onclick="btnRange('week')">이번주 </button>
+					                	<button type="button" class="btn btn-primary" onclick="btnRange('month')">한달 </button>
+					                	<button type="button" class="btn btn-primary" onclick="btnRange('year')">일년 </button>
+<!-- 						                	<div class="form-control"> -->
+<!-- 						                        <button type="button" class="form-button" onclick="goReflesh()">조회 </button> -->
+<!-- 						                	</div> -->
+									</div>
+					            </div>
+							</div>
+						</div>
+						<div class="manage-content mb-10-footer clearfix">
+							<div class="btn-group float-right">
+								<button type="button" class="btn btn-primary" id="searchBtn"><i class="fa fa-search"></i> 검색</button>
+								<button type="button" class="btn btn-danger" id="resetBtn"><i class="fa fa-undo"></i> 리셋</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="manage-content mb-10-header">
+							<h3 class="manage-content mb-10-title">접속통계</h3>
+						</div>
+						<div class="manage-content mb-10">
+<!--
+							<table id="datatable" class="table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+ -->
+				 			<div class="chart-area" style="width: 100%;heigth: 400px;">
+				    			<div class="chart" id="myChart1" style="width: 100%;height: 400px;"></div>
+					        </div>
+				 			<div class="line"></div>
+<!--
+				    		<div class="value_wrap">
+				    			<div class="form-value">
+				    				<div class="title">총 접속자 수</div>
+				    				<div class="value" id="sumCnt">1940 명</div>
+				    			</div>
+				    			<div class="form-value">
+				    				<div class="title">평균 접속자 수</div>
+				    				<div class="value" id="avgCnt">1940 명</div>
+				    			</div>
+				    			<div class="form-value">
+				    				<div class="title">오늘 접속자 수</div>
+				    				<div class="value" id="toDayCnt">1940 명</div>
+				    			</div>
+				    			<div class="form-value">
+				    				<div class="title">어제 접속자 수</div>
+				    				<div class="value" id="ydDayCnt">1940 명</div>
+				    			</div>
+					        </div>
+ -->
+						</div>
+						<div class="manage-content mb-10-footer">
+<!--
+							<div class="float-right">
+								<button type="button" class="btn btn-primary pull-right" onclick="goInsert()">등록</button>
+							</div>
+ -->
+						</div>
+					</div>
+				</div>
+			</div>
+	      </div>
+	    </section>
+	    <!-- /.content -->
+	  </div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+	<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js" defer="defer"></script>
+    <script type="text/javascript" th:inline="javascript">
+	var myChart1,myChart2,option1,option2,myData ={};
+// 	var separator= separator;
+	option1 = {
+	  tooltip: {trigger: 'axis',axisPointer: {type: 'shadow'}},
+	  detail: {formatter: '{value}%',textStyle: {fontSize:10,color: 'auto',fontWeight: 'bolder'}},
+	  xAxis: {type: 'category', data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+	  yAxis: {type: 'value'},
+	  series: [{data: [120, 200, 150, 80, 70, 110, 130],type: 'line',areaStyle:{}}]};
+
+	option2 = {
+		tooltip: {trigger: 'item'},
+		legend: {top: '5%',left: 'center'},
+		series: [{
+			      name: '요일별접속통계',
+			      type: 'pie',
+			      radius: ['40%', '70%'],
+			      avoidLabelOverlap: false,
+			      itemStyle: {borderRadius: 10,borderColor: '#fff',borderWidth: 2},
+			      label: {show: false,position: 'center'},
+			      emphasis: {label: {show: true,fontSize: 40,fontWeight: 'bold'}},
+			      labelLine: {show: false},
+			      data: []}]};
+
+	$(document).ready(function() {
+//         $('.date-picker').daterangepicker({
+//         	minYear: 1999,
+//             maxDate:moment().add(-1, 'hour'),
+//             autoUpdateInput: true,
+//             singleDatePicker:false,
+//             showDropdowns: true,
+//             showCustomRangeLabel:false,
+//             timePicker: false,
+//             timePicker24Hour: true,
+//             timePickerMinutes:false,
+//             timePickerSeconds:false,
+//             drops:"auto",
+//             locale: {
+//                 format: 'YYYY-MM-DD',
+//                 applyLabel: "적용",
+//                 cancelLabel: "취소",
+//                 daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+//                 monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+//                 separator:separator
+//             },
+//             ranges:null
+//         }, function(start, end, label) {});
+
+        $('#daterange').data('daterangepicker').setStartDate(moment().add('-7','day'));
+
+		loadChartWithGrid();
+
+    });
+	$(window).on('resize', function(){
+		chartResize('#myChart1');
+	});
+	function goReflesh(){
+		loadChartWithGrid();
+	}
+
+	function getActiveTabId(){
+		return 'tab-item-'+$('.tab-item.active').attr('id');
+	}
+
+	function btnRange(range){
+		var activeTabId = getActiveTabId();
+
+		var daterange = $('#daterange','div[data-type-id='+activeTabId+']');
+
+		switch(range){
+		case 'week':
+			$(daterange).data('daterangepicker').setStartDate(moment().add('-1','week'));
+			break;
+		case 'month' :
+			$(daterange).data('daterangepicker').setStartDate(moment().add('-1','month'));
+			break;
+		case 'year':
+			$(daterange).data('daterangepicker').setStartDate(moment().add('-1','year'));
+			break;
+		}
+
+
+		console.log(range);
+	}
+
+	function loadChartWithGrid(){
+		var arrDate = $('#daterange').val().split(separator);
+
+		myData.chartType = 'dateRange';
+		myData.startDate = arrDate[0];
+		myData.endDate = arrDate[1];
+
+		var tempArea = $('.chart-area');
+
+		var iW = tempArea.width();
+		var iH = tempArea.height();
+
+		var tempChart = $('#myChart1')[0];
+		var dchart = echarts.init(tempChart);
+
+		dchart.resize({width:iW,height:iH});
+		dchart.showLoading();
+
+		$.ajax({
+	    	url : "/manage/statistics-date",
+	    	type : "GET",
+	    	data : myData,
+	    	dataType : "json",
+	    	success : function(res) {
+	    		if(res.result == 'success'){
+					var xAxis = new Array();
+					var data1 = new Array();
+
+					var gridHtml = "";
+
+					var option;
+// 					console.log(res.p.chartType);
+
+					if(res.p.chartType =='dateRange'){
+// 						gridHtml += `<thead><tr><th class="wd-p50">일자</th><th class="wd-p50">명수</th></tr></thead><tbody>`;
+
+		    			for(var i in res.list){
+		    				var data = res.list[i];
+
+		    				xAxis.push(data.time);
+								data1.push(data.cnt);
+// // 		    				console.log(data);
+
+// 		    				gridHtml += `<tr><td class="tac">${data.time}</td><td class="tac">${data.cnt}</td></tr>`;
+		    			}
+		    			gridHtml += `</tbody>`;
+		    			option1.xAxis.data   		= xAxis;
+		    			option1.series[0].data		= data1;
+
+		    			dchart.setOption(option1, true);
+					}
+// 					else if(res.p.chartType =='weekRange') {
+// 						gridHtml += `<thead><tr><th class="wd-p50">요일</th><th class="wd-p50">명수</th></tr></thead><tbody>`;
+// 						for(var i in res.list){
+// 		    				var data = res.list[i];
+
+// 		    				data1.push( { value: data.cnt, name: data.weekname });
+// // 		    				console.log(data);
+
+// 		    				gridHtml += `<tr><td class="tac">${data.weekname}</td><td class="tac">${data.cnt}</td></tr>`;
+
+// 		    			}
+// 						gridHtml += `</tbody>`;
+// // 						console.log(data1);
+// 						option2.series[0].data		= data1;
+
+// 						dchart.setOption(option2, true);
+// 					}
+// 					console.log(tempGrid);
+// 	    			console.log(gridHtml);
+					dchart.hideLoading();
+// 					tempGrid.html(gridHtml);
+// 					var info = res.info;
+
+// 					$('#sumCnt','div[data-type-id='+activeTabId+']').text(info.to_sum_cnt + " 명");
+// 					$('#avgCnt','div[data-type-id='+activeTabId+']').text(info.to_avg_cnt + " 명");
+// 					$('#toDayCnt','div[data-type-id='+activeTabId+']').text(info.to_day_count + " 명");
+// 					$('#ydDayCnt','div[data-type-id='+activeTabId+']').text(info.to_yuesterday_count + " 명");
+
+	    		}
+	    	},
+	    	error:function(request,status,error) {
+	    		alert('처리중 시스템 장애입니다');
+	    		console.log("code:"+request.status+"\nerror:"+error);
+	    	}
+		});
+	}
+
+	function exportExcel(){
+		var activeTabId = getActiveTabId();
+		var fileName =  "" ;
+		var myData={};
+
+		var tempChart = $('.chart','div[data-type-id='+activeTabId+']')[0];
+		var dchart = echarts.init(tempChart);
+		var arrDate = $('#daterange').val().split(separator);
+
+		myData.chartType = $('.tab-item.active').attr('data-chart-type');
+		myData.startDate = arrDate[0];
+		myData.endDate = arrDate[1];
+
+		if(myData.chartType =='dateRange'){
+			fileName = "기간별_접속통계_"+moment().format('YYYYMMDD_hhmmss');
+		} else if(myData.chartType =='weekRange') {
+			fileName = "요일별_접속통계_"+moment().format('YYYYMMDD_hhmmss');
+		}
+
+// 		console.log('url : ' + dchart.getDataURL());
+// 		console.log('Width : ' + dchart.getWidth());
+// 		console.log('Height : ' + dchart.getHeight());
+// 		console.log('fileName : ' + fileName);
+// 		console.log('[[${_csrf.parameterName}]]: [[${_csrf.token}]]');
+
+		$("#excel_iframe").attr("action", "/manage/waytrip/statistics-excel");
+		$("#excel_iframe").append("<input type=hidden name=[(${_csrf.parameterName})] value=[(${_csrf.token})] />");
+	    $("#excel_iframe").append("<input type=hidden name='fileName' value='"+fileName+"'/>");
+
+	    $("#excel_iframe").append("<input type=hidden name='chartType' value='"+myData.chartType+"'/>");
+	    $("#excel_iframe").append("<input type=hidden name='startDate' value='"+myData.startDate+"'/>");
+	    $("#excel_iframe").append("<input type=hidden name='endDate' value='"+myData.endDate+"'/>");
+
+	    $("#excel_iframe").append("<input type=hidden name='fileContents' value='"+encodeURIComponent(dchart.getDataURL())+"'/>");
+	    $("#excel_iframe").append("<input type=hidden name='fileSizes' value='"+dchart.getWidth()  +  ":"  + dchart.getHeight() + "'/>");
+
+	    console.log( $("#excel_iframe").serialize() );
+
+	    $.ajax({
+	    	url : $("#excel_iframe").prop('action'),
+	    	type : "POST",
+	    	data: $("#excel_iframe").serialize(),
+	    	xhrFields:{responseType: 'blob'},
+	    	success : function(result) {
+	    		console.log(result);
+				var blob = result;
+				var downloadUrl = URL.createObjectURL(blob);
+				var a = document.createElement("a");
+				a.href = downloadUrl;
+				a.download = fileName+".xlsx";
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+	    	},
+	    	error:function(request,status,error) {
+	    		alert('처리중 시스템 장애입니다');
+	    		console.log("code:"+request.status+"\nerror:"+error);
+	    	},complete : function() {
+// 				setTimeout(() => { }, 100);
+				$("#excel_iframe").empty();
+			}
+		});
+	}
+
+	chartResize = function(target){
+		var tempArea = $(target).parent();
+
+		var iW = tempArea.width();
+		var iH = tempArea.height();
+
+		echarts.init($(target)[0]).resize({width:iW,height:iH});
+
+	}
+
+	/**
+	 * javascript SimpleDateFormat 함수
+	 * ex)
+	 * new Date().format("yyyy-MM-dd");
+	 * new Date().format("yyyy-MM-dd HH:mm:ss");
+	 * new Date().format("yyyy-MM-dd a/p hh:mm:ss");
+	 */
+
+// 	function getToDate(format){
+// 		var date = new Date();
+// 		if(format == undefined){
+// 			date = date.format("yyyy-MM-dd");
+// 		} else {
+// 			date = date.format(format);
+// 		}
+
+// 		return date;
+// 	}
+	</script>
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script th:inline="javascript">
+	  $.widget.bridge('uibutton', $.ui.button)
+	  let datatable;
+
+	  $(document).ready(function() {
+// 		  initDatatable();
+	  });
+
+	  $("#searchBtn").click(function() {
+		  datatable.ajax.reload();
+	  });
+
+	  $("#resetBtn").click(function() {
+		  searchReset();
+		  //datatable.column( 4 ).visible(true);
+		  datatable.ajax.reload();
+	  });
+
+	  goInsert = function () {
+		  location.href = "/manage/history/form?mode=?mode=I&params="+getParams();
+	  }
+
+	  goEdit = function (id) {
+		  location.href = `/manage/history/form?contentId=${id}`;
+	  }
+
+	  goRestore = function(contentId) {
+		  $.ajax({
+			  url : "/manage/history-restore",
+			  type : "POST",
+			  data : {"content_id" : contentId},
+			  dataType : "json",
+			  beforeSend: function (xhr) {
+				  xhr.setRequestHeader(
+						  [[${_csrf.headerName}]], [[${_csrf.token}]]
+				  );
+			  },
+			  success : function(data){
+				  if( data.result === "success" ){
+					  datatable.ajax.reload();
+				  }else{
+					  alert(data.message)
+				  }
+			  }
+		  })
+	  }
+
+	  goDelete = function (contentId){
+		  if(confirm("삭제하시겠습니까?")){
+			  $.ajax({
+				  url : "/manage/history-delete",
+				  type : "POST",
+				  data : {"content_id" : contentId},
+				  dataType : "json",
+				  beforeSend: function (xhr) {
+					  xhr.setRequestHeader(
+							  [[${_csrf.headerName}]], [[${_csrf.token}]]
+					  );
+				  },
+				  success : function(data){
+					  if( data.result === "success" ){
+						  alert("삭제되었습니다.");
+						  datatable.ajax.reload();
+					  }else{
+						  alert(data.message)
+					  }
+				  }
+			  })
+		  }
+	  }
+
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+
+	</body>
+</html>

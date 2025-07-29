@@ -1,0 +1,135 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+	<div th:fragment="product-modal-template(strClass, strDataId)" th:class="${strClass}" th:id="${strDataId}">
+        <div class="data-wrapper">
+            <header>
+                <h1>상세페이지 템플릿 선택</h1>
+                <div class="cancel-btn" onclick="hideTemplateModal()">
+                    <img src="./images/icon/cancel_btn.svg" alt="">
+                </div>
+            </header>
+            <div class="data swiper">
+                <ul class="template">
+                </ul>
+                <ul class="template-select-button">
+                    <li class="swiper-button-prev"></li>
+                    <li class="swiper-button-next"></li>
+                </ul>
+            </div>
+            <ul class="select-button">
+                <li class="add">선택</li>
+                <li class="cancel">취소</li>
+            </ul>
+        </div>
+	    <script th:inline="javascript">
+			$(document).ready(function () {
+				$("#modal .data-wrapper .select-button .cancel").on("click", deSelectTemplate);
+				$("#modal .data-wrapper .select-button .add").on("click",renderTemplate);
+			});
+
+
+			function showTemplateModal() {
+				let modal = document.querySelector('#modal');
+				modal.classList.add("active");
+			}
+
+			function hideTemplateModal() {
+				let modal = document.querySelector('#modal');
+				modal.classList.remove("active");
+				selectTemplateId = 0;
+			}
+
+			function templateSwiper(){
+				const swiper = new Swiper('#modal div.data', {
+					slidesPerView:4.2,
+					speed: 400,
+					spaceBetween: 30,
+					slidesOffsetBefore:30,
+					slidesOffsetAfter:30,
+
+					// Navigation arrows
+					navigation: {
+						nextEl: '.swiper-button-next',
+						prevEl: '.swiper-button-prev',
+					},
+				});
+
+				$('.swiper-wrapper > li')
+					.off('dblclick')
+					.on('dblclick',function(){
+					    if(confirm( '선택된 탬플릿을 적용 하시겠습니까?')){
+							renderTemplate();
+						}
+					});
+			}
+
+			function deSelectTemplate(){
+				selectTemplateId = 0;
+				let templateContainer = document.querySelector("#modal .data .template");
+				let templateLists = templateContainer.querySelectorAll("li");
+				Array.from(templateLists).forEach(function(item){
+					item.classList.remove("selected");
+				})
+				hideTemplateModal();
+			}
+
+			function renderTemplate(){
+				// ajax로
+				$.ajax({
+					url:"/manage/product/getSampleTemplate",
+					type:"GET",
+					data:`templateId=${selectTemplateId}`,
+					beforeSend:function(xhr){
+						xhr.setRequestHeader(
+							[[${_csrf.headerName}]], [[${_csrf.token}]]
+						);
+					},
+					success:function(data){
+						let templateContainer = document.querySelector("#content-container");
+						templateContainer.innerHTML = '';
+						if(data.template != null){
+							hideTemplateModal();
+							templateContainer.innerHTML=data.template;
+	// /					$("#content-container").html(data.template);
+						}else{
+							//
+							console.log("empty-template");
+						}
+					},
+					error:function(data){
+					}
+				})
+			}
+
+			function deleteEditorImage(item,id){
+				// item=> clicked button
+				$.ajax({
+					url:'/manage/product/removeEditorImage',
+					type:"DELETE",
+					data:`file_id=${id}&template_id=${0}`,
+					beforeSend:function(xhr){
+						xhr.setRequestHeader(
+							[[${_csrf.headerName}]], [[${_csrf.token}]]
+						)
+					},
+					success : function(data) {
+						if (typeof data.result != "undefined" && data.result == "error") {
+							alert(data.error);
+							return;
+						} else {
+							$(item).parent().parent().remove();
+						}
+					},
+					error : function(xhr, code, errorMsg) { },
+					complete : function() { }
+
+				})
+
+			}
+
+		</script>
+	</div>
+
+</body>
+</html>

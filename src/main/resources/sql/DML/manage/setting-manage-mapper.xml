@@ -1,0 +1,623 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.SettingManageMapper">
+
+	<!--################################### historyContents ###################################-->
+	<select id="selectCountHistoryContents" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM setting_history_contents
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentLike)">and content like concat('%',#{contentLike},'%')</if>
+		</where>
+	</select>
+
+	<select id="selectListHistoryContents" parameterType="map" resultType="SettingHistoryContents">
+		SELECT *
+		FROM(
+		SELECT @rownum:=@rownum+1 AS rownum,
+		id, history_date, content, use_yn, delete_yn, delete_id, delete_date, create_id, create_date, last_update_id, last_update_date
+		FROM setting_history_contents
+		join (SELECT @rownum:= 0) rnum
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(contentLike)">and content like concat('%',#{contentLike},'%')</if>
+		</where>
+
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+			ORDER BY
+			<choose>
+				<when test="sort == 'id'">id</when>
+				<when test="sort == 'history_date'">history_date</when>
+				<when test="sort == 'content'">content</when>
+				<when test="sort == 'use_yn'">use_yn</when>
+				<when test="sort == 'delete_yn'">delete_yn</when>
+				<when test="sort == 'last_update_date'">last_update_date</when>
+				<otherwise>rownum</otherwise>
+			</choose>
+			<choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+		</if>
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+			ORDER BY <foreach item="item" index="index" collection="listSort" separator=",">
+			<choose>
+				<when test="item.sort == 'id'">id</when>
+				<when test="item.sort == 'history_date'">history_date</when>
+				<when test="item.sort == 'content'">content</when>
+				<when test="item.sort == 'use_yn'">use_yn</when>
+				<when test="item.sort == 'delete_yn'">delete_yn</when>
+				<when test="item.sort == 'last_update_date'">last_update_date</when>
+			</choose>
+			<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+		</if>
+		) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+			LIMIT #{itemStartPosition}, #{pagePerSize}
+		</if>
+	</select>
+
+	<select id="selectOneHistoryContent" parameterType="map" resultType="SettingHistoryContents">
+		SELECT id, history_date, content, use_yn
+		FROM setting_history_contents
+		WHERE id = #{contentId}
+	</select>
+
+	<insert id="insertHistoryContents" parameterType="SettingHistoryContents" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO setting_history_contents
+		(
+			history_date, content, use_yn, create_id, create_date
+		)
+		VALUES
+		(
+			#{history_date}, #{content}, #{use_yn}, #{create_id}, NOW()
+		)
+	</insert>
+
+	<update id="updateHistoryContents" parameterType="SettingHistoryContents">
+		UPDATE setting_history_contents
+		SET history_date = #{history_date}
+		  , content = #{content}
+		  , use_yn = #{use_yn}
+		  , last_update_date = NOW()
+		WHERE id = #{id}
+	</update>
+
+	<update id="restoreHistoryContents" parameterType="map">
+		UPDATE setting_history_contents
+		SET delete_yn = 'N'
+		  , last_update_date = NOW()
+		WHERE id = #{contentId}
+	</update>
+
+	<update id="deleteHistoryContents" parameterType="map">
+		UPDATE setting_history_contents
+		SET delete_yn = 'Y'
+		  , last_update_date = NOW()
+		WHERE id = #{contentId}
+	</update>
+
+	<!--################################### awardsContents ###################################-->
+
+	<select id="selectCountAwardsContents" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM setting_awards_contents AS ac
+		LEFT JOIN setting_awards_image AS ai on ai.id = ac.id
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and ac.id = #{id}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and title like concat('%',#{titleLike},'%')</if>
+		</where>
+	</select>
+
+	<select id="selectListAwardsContents" parameterType="map" resultType="SettingAwardsContents">
+		SELECT *
+		FROM(
+		SELECT @rownum:=@rownum+1 AS rownum,
+		ac.id, reg_date, type, title, use_yn, delete_yn
+		, delete_id, delete_date, create_id, create_date, last_update_id, last_update_date
+		, IFNULL(ai.origin_filename, '') AS origin_filename
+		FROM setting_awards_contents AS ac
+		LEFT JOIN setting_awards_image AS ai on ai.id = ac.id
+		join (SELECT @rownum:= 0) rnum
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and ac.id = #{id}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and title like concat('%',#{titleLike},'%')</if>
+		</where>
+
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+			ORDER BY
+			<choose>
+				<when test="sort == 'id'">id</when>
+				<when test="sort == 'reg_date'">reg_date</when>
+				<when test="sort == 'title'">title</when>
+				<when test="sort == 'origin_filename'">origin_filename</when>
+				<when test="sort == 'use_yn'">use_yn</when>
+				<when test="sort == 'delete_yn'">delete_yn</when>
+				<when test="sort == 'last_update_date'">last_update_date</when>
+				<otherwise>rownum</otherwise>
+			</choose>
+			<choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+		</if>
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+			ORDER BY <foreach item="item" index="index" collection="listSort" separator=",">
+			<choose>
+				<when test="item.sort == 'id'">id</when>
+				<when test="item.sort == 'reg_date'">reg_date</when>
+				<when test="item.sort == 'title'">title</when>
+				<when test="item.sort == 'origin_filename'">origin_filename</when>
+				<when test="item.sort == 'use_yn'">use_yn</when>
+				<when test="item.sort == 'delete_yn'">delete_yn</when>
+				<when test="item.sort == 'last_update_date'">last_update_date</when>
+			</choose>
+			<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+		</if>
+		) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+			LIMIT #{itemStartPosition}, #{pagePerSize}
+		</if>
+	</select>
+
+	<select id="selectOneAwardsContent" parameterType="map" resultType="SettingAwardsContents">
+		SELECT ac.id, ac.reg_date, ac.type, ac.title, ac.use_yn
+			   , ai.origin_filename
+		FROM setting_awards_contents AS ac
+		LEFT JOIN setting_awards_image ai on ai.id = ac.id
+		WHERE ac.id = #{contentId}
+	</select>
+
+	<insert id="insertAwardsContents" parameterType="SettingAwardsContents" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO setting_awards_contents
+		(
+		 	reg_date, type, title, use_yn, create_id, create_date
+		)
+		VALUES
+		(
+			#{reg_date}, #{type}, #{title}, #{use_yn}, #{create_id}, NOW()
+		)
+	</insert>
+
+	<update id="updateAwardsContents" parameterType="SettingAwardsContents">
+		UPDATE setting_awards_contents
+		SET reg_date = #{reg_date}
+			, title = #{title}
+			, type = #{type}
+		  	, use_yn = #{use_yn}
+			, last_update_date = NOW()
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteAwardsContents" parameterType="map">
+		UPDATE setting_awards_contents
+		SET delete_yn = 'Y'
+		  , last_update_date = NOW()
+		WHERE id = #{contentId}
+	</update>
+
+	<update id="restoreAwardsContents" parameterType="map">
+		UPDATE setting_awards_contents
+		SET delete_yn = 'N'
+		  , last_update_date = NOW()
+		WHERE id = #{contentId}
+	</update>
+
+<!--################################### awardsImage ###################################-->
+	<select id="selectOneAwardsAttachFile" parameterType="map" resultType="SettingAwardsImage">
+		SELECT file_id, id, upload_path, upload_filename, file_extension, file_size, file_mimetype, origin_filename, upload_id, upload_date
+		  FROM setting_awards_image
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+		</where>
+	</select>
+
+	<insert id="insertAwardsAttachFile" parameterType="SettingAwardsImage" useGeneratedKeys="true" keyProperty="fileId">
+		INSERT INTO setting_awards_image (
+			id, upload_path, upload_filename,
+			file_extension, file_size, file_mimetype,
+			origin_filename,upload_id,upload_date
+		) VALUES (
+			#{id}, #{upload_path}, #{upload_filename},
+			#{file_extension}, #{file_size}, #{file_mimetype},
+			#{origin_filename}, #{upload_id},now()
+		)
+	</insert>
+
+	<delete id="deleteAwardsAttachFile" parameterType="SettingAwardsImage">
+		DELETE
+		FROM setting_awards_image
+		WHERE id = #{id}
+	</delete>
+
+	<!--################################### allianceContents ###################################-->
+	<select id="selectCountAllianceContents" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM setting_alliance_contents AS ac
+		LEFT JOIN setting_alliance_image AS ai on ai.id = ac.id
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and title like concat('%',#{titleLike},'%')</if>
+		</where>
+	</select>
+
+	<select id="selectListAllianceContents" parameterType="map" resultType="SettingAllianceContents">
+		SELECT *
+		FROM(
+		SELECT @rownum:=@rownum+1 AS rownum,
+				ac.id, reg_date, title, IFNULL(link, '') AS link, use_yn, delete_yn
+		        , delete_id, delete_date, create_id, create_date, last_update_id, last_update_date
+				, IFNULL(ai.origin_filename, '') AS origin_filename
+		FROM setting_alliance_contents AS ac
+		LEFT JOIN setting_alliance_image AS ai on ai.id = ac.id
+		join (SELECT @rownum:= 0) rnum
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and ac.id = #{id}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and title like concat('%',#{titleLike},'%')</if>
+		</where>
+
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+			ORDER BY
+			<choose>
+				<when test="sort == 'id'">id</when>
+				<when test="sort == 'regDate'">reg_date</when>
+				<when test="sort == 'title'">title</when>
+				<when test="sort == 'link'">link</when>
+				<when test="sort == 'originFilename'">origin_filename</when>
+				<when test="sort == 'useYn'">use_yn</when>
+				<when test="sort == 'deleteYn'">delete_yn</when>
+				<when test="sort == 'lastUpdateDate'">last_update_date</when>
+				<otherwise>rownum</otherwise>
+			</choose>
+			<choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+		</if>
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+			ORDER BY <foreach item="item" index="index" collection="listSort" separator=",">
+			<choose>
+				<when test="item.sort == 'id'">id</when>
+				<when test="item.sort == 'reg_date'">reg_date</when>
+				<when test="item.sort == 'title'">title</when>
+				<when test="item.sort == 'link'">link</when>
+				<when test="item.sort == 'origin_filename'">origin_filename</when>
+				<when test="item.sort == 'use_yn'">use_yn</when>
+				<when test="item.sort == 'delete_yn'">delete_yn</when>
+				<when test="item.sort == 'last_update_date'">last_update_date</when>
+			</choose>
+			<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+		</if>
+		) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+			LIMIT #{itemStartPosition}, #{pagePerSize}
+		</if>
+	</select>
+
+	<select id="selectOneAllianceContent" parameterType="map" resultType="SettingAllianceContents">
+		SELECT ac.id, ac.reg_date, ac.title, ac.link, ac.use_yn
+			 , ai.origin_filename
+		FROM setting_alliance_contents AS ac
+		LEFT JOIN setting_alliance_image ai on ai.id = ac.id
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and ac.id = #{id}</if>
+		</where>
+	</select>
+
+	<insert id="insertAllianceContents" parameterType="SettingAllianceContents" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO setting_alliance_contents
+		(
+			reg_date, title, link, use_yn, create_id, create_date
+		)
+		VALUES
+		(
+			#{regDate}, #{title}, #{link}, #{useYn}, #{createId}, NOW()
+		)
+	</insert>
+
+	<update id="updateAllianceContents" parameterType="SettingAllianceContents">
+		UPDATE setting_alliance_contents
+		SET reg_date = #{regDate}
+		  , title = #{title}
+		  , link = #{link}
+		  , use_yn = #{useYn}
+		  , last_update_date = NOW()
+		WHERE id = #{id}
+	</update>
+
+	<update id="restoreAllianceContents" parameterType="map">
+		UPDATE setting_alliance_contents
+		SET delete_yn = 'N'
+		  , last_update_date = NOW()
+		WHERE id = #{contentId}
+	</update>
+
+	<update id="deleteAllianceContents" parameterType="map">
+		UPDATE setting_alliance_contents
+		SET delete_yn = 'Y'
+		  , last_update_date = NOW()
+		WHERE id = #{contentId}
+	</update>
+	<!--################################### allianceImage ###################################-->
+
+	<select id="selectOneAllianceAttachFile" parameterType="map" resultType="SettingAllianceImage">
+		SELECT file_id, id, upload_path, upload_filename, file_extension, file_size, file_mimetype, origin_filename, upload_id, upload_date
+          FROM setting_alliance_image
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+		</where>
+	</select>
+
+	<insert id="insertAllianceAttachFile" parameterType="SettingAllianceImage" useGeneratedKeys="true" keyProperty="fileId">
+		INSERT INTO setting_alliance_image
+		(
+			id, upload_path, upload_filename,
+			file_extension, file_size, file_mimetype,
+			origin_filename, upload_id, upload_date
+		)
+		VALUES
+		(
+			#{id}, #{uploadPath}, #{uploadFilename},
+			#{fileExtension}, #{fileSize}, #{fileMimetype},
+			#{originFilename}, #{uploadId}, now()
+		)
+	</insert>
+
+	<delete id="deleteAllianceAttachFile" parameterType="SettingAllianceImage">
+		DELETE
+		FROM setting_alliance_image
+		WHERE id = #{id}
+	</delete>
+
+	<select id="selectCompanyInfo" resultType="SettingCompanyInfo">
+		SELECT id, site_name, company_name, company_owner,
+		       company_registration_no,
+		       company_mail_order_registration_no,
+		       company_tourism_registration_no,
+		       company_tell, company_fax, company_email,
+			   company_cs_time, company_cs_tell,
+			   company_address_zipcode, company_address_jibun,
+			   company_address_road, company_address_detail,
+			   company_latitude, company_longitude,
+			   create_id, create_date
+		  FROM setting_company_info
+		 ORDER BY id DESC LIMIT 1
+	</select>
+
+	<insert id="insertCompanyInfo" parameterType="SettingCompanyInfo" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO setting_company_info
+			   (
+			    	site_name, company_name, company_owner,
+			    	company_registration_no,
+			    	company_mail_order_registration_no,
+			    	company_tourism_registration_no,
+			    	company_tell, company_fax, company_email,
+			    	company_cs_tell, company_cs_time,
+					company_address_zipcode, company_address_jibun,
+					company_address_road, company_address_detail,
+					company_latitude, company_longitude,
+					create_id, create_date
+			   )
+		VALUES (
+				    #{siteName}, #{companyName}, #{companyOwner},
+		        	#{companyRegistrationNo},
+		        	#{companyMailOrderRegistrationNo},
+		        	#{companyTourismRegistrationNo},
+		        	#{companyTell}, #{companyFax}, #{companyEmail},
+					#{companyCsTell}, #{companyCsTime},
+					#{companyAddressZipcode}, #{companyAddressJibun},
+					#{companyAddressRoad}, #{companyAddressDetail},
+					#{companyLatitude}, #{companyLongitude},
+		        	#{createId}, now()
+			   )
+	</insert>
+
+	<select id="selectNavbar" resultType="SettingNavbar">
+		SELECT id, expand_type,
+		       ci_image_id, ci_image_url,
+		       background_color, border_color, font_color,
+			   create_id, create_date
+		FROM setting_navbar
+		ORDER BY id DESC LIMIT 1
+	</select>
+
+	<select id="selectNavMenuList" resultType="MenuUser">
+		SELECT menu_id, upper_menu_id, menu_name, menu_url, menu_type, menu_sort, menu_desc, use_yn,
+			   CASE WHEN upper_menu_id IS NULL THEN 0
+					ELSE (SELECT CASE WHEN upper_menu_id IS NULL THEN 1 ELSE 2 END FROM menu_user mu2 WHERE mu2.menu_id = mu.upper_menu_id)
+			    END depth
+		  FROM menu_user mu
+		 WHERE delete_yn = 'N' AND use_yn = 'Y' AND navbar_yn = 'Y'
+		 ORDER BY menu_sort, upper_menu_id
+	</select>
+
+	<insert id="insertNavbar" parameterType="SettingNavbar">
+		INSERT INTO setting_navbar
+		   SET expand_type = #{expandType},
+			   ci_image_id = #{ciImageId},
+			   ci_image_url = #{ciImageUrl},
+			   background_color = #{backgroundColor},
+			   border_color = #{borderColor},
+			   font_color = #{fontColor},
+			   create_id = #{createId},
+			   create_date = now()
+	</insert>
+
+	<insert id="insertAlarmMailServer" parameterType="SettingMailServer">
+		INSERT INTO setting_mail_server
+		   SET alarm_type = #{alarmType},
+		       smtp_email = #{smtpEmail},
+		       smtp_username = #{smtpUsername},
+		       smtp_server = #{smtpServer},
+		       smtp_port = #{smtpPort},
+		       smtp_authorize_required = #{smtpAuthorizeRequired},
+		       smtp_secure_type = #{smtpSecureType},
+		       smtp_login_id = #{smtpLoginId},
+		       smtp_login_pw = #{smtpLoginPw},
+		       smtp_use_yn = #{smtpUseYn},
+		       create_id = #{createId},
+		       create_date = now()
+	</insert>
+
+	<update id="updateAlarmMailServer" parameterType="SettingMailServer">
+		UPDATE setting_mail_server
+		   SET smtp_email = #{smtpEmail},
+		       smtp_username = #{smtpUsername},
+		       smtp_server = #{smtpServer},
+		       smtp_port = #{smtpPort},
+		       smtp_authorize_required = #{smtpAuthorizeRequired},
+		       smtp_secure_type = #{smtpSecureType},
+		       smtp_login_id = #{smtpLoginId},
+		       smtp_login_pw = #{smtpLoginPw},
+		       smtp_use_yn = #{smtpUseYn},
+		       last_update_id = #{lastUpdateId},
+		       last_update_date = now()
+		 WHERE id = #{id} AND alarm_type = #{alarmType}
+	</update>
+
+	<select id="selectAlarmMailServer" parameterType="String" resultType="SettingMailServer">
+		SELECT id, alarm_type,
+		       smtp_email, smtp_username,
+		       smtp_server, smtp_port,
+		       smtp_authorize_required, smtp_secure_type,
+		       smtp_login_id, smtp_login_pw,
+		       smtp_use_yn, create_id, create_date
+		  FROM setting_mail_server
+		 WHERE alarm_type = #{value}
+	</select>
+
+	<insert id="insertAlarmMailReceiver" parameterType="SettingMailReceiver">
+		INSERT INTO setting_mail_receiver
+		   SET server_id = #{serverId},
+		       email = #{email},
+		       username = #{username},
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+					start_date = #{startDate},
+				</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+					expire_date = #{expireDate},
+				</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+					use_yn = #{useYn},
+				</if>
+			   create_id = #{createId},
+			   create_date = now()
+	</insert>
+
+	<select id="selectAlarmMailReceiverList" parameterType="Integer" resultType="SettingMailReceiver">
+		SELECT id, server_id,
+		       email, username,
+		       start_date, expire_date, use_yn,
+		       create_id, create_date
+		  FROM setting_mail_receiver
+		 WHERE delete_yn = 'N' AND server_id = #{value}
+	</select>
+
+	<update id="updateAlarmMailReceiver" parameterType="SettingMailReceiver">
+		UPDATE setting_mail_receiver
+		   SET email = #{email},
+			   username = #{username},
+				<choose>
+					<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+						start_date = #{startDate},
+					</when>
+					<otherwise>
+						start_date = null,
+					</otherwise>
+				</choose>
+				<choose>
+					<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+						expire_date = #{expireDate},
+					</when>
+					<otherwise>
+						expire_date = null,
+					</otherwise>
+				</choose>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+					use_yn = #{useYn},
+				</if>
+				last_update_id = #{lastUpdateId},
+				last_update_date = now()
+		 WHERE id = #{id} AND server_id = #{serverId}
+	</update>
+
+	<update id="updateAlarmMailReceiverDelete" parameterType="SettingMailReceiver">
+		UPDATE setting_mail_receiver
+		   SET delete_yn = 'Y',
+			   delete_id = #{deleteId},
+			   delete_date = now()
+		 WHERE id = #{id} AND server_id = #{serverId}
+	</update>
+
+	<select id="selectAlarmMessage" parameterType="String" resultType="SettingMessage">
+		SELECT id, alarm_type,
+			   api_corp, api_type, api_use_time, api_queue_type,
+			   use_yn, create_id, create_date
+		  FROM setting_message
+		 WHERE alarm_type = #{value}
+	</select>
+
+	<select id="selectAlarmMessageReceiverList" parameterType="Integer" resultType="SettingMessageReceiver">
+		SELECT id, message_id,
+			   mobile, username,
+			   start_date, expire_date, use_yn,
+			   create_id, create_date
+		  FROM setting_message_receiver
+		 WHERE delete_yn = 'N' AND message_id = #{value}
+	</select>
+
+	<update id="updateAlarmMessage" parameterType="SettingMessage">
+		UPDATE setting_message
+		   SET api_use_time = #{apiUseTime}, api_queue_type = #{apiQueueType}, use_yn = #{useYn},
+		       last_update_id = #{lastUpdateId}, last_update_date = now()
+		 WHERE id = #{id} AND alarm_type = #{alarmType}
+	</update>
+
+
+	<insert id="insertAlarmMessageReceiver" parameterType="SettingMessageReceiver">
+		INSERT INTO setting_message_receiver
+			SET message_id = #{messageId},
+				mobile = #{mobile},
+				username = #{username},
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+					start_date = #{startDate},
+				</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+					expire_date = #{expireDate},
+				</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+					use_yn = #{useYn},
+				</if>
+				create_id = #{createId},
+				create_date = now()
+	</insert>
+
+	<update id="updateAlarmMessageReceiver" parameterType="SettingMessageReceiver">
+		UPDATE setting_message_receiver
+		   SET mobile = #{mobile},
+				username = #{username},
+				<choose>
+					<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+						start_date = #{startDate},
+					</when>
+					<otherwise>
+						start_date = null,
+					</otherwise>
+				</choose>
+				<choose>
+					<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+						expire_date = #{expireDate},
+					</when>
+					<otherwise>
+						expire_date = null,
+					</otherwise>
+				</choose>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+					use_yn = #{useYn},
+				</if>
+				last_update_id = #{lastUpdateId},
+				last_update_date = now()
+		 WHERE id = #{id} AND message_id = #{messageId}
+	</update>
+
+	<update id="updateAlarmMessageReceiverDelete" parameterType="SettingMessageReceiver">
+		UPDATE setting_message_receiver
+		   SET delete_yn = 'Y',
+ 			   delete_id = #{deleteId},
+			   delete_date = now()
+  		 WHERE id = #{id} AND message_id = #{messageId}
+	</update>
+</mapper>

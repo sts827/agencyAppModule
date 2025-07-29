@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <!-- Preloader -->
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+
+	  <!-- Navbar -->
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <!-- /.navbar -->
+
+	  <!-- Main Sidebar Container -->
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0" > 결재내역</h1>
+	    </div>
+	    <!-- /.content-header -->
+
+	    <!-- Main content -->
+	    <section class="content">
+	      <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0 search-body">
+							<div class="row form-inline">
+
+								<div class="form-inline col-4 p-0">
+									<div class="form-inline col-4">
+					                    <select id="dateType" name="dateType" class="form-control col-md-12">
+											<option value="" >일자선택</option>
+											<option value="payDate">접수일자</option>
+											<option value="createDate">작성일자</option>
+					                	</select>
+									</div>
+									<div class="form-inline col-8 p-0">
+		                             	<label class="col-2 p-0">기간</label>
+										<input type="text" id="dateRange" name="dateRange" class="form-control col-md-10 p-0 date-range-picker tac">
+									</div>
+								</div>
+								<div class="form-inline col-md-4 p-0">
+									<div class="form-inline col-md-6">
+		                             	<label class="col-5">결제유형</label>
+					                    <select id="payDivision" name="payDivision" class="form-control col-md-7">
+											<option value="" >결제유형</option>
+											<option value="G">발생비용</option>
+											<option value="D">입금비용</option>
+					                	</select>
+									</div>
+									<div class="form-inline col-md-6">
+		                             	<label class="col-4">응대자</label>
+										<input type="text" id="responseName" name="responseName" class="form-control col-md-8" placeholder="미입력시 전체.">
+									</div>
+								</div>
+								<div class="form-inline col-3">
+									<input type="text" id="searchKey" name="searchKey" class="form-control col-md-12" placeholder="고객명, 연락처를 입력해주세요">
+								</div>
+								<div class="col-md-1 clearfix">
+									<div class="btn-group float-right">
+										<button type="button" class="btn btn-primary" id="searchBtn"><i class="fa fa-search"></i> 검색</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+<!--/*
+			<div class="row form-group">
+				<div class="col-md-12">
+					<div class="float-right">
+						<button type="button" class="btn btn-primary pull-right" onclick="goInsert()">등록하기</button>
+					</div>
+				</div>
+			</div>
+*/-->
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0">
+							<table id="datatable" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+	      </div>
+	    </section>
+	    <!-- /.content -->
+	  </div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashinquiry demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashinquiry.js"></script>
+	-->
+
+	<script type="text/javascript" th:inline="javascript">
+		var datatable;
+		$(document).ready(function() {
+			initDatatable();
+		});
+
+		initDatatable = function(){
+			var baseColumns = [
+					{ "name" : "payDate", "title" : "일시","data" : "pay_date","className" : "dt-head-center dt-body-center",width:'100px'},
+					{ "name" : "id", "title" : "고유번호","data" : "id","className" : "dt-head-center dt-body-center",visible:false},
+					{ "name" : "reservationId", "title" : "고유번호","data" : "reservation_id","className" : "dt-head-center dt-body-center",visible:false},
+					{ "name" : "userEmail", "title" : "고객ID(email)","data" : "user_email","className" : "dt-head-center dt-body-center",width:'150px'},
+					{ "name" : "userName", "title" : "고객명","data" : "user_name","className" : "dt-head-center dt-body-center",width:'100px'},
+					{ "name" : "userMobile", "title" : "연락처","data" : "user_mobile","className" : "dt-head-center dt-body-center",width:'120px'},
+					{ "name" : "amtG",    "title" : "발생비용",
+					  "data" : function (row, type, set) { return numberWithCommas( row["amt_g"] ); },
+					  "className" : "dt-head-center dt-body-right",width:'90px'},
+					{ "name" : "amtD",    "title" : "입금비용",
+					  "data" : function (row, type, set) { return numberWithCommas( row["amt_d"] ); },
+					  "className" : "dt-head-center dt-body-right",width:'90px'},
+					{ "name" : "payComment",   "title" : "내용","data" : "pay_comment","className" : "dt-head-center dt-body-left"},
+					//{ "name" : "createId",   "title" : "작성자","data" : "create_id","className" : "dt-head-center dt-body-center",width:'100px'},
+					{ "name" : "createName",   "title" : "작성자","data" : "create_name","className" : "dt-head-center dt-body-center",width:'100px'},
+					{ "name" : "createDate",   "title" : "작성일","data" : "create_date","className" : "dt-head-center dt-body-center",width:'120px'},
+					{ "name" : "func_btns", "title":"기능",
+						"data" :
+							function (row, type, set) {
+								var html = "";
+								html += `<div class="form-inline justify-content-center">`;
+								html += "<button type='button' class='btn btn-default' data-toggle='tooltip' title='통합조회' onclick='goView(\""+row["id"]+"\")'>통합조회</button>&nbsp;";
+/*								if ( row["deleteYn"] === 'Y' ) {
+									  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='복구'  onclick='goRestore(\""+row["id"]+"\")' style='color:#fff;background-color:#007bff;border-color:#007bff;box-shadow:none'>복구</button>";
+								} else  {
+									  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제'  onclick='goDelete(\""+row["id"]+"\")'>삭제</button>";
+								}*/
+								html += `</div>`;
+								return html;
+							},
+					   "className": "dt-head-center dt-body-center", "orderable" : false, "width":"140px"},
+				];
+
+			datatable = $("#datatable").DataTable({
+				"searching" : false
+				,"paging": true
+				,"bPaginate": true
+				,"responsive": true
+				,"language": lang_kor
+				,"ordering": false
+				,"bLengthChange" : false
+				,"bInfo":false
+				,"ajax" : {
+					"url" : "/manage/user/payment-list-v"
+					,"method" : "post"
+					, "beforeSend": function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					}
+					,"data" : function(d) {
+
+						if( $('#dateType option:selected').index() > 0 ){
+							d.dateType = $('#dateType option:selected').val();
+
+							var dateRange = $('#dateRange').val().split(separator);
+
+							d.dateFrom = dateRange[0];
+							d.dateTo   = dateRange[1];
+						}
+						if( $('#payDivision option:selected').index() > 0 ){
+							d.payDivision = $('#payDivision option:selected').val();
+						}
+
+						if ($('#responseName').val().trim() != "") d.responseName       = $('#responseName').val().trim();
+						if ($('#searchKey').val().trim() != "") d.searchKey = $('#searchKey').val().trim();
+					}
+				},"processing": true
+				,"serverSide": true
+				,"order" :
+					[ [0, 'desc'] ]
+				,"createdRow": function(row, data) {
+					  if ( data.deleteYn === "Y" ) {
+						  $(row).css('background-color', '#DC3545');
+					  } else if ( data.secretYn === "Y" ) {
+						  $(row).css('background-color', '#e9e9e9');
+					  }
+				  }
+				,"initComplete": function(settings, json) {
+	    			//fnInitBootstrapToggle();
+	  			}
+				,"columns": baseColumns
+			});
+		};
+
+		$("#searchBtn").click(function() {
+			if( datatable !== undefined)
+				datatable.ajax.reload();
+		});
+
+		goView = function(id){
+			location.href = `/manage/user/payment/view?id=${id}&params=`+getParams();
+		}
+
+		goInsert = function(id){
+			location.href = `/manage/user/payment/form?params=`+getParams();
+		}
+
+		goDelete = function(id){
+			if(confirm("삭제하시겠습니까?")){
+				$.ajax({
+					url : '/manage/user/counsel-delete',
+					type : "POST",
+					data : {"id" : id},
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					},
+					success : function(res){
+						if("success" == res.result){
+							alert("삭제처리 되었습니다.");
+							datatable.ajax.reload();
+						}else{
+							alert(res.message)
+						}
+					}
+				})
+			}
+		}
+
+		goResotre = function(id){
+				$.ajax({
+					url : '/manage/user/counsel-restore',
+					type : "POST",
+					data : {"id" : id},
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					},
+					success : function(res){
+						if("success" == res.result){
+							datatable.ajax.reload();
+							alert("복구처리 되었습니다.");
+						}else{
+							alert(res.message)
+						}
+					}
+				})
+		}
+	</script>
+	<style>
+		.way-table .box-label{display: inline-block;min-width: 90%;color: #FFF;border: 1px solid #999999;border-radius: 5px;background-color: #999999;text-align: center;}
+
+		.way-table .box-label.product     {background-color: #d8530e;border-color: #d8530e;}
+		.way-table .box-label.cancel      {background-color: #f30b0b;border-color: #f30b0b;}
+		.way-table .box-label.payment     {background-color: #309115;border-color: #309115;}
+		.way-table .box-label.reservation {background-color: #feff00;border-color: #feff00;}
+	</style>
+
+	</body>
+</html>

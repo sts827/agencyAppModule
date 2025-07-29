@@ -1,0 +1,233 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.MainManageMapper">
+    <select id="selectPopupListCount" parameterType="HashMap" resultType="Integer">
+        SELECT COUNT(*) FROM main_notice_popup
+         WHERE delete_yn = 'N'
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(type)">
+                    <if test="type != 'ALL'">
+                    AND notice_type = #{type}
+                    </if>
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+                   <if test="useYn != 'ALL'">
+                       AND use_yn = #{useYn}
+                   </if>
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+               AND title_text LIKE CONCAT('%', #{searchKey}, '%')
+               </if>
+    </select>
+
+    <select id="selectPopupList" parameterType="HashMap" resultType="MainNoticePopup">
+        SELECT id, time_key,
+               notice_type, content_type,
+               image_id_pc, image_url_pc,
+               image_background_pc, image_text_pc, visible_yn_pc,
+               image_id_mobile, image_url_mobile,
+               image_background_mobile, image_text_mobile, visible_yn_mobile,
+               title_text, notice_text,
+               link_url, link_target,
+               one_day_yn, one_week_yn,
+               start_date, expire_date,
+               order_number, use_yn,
+               create_id, create_date, last_update_id, last_update_date
+          FROM main_notice_popup
+         WHERE delete_yn = 'N'
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(type)">
+                    AND notice_type = #{type}
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+                    <if test="useYn != 'ALL'">
+                    AND use_yn = #{useYn}
+                    </if>
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+               AND title_text LIKE CONCAT('%', #{searchKey}, '%')
+               </if>
+         ORDER BY order_number, id DESC
+         <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+    </select>
+
+    <insert id="insertMainAttachImage" parameterType="MainAttachImage" useGeneratedKeys="true" keyProperty="fileId">
+        INSERT INTO main_attach_image
+        (
+            service_type,
+            upload_path, upload_filename,
+            file_extension, file_size, file_mimetype,
+            origin_filename,
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >
+            	upload_id,
+            </if>
+            upload_date
+        )
+        VALUES (
+            #{serviceType},
+            #{uploadPath}, #{uploadFilename},
+            #{fileExtension}, #{fileSize}, #{fileMimetype},
+            #{originFilename},
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >
+            	#{uploadId},
+            </if>
+            now()
+        )
+    </insert>
+
+    <insert id="insertMainNoticePopup" parameterType="MainNoticePopup">
+        INSERT INTO main_notice_popup
+           SET time_key = #{timeKey},
+               notice_type = #{noticeType},
+               content_type = #{contentType},
+               image_id_pc = #{imageIdPc},
+               image_url_pc = #{imageUrlPc},
+               image_background_pc = #{imageBackgroundPc},
+               image_text_pc = #{imageTextPc},
+               visible_yn_pc = #{visibleYnPc},
+               image_id_mobile = #{imageIdMobile},
+               image_url_mobile = #{imageUrlMobile},
+               image_background_mobile = #{imageBackgroundMobile},
+               image_text_mobile = #{imageTextMobile},
+               visible_yn_mobile = #{visibleYnMobile},
+               title_text = #{titleText},
+               notice_text = #{noticeText},
+               link_url = #{linkUrl},
+               link_target = #{linkTarget},
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(oneDayYn)">
+               one_day_yn = #{oneDayYn},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(oneWeekYn)">
+               one_week_yn = #{oneWeekYn},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+               start_date = #{startDate},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+               expire_date = #{expireDate},
+               </if>
+               order_number = #{orderNumber},
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+               use_yn = #{useYn},
+               </if>
+               create_id = #{createId},
+               create_date = now()
+    </insert>
+
+    <update id="updateMainNoticePopupStatus" parameterType="HashMap">
+        UPDATE main_notice_popup
+           SET last_update_id = #{lastUpdateId}, last_update_date = now()
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(type)">
+                <choose>
+                    <when test="type == 'PC'">
+                        , visible_yn_pc = #{status}
+                        <if test='status == "N"'>
+                        , use_yn = (SELECT visible_yn_mobile FROM main_notice_popup WHERE id = #{id} AND time_key = #{timeKey})
+                        </if>
+                    </when>
+                    <when test="type == 'MOBILE'">
+                        , visible_yn_mobile = #{status}
+                        <if test='status == "N"'>
+                        , use_yn = (SELECT visible_yn_pc FROM main_notice_popup WHERE id = #{id} AND time_key = #{timeKey})
+                        </if>
+                    </when>
+                    <otherwise>
+                        , visible_yn_pc = #{status}
+                        , visible_yn_mobile = #{status}
+                        <if test='status == "N"'>
+                        , use_yn = 'N'
+                        </if>
+                    </otherwise>
+                </choose>
+               </if>
+               <if test='status == "Y"'>, use_yn = 'Y'</if>
+         WHERE id = #{id} AND time_key = #{timeKey}
+    </update>
+
+    <update id="updateMainNoticePopupDelete" parameterType="HashMap">
+        UPDATE main_notice_popup
+           SET delete_yn = 'Y', delete_id = #{deleteId}, delete_date = now()
+         WHERE id = #{id} AND time_key = #{timeKey}
+    </update>
+
+    <select id="selectMainNoticePopup" parameterType="HashMap" resultType="MainNoticePopup">
+        SELECT id, time_key,
+               notice_type, content_type,
+               image_id_pc, image_url_pc,
+               image_background_pc, image_text_pc, visible_yn_pc,
+               image_id_mobile, image_url_mobile,
+               image_background_mobile, image_text_mobile, visible_yn_mobile,
+               title_text, notice_text,
+               link_url, link_target,
+               one_day_yn, one_week_yn,
+               start_date, expire_date,
+               order_number, use_yn,
+               create_id, create_date, last_update_id, last_update_date
+          FROM main_notice_popup
+         WHERE delete_yn = 'N' AND id = #{id} AND time_key = #{timeKey}
+    </select>
+
+    <update id="updateMainNoticePopup" parameterType="MainNoticePopup">
+        UPDATE main_notice_popup
+           SET content_type = #{contentType},
+               <if test="imageIdPc > 0">
+               image_id_pc = #{imageIdPc},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(imageUrlPc)">
+               image_url_pc = #{imageUrlPc},
+               </if>
+               image_background_pc = #{imageBackgroundPc},
+               image_text_pc = #{imageTextPc},
+               visible_yn_pc = #{visibleYnPc},
+               <if test="imageIdMobile > 0">
+               image_id_mobile = #{imageIdMobile},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(imageUrlMobile)">
+               image_url_mobile = #{imageUrlMobile},
+               </if>
+               image_background_mobile = #{imageBackgroundMobile},
+               image_text_mobile = #{imageTextMobile},
+               visible_yn_mobile = #{visibleYnMobile},
+               title_text = #{titleText},
+               notice_text = #{noticeText},
+               link_url = #{linkUrl},
+               link_target = #{linkTarget},
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(oneDayYn)">
+                   one_day_yn = #{oneDayYn},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(oneWeekYn)">
+                   one_week_yn = #{oneWeekYn},
+               </if>
+                <choose>
+                    <when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                        start_date = #{startDate},
+                    </when>
+                    <otherwise>
+                        start_date = null,
+                    </otherwise>
+                </choose>
+                <choose>
+                    <when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+                        expire_date = #{expireDate},
+                    </when>
+                    <otherwise>
+                        expire_date = null,
+                    </otherwise>
+                </choose>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+                   use_yn = #{useYn},
+               </if>
+               last_update_id = #{lastUpdateId},
+               last_update_date = now()
+         WHERE delete_yn = 'N' AND id = #{id} AND time_key = #{timeKey}
+    </update>
+
+    <update id="updateMainNoticePopupOrder" parameterType="HashMap">
+        UPDATE main_notice_popup
+           SET last_update_id = #{lastUpdateId}, last_update_date = now(),
+               order_number = #{orderNumber}
+         WHERE delete_yn = 'N' AND id = #{id}
+
+    </update>
+</mapper>

@@ -1,0 +1,20 @@
+.fc-toolbar, .fc-toolbar.fc-header-toolbar {padding:1rem 0;}
+.fc-toolbar-chunk {display:flex;}
+.fc .fc-toolbar.fc-header-toolbar {margin-bottom:1rem;}
+.fc .fc-button-primary {border:none;color:#666666;background-color: inherit;}
+.fc .fc-button-primary:disabled {border:none;color:#666666;background-color: inherit;}
+.fc .fc-button-primary:hover {border:none;background-color:inherit;}
+.fc .fc-button-primary:focus {box-shadow:none;}
+.fc .fc-button-primary:not(:disabled).fc-button-active,.fc .fc-button-primary:not(:disabled):active {border:none;color:#666666;background-color: inherit;}
+.fc .fc-button-primary:not(:disabled).fc-button-active:focus,.fc .fc-button-primary:not(:disabled):active:focus {box-shadow:none;}
+.fc .fc-button:focus {box-shadow:none;}
+.fc-today-button {background-color:#333333 !important;color:#FFFFFF !important;}
+
+.fc .fc-toolbar-title {line-height: 1.5;}
+
+.fc-theme-standard .fc-scrollgrid {border-top:2px solid #222222;}
+.fc-col-header-cell {height:45px;background-color: #EDEEF3;color:#222222;line-height:45px;}
+.fc-col-header-cell a {color:inherit;}
+.fc .fc-daygrid-day-top {flex-direction: row;}
+.fc .fc-daygrid-day-top a {color:inherit;}
+.fc .fc-daygrid-day.fc-day-today {background-color: #ECF5FF;}

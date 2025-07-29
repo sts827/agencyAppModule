@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0">게시글 <th:block th:text="${mode eq 'I' ? '등록' : '수정'}"></th:block></h1>
+	    </div>
+		<div class="manage-content mb-10">
+			<form id="saveForm" name="saveForm" enctype="multipart/form-data">
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+				<input type="hidden" name="params" id="params" />
+				<input type="hidden" name="mode" id="mode" th:value="${mode}" />
+				<input type="hidden" name="id" id="id" th:value="${board.id}" />
+				<input type="hidden" name="contentId" id="contentId" th:value="${board.id}" />
+
+				<h3 class="title">게시글 <th:block th:text="${mode eq 'I' ? '등록' : '수정'}"></th:block></h3>
+				<div class="container-fluid p-0">
+					<div class="row form-group ">
+						<label class="col-md-2 req" for="company-name">게시판</label>
+                        <select id="boardId" name="boardId" class="form-control col-md-10"
+								onchange="boardSeleted(this)">
+							<option value="">선택</option>
+<th:block th:each="list : ${listBoard}" >
+							<option th:value="${list.id}"  th:text="${list.title}"
+									th:attachFileSize="${list.attachFileSize}"
+									th:selected="${board.boardId eq list.id} ? 'selected'"
+									th:data-fixYn="${list.fixYn}"
+									th:data-secretYn="${list.secretYn}" ></option>
+</th:block>
+                    	</select>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2" for="createDate">등록일</label>
+						<input type="text" class="form-control  col-md-10 date-single-time-picker" id="createDate" name="createDate" placeholder="등록일 미 입력시 현재날짜로 등록됩니다."  th:value="${board.createDate}">
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2 req" for="title">제목</label>
+						<input type="text" name="title" class="form-control col-md-7 col-xs-12" placeholder="글 제목을 입력" th:value="${board.title}" />
+						<div class="col-md-3 form-inline">
+							<label class="col-5 req" for="useYn">사용여부</label>
+							<div class="col-7">
+								<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="success" data-on="사용" data-off="미사용" data-width="100%" th:checked="${board.useYn eq 'Y'} ? 'checked' : ${board.useYn eq null ? 'checked' : ''}">
+							</div>
+						</div>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2 req" for="content">내용</label>
+						<div class="col-md-10 p-0">
+							<textarea class="form-control col-md-10 ckeditor" rows="10" id="content" name="content" th:text="${board.content}"></textarea>
+						</div>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2" for="secretYn">비밀글</label>
+						<div class="col-md-4">
+							<input type="checkbox" id="secretYn" name="secretYn" data-toggle="toggle" data-onstyle="success" data-on="사용" data-off="미사용" data-width="100%" th:checked="${board.secretYn eq 'Y'} ? 'checked'">
+						</div>
+						<label class="col-md-2" for="deleteYn">고정글</label>
+						<div class="col-md-4">
+							<input type="checkbox" id="fixYn" name="fixYn" data-toggle="toggle" data-onstyle="success" data-on="사용" data-off="미사용" data-width="100%" th:checked="${board.fixYn eq 'Y'} ? 'checked'">
+						</div>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2" for="deleteYn">파일첨부</label>
+						<div class="col-10">
+							<div class="row" id="attach-file-list">
+								<div class="board_photo add" style="" onClick="uploadFile('attach');">
+									<button type="button" class="btn"><i class="way-nav-icon wi-photo"></i></button>
+								</div>
+								<input type="file" id="attach" name="attach" style="display: none;" onchange="addFile(this);" multiple />
+							</div>
+						</div>
+					</div>
+<!--/*
+					<div class="row form-group ">
+						<label class="col-md-2" for="deleteYn">파일첨부</label>
+						<div class="col-10">
+							<div class="row">
+								<div class="btn-group">
+									<button type="button" onClick="uploadFile('attach');"  class="fileUpload btn btn-primary"><span><i class="fa fa-plus"></i>&nbsp;첨부파일 추가</span></button>
+									<button type="button" class="fileUpload btn btn-danger" onclick="removeFiles()"><span><i class="fa fa-minus"></i>&nbsp;전체삭제</span></button>
+									<input type="file" id="attach" name="attach" style="display: none;" onchange="addFile(this);" multiple />
+								</div>
+							</div>
+							<div class="row">
+								<ul id="attach-file-list"></ul>
+								<div id="attach-hidden-files"></div>
+							</div>
+						</div>
+					</div>
+*/-->
+				</div>
+			</form>
+		</div>
+		<div class="col-md-12 clearfix">
+			<div class="text-center">
+				<button type="button" class="btn btn-black"   onclick="preList()">취소하기</button>
+				<button type="button" class="btn btn-primary" onclick="save()">저장하기</button>
+				<button type="button" class="btn btn-danger"  onclick="goDelete()" th:if="${mode eq 'U'}">삭제하기</button>
+			</div>
+		</div>
+	    <!-- /.content -->
+	</div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashboard.js"></script>
+	-->.
+	<script type="text/javascript" th:inline="javascript">
+	var attchFileSize;
+	let editor;
+
+	$(document).ready(function() {
+		$('#boardId').trigger('change');
+
+// 		console.log([[${board.boardId}]]);
+// 		console.log();
+		initAttachFileSize();
+
+		if($("#mode").val() !== 'I') initAttachFileList();
+
+		fnMakeCkeditor($('#content')[0],  false).then(
+			makedEditor => {
+				editor = makedEditor;
+			});
+	});
+
+	$(window).on('load', function(){
+		initUploadFile('photo');
+	});
+
+	function initAttachFileSize(){
+		var data = [[${listBoard}]];
+		var boardId = [[${board.boardId}]];
+
+		if(data != null){
+			//console.log(data[0]);
+			for(var idx in data){
+				if( data[idx].id == boardId ){
+// 					console.log( data[idx].attachFileSize );
+					attchFileSize = data[idx].attachFileSize;
+
+					break;
+				}
+			}
+		}
+	}
+
+	function save() {
+		var form = document.saveForm;
+		var nowac = "";
+		if($.trim(form.boardId.value) == "") {
+			alert("게시판을 선택 해 주세요.");
+			form.boardId.focus();
+		} else if($.trim(form.title.value) == "") {
+			alert("글제목을 입력해 주세요.");
+			form.title.focus();
+		}else {
+
+
+// 			var contents = eval("CKEDITOR.instances.bbsNttCm.getData()");
+// 			$("#bbsNttCm").val(contents);
+			var url = "/manage/board/contents-save";
+
+			if($("#mode").val() == 'R'){
+				nowac = "저장";
+			}else if($("#mode").val() == 'I'){
+				nowac = "등록";
+			}
+			if(confirm(nowac+"하시겠습니까?")) {
+				$("#content").text(editor.getData());
+
+				var formData = new FormData($('#saveForm')[0]);
+
+				 $('input[data-toggle="toggle"]').each(function(i,e){
+				    formData.set( $(e).attr('name'), $(e).is(':checked') ? 'Y' : 'N');
+				});
+
+				if( typeof(filesArr) !== 'undefined' ){
+					for (var i = 0; i < filesArr.length; i++) {
+				        // 삭제되지 않은 파일만 폼데이터에 담기
+				        if (!filesArr[i].isDelete) {
+				        	formData.append("attachs", filesArr[i]);
+
+				        } else {
+				        	formData.append("deletes", filesArr[i].fileId);
+				        }
+
+				        if(filesArr[i].isThumnail){
+				        	if(filesArr[i].uploadFilename !== undefined){
+				        		formData.append("thumnail", filesArr[i].uploadFilename);
+				        	} else {
+				        		formData.append("thumnail", filesArr[i]);
+				        	}
+				        }
+				    }
+				}
+				$.ajax({
+		            url: url,
+		            type : 'POST',
+		            enctype: 'multipart/form-data',
+					contentType : false,
+					processData : false,
+		            data : formData,
+		            dataType: 'JSON',
+		            success : function(data) {
+		                if (typeof data.result != "undefined" && data.result == "error") {
+		                    alert(data.message);
+		                    return;
+		                } else {
+		                    alert(data.message);
+		                    preList();
+		                }
+		            },
+		            error : function(xhr, code, errorMsg) { },
+		            beforeSend : function() { },
+		            complete : function() { }
+		        });
+			}
+		}
+	}
+
+	function preList(){
+		location.href = "/manage/board/contents/list?params="+parmas;
+	}
+
+	function initAttachFileList(){
+		var html = '';
+
+		var thumnail = [[${board.thumbnailUrl}]];
+
+		console.log(`thumnail : ${thumnail}`);
+
+		$.ajax({
+			url : '/manage/board/contents-attchlist',
+			type : "GET",
+			data : {"id" : [[${board.id}]]},
+			dataType : "json",
+			success : function(res) {
+				if ("success" == res.result) {
+// 					console.log(res);
+// 					showAttachFileList('attach', res.listAttach);
+
+					var files = res.listAttach;
+
+					if(files !== null){
+						for(let i=0; i<files.length; i++){
+							var file = files[i];
+							console.log(file );
+							var _thumnailUrl = `/upload/images/${file.uploadFilename}`;
+
+							filesArr.push(file);
+							filesArr[i].isDelete = false;
+
+							//console.log(thumnail === _thumnailUrl );
+							if(thumnail === _thumnailUrl ){
+								filesArr[i].isThumnail = true;
+							} else {
+								filesArr[i].isThumnail = false;
+							}
+// 							console.log(file);
+							let htmlData = '';
+/*
+				            htmlData += '<div id="file' + i + '" class="filebox mt-10">';
+				            if(filesArr[i].is_thumnail){
+				            	htmlData += '   <button type="button" class="btn btn-danger thumnail" onclick="setThumnail(' + i + ');">썸네일</button>';
+				            } else {
+				            	htmlData += '   <button type="button" class="btn btn-primary thumnail" onclick="setThumnail(' + i + ');">썸네일 지정</button>';
+				            }
+				            htmlData += '   <span class="no">' + (i+1) + '.</span>';
+				            htmlData += '   <span class="name">' + file.origin_filename + '</span>';
+				            htmlData += '   <span class="size"> (' + formatFileSize(file.file_size) + ')</span>';
+				            htmlData += '   <a class="delete" onclick="deleteFile(' + i + ');"><i class="far fa-minus-square"></i></a>';
+				            htmlData += `   <div><img src="${_thumnailUrl}"></div>`;
+				            htmlData += '</div>';
+				            $('#attach-file-list').append(htmlData);
+*/
+				            htmlData += `<div class="board_photo" id="file${i}">`;
+							htmlData += `<div><img src="${_thumnailUrl}"></div>`;
+							htmlData += `<button type="button" class="board_btn thumnail ${filesArr[i].isThumnail ? 'check' : ''} p-0" onclick="setThumnail('${i}');"><i class="way-nav-icon"></i></button>`;
+							htmlData += `<button type="button" class="board_btn delete p-0" onclick="deleteFile('${i}');"><i class="way-nav-icon wi-delete"></i></button>`;
+							htmlData += `</div>`;
+							$('#attach-file-list').prepend(htmlData);
+						}
+
+						fileNo = files.length;
+					}
+				}else {
+					alert(res.message);
+				}
+			}
+		});
+	}
+
+	function delFileRow(target) {
+		var tTarget = $(target).parent().parent()[0];
+		var pTarget = $(target).parent()[0];
+		var pStatus = $(tTarget).children("input[name=acthFileIemStatus]");
+		var aTag = $(tTarget).children("A")[0];
+		var btnD = $(pTarget).children("#btnDel");
+		var btnC = $(pTarget).children("#btnCancel");
+		var status = pStatus.val();
+
+// 		console.log(status);
+// 		console.log(aTag);
+		if(status == ""){
+			btnD.hide();
+			btnC.show();
+			pStatus.val('Del');
+			$(aTag).removeClass('addActhFileIem');
+		} else {
+			btnD.show();
+			btnC.hide();
+			pStatus.val('');
+			$(aTag).addClass('addActhFileIem');
+		}
+// 		console.log(aTag);
+	}
+
+
+	function delFileRow2(target) {
+		var tTarget = $(target).parent().parent().parent();
+// 		console.log(tTarget);
+		var pStatus = $("input[name=acthFileIemStatus]",tTarget);
+		var btnD = $("#btnDel", tTarget);
+		var btnC = $("#btnCancel", tTarget);
+		var td = $("td:eq(0)", tTarget);
+		var status = pStatus.val();
+
+		if(status == ""){
+			btnD.hide();
+			btnC.show();
+			pStatus.val('Del');
+			td.text('삭제예정');
+// 			$(aTag).removeClass('addActhFileIem');
+		} else {
+			btnD.show();
+			btnC.hide();
+			pStatus.val('');
+			td.text('등록됨');
+// 			$(aTag).addClass('addActhFileIem');
+		}
+// 		console.log(aTag);
+	}
+
+	function addCancel(line) {
+		$(line).parent().parent().remove();
+	}
+
+	function boardSeleted(obj){
+		console.log(obj);
+
+		console.log( $($(this), 'option:selected') );
+
+		let opt = $('#boardId option:selected');
+
+		if(opt !== 'undefined'){
+			$(opt).each(function() {
+				$.each(this.attributes, function() {
+					if(this.specified) {
+			 			console.log(this.name, this.value);
+			 			if(this.value == 'Y'){
+							 $(`#${this.name}`).show();
+						 } else {
+							 $(`#${this.name}`).hide();
+						}
+			 		}
+				});
+			});
+		}
+
+// 		if($('#bbsId option:selected').attr('bbscategoryuseat') == 'Y'){
+// 			initAttachFileSize();
+// 			$.ajax({
+// 				url : '/mngr/bbsNttCtgr/list.json',
+// 				type : "POST",
+// 				data : {"bbsId" : $('#bbsId option:selected').val(), pagingYn:false},
+// 				dataType : "json",
+// 				success : function(res) {
+// 					if ("success" == res.result) {
+// 						/*사용 노선 Upload*/
+// 						$("#bbsNttCtgrId").empty();
+// 						if(res.data.length == 0) {
+// 							$("#bbsNttCtgrId").append("<option value=\"\">등록된 카테고리가 없습니다.</option>");
+// 						}else {
+// 							$("#bbsNttCtgrId").append("<option value=\"\">카테고리 선택 선택</option>");
+// 							for(idx in res.data) {
+// 								var data = res.data[idx];
+// 								$("#bbsNttCtgrId").append(`<option value="${data.bbsNttCtgrId}" fileUploadSize="${data.attachFileSize}">${data.bbsNttCtgrName}</option>`);
+// 							}
+// 							$('tr#bbsNttCtgrList').show();
+// 						}
+// 					}else {
+// 						alert(res.message);
+// 					}
+// 				}
+// 			});
+// 		}
+	}
+
+	removeFiles = function() {
+// 		$("#attach").val('');
+// 		$("#attach-file-list").children().remove();
+
+		for(var i=0; i<fileNo; i++){
+			deleteFile(i);
+		}
+	}
+	</script>
+	<style>
+	    #attach-file-list .filebox img {
+		    width: 70%;
+		    height: auto;
+		}
+
+		.ck-editor__editable { height: 400px; }
+
+		.board_photo{position: relative;width: 150px;height: 150px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 5px;}
+		.board_photo img{width: 100%; height: 100%;}
+		.board_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+
+		.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+		.board_btn.thumnail {top: 5px;left: 5px;}
+		.board_btn.thumnail.check {background-color: greenyellow;}
+		.board_btn.delete {top: 5px;right: 5px;}
+	</style>
+	</body>
+</html>

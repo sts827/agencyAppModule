@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	<nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+	<aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	<section class="content-wrapper">
+		<form id="notice-popup-form">
+		<input type="hidden" name="id" th:value="${popup != null} ? ${popup.id}" />
+		<input type="hidden" name="timeKey" th:value="${popup != null} ? ${popup.timeKey}" />
+		<input type="hidden" name="noticeType" value="notice-bar" />
+		<div class="content-header">
+			<h1 class="m-0">팝업등록</h1>
+		</div>
+		<div class="manage-content filter">
+			<div class="row form-inline">
+				<div class="input-area-half">
+					<label class="input-label">팝업유형*</label>
+					<select class="form-control inline-one" id="visible-code" name="visibleCode">
+						<option value="ALL" th:selected="${popup != null and popup.visibleYnPc == 'Y' and popup.visibleYnMobile == 'Y'} ? 'selected'">전체</option>
+						<option value="PC" th:selected="${popup != null and popup.visibleYnPc == 'Y' and popup.visibleYnMobile == 'N'} ? 'selected'">PC만</option>
+						<option value="MOBILE" th:selected="${popup != null and popup.visibleYnPc == 'N' and popup.visibleYnMobile == 'Y'} ? 'selected'">모바일만</option>
+					</select>
+				</div>
+			</div>
+			<div>
+				<label class="alt-input-label">팝업유형(PC, 모바일, 전체)을 선택해주세요.</label>
+			</div>
+		</div>
+		<div class="manage-content no-pd mt-4 notice-pc">
+			<div class="input-box">
+				<div class="content-header mb-3">
+					<label class="alt-input-title">PC</label>
+					<label class="alt-input-label">이미지 추천 사이즈: 800px~1200px * 80px</label>
+				</div>
+				<div class="notice-bar-preview">
+					<div id="notice-bar-preview-pc" class="notice-bar-area">
+						<img id="preview-img-pc" class="image-field" th:src="${popup != null} ? @{/upload/{url}(url=${popup.imageUrlPc})}"/>
+					</div>
+					<div class="notice-bar-preview-control">
+						<div class="item one-now">닫기</div>
+						<div class="item one-day" style="display:none;">오늘 하루 닫기</div>
+						<div class="item one-week">일주일간 닫기</div>
+					</div>
+				</div>
+			</div>
+			<div class="input-box">
+				<div class="row mb-3 form-inline image-field">
+					<div class="input-area-half">
+						<label class="input-label">이미지*</label>
+						<input type="file" class="form-control inline-one" id="image-pc" name="image_pc" accept="image/*" />
+					</div>
+					<div class="input-area-half">
+						<label class="input-label">배경색*</label>
+						<input type="color" class="form-control" id="color-code-pc" data-target-id="color-text-pc" name="imageBackgroundPc" value="#FFFFFF" th:value="${popup != null} ? ${popup.imageBackgroundPc}" />
+						<input type="text" class="form-control with-input-color" data-target-id="color-code-pc" id="color-text-pc" maxlength="9" value="#FFFFFF" th:value="${popup != null} ? ${popup.imageBackgroundPc}" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-content no-pd mt-4 notice-mobile">
+			<div class="input-box">
+				<div class="content-header mb-3">
+					<label class="alt-input-title">Mobile</label>
+					<label class="alt-input-label">이미지 추천 사이즈: 767px * 120px</label>
+				</div>
+				<div class="notice-bar-preview mobile">
+					<div id="notice-bar-preview-mobile" class="notice-bar-area">
+						<img id="preview-img-mobile" class="image-field" th:src="${popup != null} ? @{/upload/{url}(url=${popup.imageUrlMobile})}"/>
+					</div>
+					<div class="notice-bar-preview-control">
+						<div class="item one-now">닫기</div>
+						<div class="item one-day" style="display:none;">오늘 하루 닫기</div>
+						<div class="item one-week">일주일간 닫기</div>
+					</div>
+				</div>
+			</div>
+			<div class="input-box">
+				<div class="row mb-3 form-inline image-field">
+					<div class="input-area-half">
+						<label class="input-label">이미지*</label>
+						<input type="file" class="form-control inline-one" id="image-mobile" name="image_mobile" accept="image/*" />
+					</div>
+					<div class="input-area-half">
+						<label class="input-label">배경색*</label>
+						<input type="color" class="form-control" id="color-code-mobile" data-target-id="color-text-mobile" name="imageBackgroundMobile" value="#FFFFFF" th:value="${popup != null} ? ${popup.imageBackgroundMobile}" />
+						<input type="text" class="form-control with-input-color" data-target-id="color-code-mobile" id="color-text-mobile" maxlength="9" value="#FFFFFF" th:value="${popup != null} ? ${popup.imageBackgroundMobile}" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-content no-pd mt-4">
+			<div class="input-box">
+				<div class="row mb-3 form-inline">
+					<div class="input-area-full">
+						<label class="input-label">팝업명*</label>
+						<input type="text" class="form-control inline-one" id="title" name="titleText" placeholder="팝엄명을 입력해주세요." required="required" th:value="${popup != null} ? ${popup.titleText}" />
+					</div>
+				</div>
+				<div class="row mb-3 form-inline">
+					<div class="input-area-half">
+						<label class="input-label">링크형식*</label>
+						<select class="form-control inline-one" name="linkTarget">
+							<option value="_BLANK" th:selected="${popup != null and popup.linkTarget == '_BLANK'} ? 'selected'">새창</option>
+							<option value="THIS" th:selected="${popup != null and popup.linkTarget == 'THIS'} ? 'selected'">현재창</option>
+						</select>
+					</div>
+				</div>
+				<div class="row mb-3 form-inline">
+					<div class="input-area-full">
+						<label class="input-label">링크 URL</label>
+						<input type="text" class="form-control inline-one" name="linkUrl" placeholder="링크 주소를 입력해주세요." th:value="${popup != null} ? ${popup.linkUrl}" />
+					</div>
+				</div>
+				<div class="row form-inline">
+					<div class="input-area-third">
+						<label class="input-label">시작일</label>
+						<input type="text" class="form-control inline-one date-time" name="startDate" id="start-date" placeholder="노출 시작일시" readonly="readonly" autocomplete="off" th:value="${popup != null} ? ${popup.startDate}" />
+						<div class="input-overlay">
+							<button type="button" class="overlay-button" onclick="fnSetNullDatetime('start-date')"><img src="/images/icon/bell.svg" /></button>
+						</div>
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">종료일</label>
+						<input type="text" class="form-control inline-one date-time" name="expireDate" id="expire-date" placeholder="노출 종료일시" readonly="readonly" autocomplete="off" th:value="${popup != null} ? ${popup.expireDate}" />
+						<div class="input-overlay">
+							<button type="button" class="overlay-button" onclick="fnSetNullDatetime('expire-date')"><img src="/images/icon/bell.svg" /></button>
+						</div>
+					</div>
+				</div>
+				<div class="mb-3">
+					<label class="alt-input-label">시작일, 종료일 미지정시 상시 노출됩니다.</label>
+				</div>
+				<div class="row mb-3 form-inline">
+					<div class="row input-area-half m-0">
+						<div class="input-area-third">
+							<label class="input-label">노출여부</label>
+							<input class="form-control" type="checkbox" id="use-yn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${popup != null and popup.useYn == 'Y'} ? 'checked'" />
+						</div>
+						<div class="input-area-third">
+							<label class="input-label tri-second">하루동안</label>
+							<input class="form-control" type="checkbox" id="one-day-yn" name="oneDayYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${popup != null and popup.oneDayYn == 'Y'} ? 'checked'" />
+						</div>
+						<div class="input-area-third">
+							<label class="input-label tri-third">일주일간</label>
+							<input class="form-control" type="checkbox" id="one-week-yn" name="oneWeekYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${popup == null} or ${popup != null and popup.oneWeekYn == 'Y'} ? 'checked'" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-control">
+			<button type="button" class="btn btn-dark" onclick="history.back()">취소하기</button>
+			<button type="button" class="btn btn-primary" th:onclick="${popup != null} ? 'fnUpdateNoticeBarPopup()' : 'fnSaveNoticeBarPopup()'">저장하기</button>
+		</div>
+		</form>
+	</section>
+	<footer th:replace="~{/manage/inc/manage-footer-include :: footer}" />
+	<aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+	$(document).ready(function(){
+		$('#visible-code').change(function(e){
+			switch ($('#visible-code').val()){
+				case 'PC':
+					$('.notice-mobile').hide();
+					$('.notice-pc').show();
+					break;
+				case 'MOBILE':
+					$('.notice-pc').hide();
+					$('.notice-mobile').show();
+					break;
+				case 'ALL': default:
+					$('.notice-mobile').show();
+					$('.notice-pc').show();
+					break;
+			}
+		});
+
+		$('#color-code-pc, #color-text-pc').change(function(e){
+			let item = $(e.target);
+			if(formValidCheck(item, 'input', 'is-invalid', 'hex-color')){
+				$('#'+$(item).attr('data-target-id')).val($(item).val());
+				$('#notice-bar-preview-pc').css('background-color', $(item).val());
+			}
+		});
+
+		$('#image-pc').change(function(e){
+			let files = e.target.files;
+			if(files.length > 0) {
+				for (let i = 0; i < files.length; i++) {
+					if (!files[i].type.startsWith("image/")) continue;
+					const img = document.getElementById("preview-img-pc");
+					img.file = files[i];
+					img.classList.add('image-field');
+
+					const reader = new FileReader();
+					reader.onload = (el) => {
+						img.src = el.target.result;
+					};
+					reader.readAsDataURL(files[i]);
+				}
+			}
+		});
+
+		$('#color-code-mobile, #color-text-mobile').change(function(e){
+			let item = $(e.target);
+			if(formValidCheck(item, 'input', 'is-invalid', 'hex-color')){
+				$('#'+$(item).attr('data-target-id')).val($(item).val());
+				$('#notice-bar-preview-mobile').css('background-color', $(item).val());
+			}
+		});
+
+		$('#image-mobile').change(function(e){
+			let files = e.target.files;
+			if(files.length > 0) {
+				for (let i = 0; i < files.length; i++) {
+					if (!files[i].type.startsWith("image/")) continue;
+					const img = document.getElementById("preview-img-mobile");
+					img.file = files[i];
+					img.classList.add('image-field');
+
+					const reader = new FileReader();
+					reader.onload = (el) => {
+						img.src = el.target.result;
+					};
+					reader.readAsDataURL(files[i]);
+				}
+			}
+		});
+
+		$('#one-day-yn').change(function(e){
+			if($(e.target).prop('checked')){
+				$('.one-day').show();
+			}else{
+				$('.one-day').hide();
+			}
+		});
+		$('#one-week-yn').change(function(e){
+			if($(e.target).prop('checked')){
+				$('.one-week').show();
+			}else{
+				$('.one-week').hide();
+			}
+		});
+
+		$('.date-time').daterangepicker({
+			minDate:moment().add(-1, 'hour'),
+			autoUpdateInput: true,
+			singleDatePicker:true,
+			showDropdowns: true,
+			showCustomRangeLabel:false,
+			timePicker: true,
+			timePicker24Hour: true,
+			timePickerMinutes:true,
+			drops:"auto",
+			locale: {
+				format: 'YYYY-MM-DD HH:mm:ss',
+				applyLabel: "적용",
+				cancelLabel: "취소",
+				daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+				monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+				separator:separator
+			}
+		}, function(start, end, label){});
+		let item = [[${popup}]];
+		if(item == null){
+			$('#start-date').val('');
+			$('#expire-date').val('');
+		}else{
+			$('#start-date').val(item.startDate);
+			$('#expire-date').val(item.expireDate);
+		}
+	});
+
+	fnSetNullDatetime = function(target){
+		$('#'+target).val('');
+	}
+
+	fnSaveNoticeBarPopup = function(){
+		let form = document.getElementById('notice-popup-form');
+		if(!formValidCheck($('#title'), 'input', 'is-invalid', 'text')) return;
+		if($('#color-code-pc') != null && !formValidCheck($('#color-code-pc'), 'input', 'is-invalid', 'text')) return;
+		if($('#color-code-mobile') != null && !formValidCheck($('#color-code-mobile'), 'input', 'is-invalid', 'text')) return;
+		switch ($('#visible-code').val()){
+			case 'PC':
+				if(!formValidCheck($('#image-pc'), 'input', 'is-invalid', 'text')) return;
+				break;
+			case 'MOBILE':
+				if(!formValidCheck($('#image-mobile'), 'input', 'is-invalid', 'text')) return;
+				break;
+			case 'ALL': default:
+				if(!formValidCheck($('#image-pc'), 'input', 'is-invalid', 'text')) return;
+				if(!formValidCheck($('#image-mobile'), 'input', 'is-invalid', 'text')) return;
+				break;
+		}
+
+		$.ajax({
+			url : "/manage/main/popup/add",
+			type : "POST",
+			enctype: 'multipart/form-data',
+			contentType : false,
+			processData : false,
+			data :  new FormData($(form)[0]),
+			dataType : "json",
+			success : function(data){
+				if( data.result === "success" ){
+					alert(data.message);
+					location.replace('/manage/main/popup/list?type=notice-bar');
+				}else{
+					alert(data.message);
+					console.log(data);
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		})
+	}
+
+	fnUpdateNoticeBarPopup = function(){
+		let form = document.getElementById('notice-popup-form');
+		if(!formValidCheck($('#title'), 'input', 'is-invalid', 'text')) return;
+
+		$.ajax({
+			url : "/manage/main/popup/update",
+			type : "PUT",
+			enctype: 'multipart/form-data',
+			contentType : false,
+			processData : false,
+			data :  new FormData($(form)[0]),
+			dataType : "json",
+			success : function(data){
+				if( data.result === "success" ){
+					alert(data.message);
+					location.replace('/manage/main/popup/list?type=notice-bar');
+				}else{
+					alert(data.message);
+					console.log(data);
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		})
+	}
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

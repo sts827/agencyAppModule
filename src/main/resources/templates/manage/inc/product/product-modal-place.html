@@ -1,0 +1,164 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<!--연결 장소 선택 모달-->
+	<div th:fragment="product-modal-place(strClass, strDataId)" th:class="${strClass}" th:id="${strDataId}">
+	    <div class="connect-place-select-modal-inner-box">
+	        <div class="schedule-add-modal-top" style="">
+	            <p class="schedule-add-modal-top-text">연결 장소 선택</p>
+	            <button type="button" onclick="closeConnectPlaceModal()"><img src="/images/icon/x-black-17x17.svg" style="width: 17px; height: 17px;" alt=""></button>
+	        </div>
+	        <div class="connect-place-select-modal-scroll-box">
+	            <div id="scheduleAddModalScrollInnerBox" class="connect-place-select-modal-scroll-inner-box">
+	                <form id="search-form" style="padding-right: 17px;">
+	                    <label class="region-type-select">
+	                        <span class="schedule-p-text">지역구분</span>
+	                        <select id="region-type-select" style="margin-left: 18px;" disabled>
+	                            <option value="samePrice">제주 동부</option>
+	                            <option value="samePrice">제주 서부</option>
+	                            <option value="samePrice">제주 남부</option>
+	                            <option value="samePrice">제주 북부</option>
+	                        </select>
+	                    </label>
+	                    <label class="region-type-select">
+	                        <span class="schedule-p-text">장소구분</span>
+	                        <select id="place-type-select" style="margin-left: 18px;" disabled>
+	                            <option value="samePrice">관광지</option>
+	                        </select>
+	                    </label>
+	                    <div class="place-search-box">
+	                        <p class="place-search-name">장소명</p>
+	                        <input type="text" class="place-search-name-input">
+	                        <button type="button" class="place-search-btn" onclick="searchTourPlace()">조회</button>
+	                    </div>
+	                    <hr class="place-hr">
+	                    <div id="place-item-list">
+	                        <!--스크립트에서 처리-->
+	                    </div>
+	                    <div id="place-item-list-paging" class="pagination-box"></div>
+	                </form>
+	            </div>
+	        </div>
+
+	        <div class="place-choose-btn-box">
+	            <button type="button" class="place-choose-btn" onclick="selectConnectPlace()">선택</button>
+	            <button type="button" class="place-choose-close-btn" onclick="closeConnectPlaceModal()">닫기</button>
+	        </div>
+	    </div>
+	    <script th:inline="javascript">
+			function searchTourPlace() {
+				$('#place-item-list-paging').pagination({
+					dataSource: function(done) {
+						const searchWord = document.querySelector('.connect-place-select-modal-box').querySelector('.place-search-name-input').value;
+						$.ajax({
+							url: '/manage/place/spot-list',
+							type: 'POST',
+							data: { titleLike : searchWord},
+							beforeSend: function (xhr) {
+								xhr.setRequestHeader(
+									[[${_csrf.headerName}]], [[${_csrf.token}]]
+								);
+							},
+							success: function(data) {
+								done(data.data); // 데이터와 총 개수 전달
+							}
+						})
+					}
+					, totalNumberLocator: function(response) {
+						return response;
+					}
+					, pageSize : 5
+					, showPrevious: true
+					, showNext: true
+					, locator: 'lists'
+					, alias: {
+						pageNumber: 'startPage'
+						, pageSize : 'boardPerPage'
+					}
+					, callback: function (data) {
+						document.querySelector('#place-item-list').innerHTML = "";
+						//검색결과 item에 생성
+						for ( const item of data ) {
+							document.querySelector('#place-item-list').insertAdjacentHTML('afterbegin',
+								`
+							<div class="place-item-box">
+								<p class="place-item-name">${item.tsTitle}</p>
+								<p class="place-item-address">${item.tsRoad}</p>
+								<input id="place-item-id" type="hidden" value="${item.tsId}">
+							</div>
+							`)
+						}
+						//검색결과 모든 item에 active 효과
+						document.querySelectorAll('.place-item-box').forEach((div) => {
+							div.addEventListener('click', () => {
+								document.querySelectorAll('.place-item-box').forEach((item) => {
+									item.classList.remove('active');
+								});
+								div.classList.add('active');
+							});
+						});
+					}
+				})
+			}
+
+			function showConnectPlaceModal(e) {
+				detailSchedulePlaceParents = e.closest('.detail-schedule-item-box')
+				$('#place-item-list-paging').pagination({
+					dataSource: function(done) {
+						$.ajax({
+							url: '/manage/place/spot-list',
+							type: 'POST',
+							data: { titleLike : ""},
+							beforeSend: function (xhr) {
+								xhr.setRequestHeader(
+									[[${_csrf.headerName}]], [[${_csrf.token}]]
+								);
+							},
+							success: function(data) {
+								done(data.data); // 데이터와 총 개수 전달
+							}
+						})
+					}
+					, totalNumberLocator: function(response) {
+						return response;
+					}
+					, pageSize : 5
+					, showPrevious: true
+					, showNext: true
+					, locator: 'lists'
+					, alias: {
+						pageNumber: 'startPage'
+						, pageSize : 'boardPerPage'
+					}
+					, callback: function (data) {
+						document.querySelector('#place-item-list').innerHTML = "";
+						//검색결과 item에 생성
+						for ( const item of data ) {
+							document.querySelector('#place-item-list').insertAdjacentHTML('afterbegin',
+								`
+							<div class="place-item-box">
+								<p class="place-item-name">${item.tsTitle}</p>
+								<p class="place-item-address">${item.tsRoad}</p>
+								<input id="place-item-id" type="hidden" value="${item.tsId}">
+								<input id="place-item-image" type="hidden" value="${item.tsAppend}">
+							</div>
+							`)
+						}
+						//검색결과 모든 item에 active 효과
+						document.querySelectorAll('.place-item-box').forEach((div) => {
+							div.addEventListener('click', () => {
+								document.querySelectorAll('.place-item-box').forEach((item) => {
+									item.classList.remove('active');
+								});
+								div.classList.add('active');
+							});
+						});
+					}
+				})
+
+				document.querySelector('.connect-place-select-modal-box').style.display = "flex";
+			}
+		</script>
+    </div>
+</body>
+</html>

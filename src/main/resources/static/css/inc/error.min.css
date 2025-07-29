@@ -1,0 +1,5 @@
+@charset "UTF-8";
+/*!
+ * Wayplus Error Page StyleSheet
+ */
+.error-code,.error-message{width:100%;text-align:center}.error-code{margin-top:50px;font-size:100px;font-weight:900}.error-message{color:#696969}

@@ -1,0 +1,175 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <div th:fragment="tab-payment(userEmail)" class="tab-content" data-id="payment" style="display: none;">
+		<div class="manage-content mb-10" >
+			<h3 class="title">결제정보</h3>
+			<div class="container-fluid p-0">
+				<div class="row form-group">
+					<label class="control-label form-inline col-2">금액</label>
+					<div class="row form-group col-10 p-0">
+						<div class="row form-group col-12">
+							<div class="col-4">
+								<label class="control-label col-12">총금액</label>
+								<input type="text" id="totalAmount" name="totalAmount" class="form-control col-12 tar" value="0" treadonly>
+							</div>
+							<div class="col-4">
+								<label class="control-label col-12">결제금액</label>
+								<input type="text" id="depsitAmount" name="depsitAmount" class="form-control col-12 tar"value="0" readonly>
+							</div>
+							<div class="col-4">
+								<label class="control-label col-12">잔금</label>
+								<input type="text" id="balanceAmount" name="balanceAmount" class="form-control col-12 tar" value="0" readonly>
+							</div>
+						</div>
+						<div class="row form-group col-12">
+							<label class="control-label col-12">결제내역</label>
+							<table id="datatablePayment" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+
+						<div class="row form-group col-12" >
+							<form id="savePaymentForm" name="savePaymentForm" enctype="multipart/form-data" class="col-12">
+								<input type="hidden" name="userEmail" th:value="${userEmail}">
+
+								<label class="control-label col-12">내역등록</label>
+								<div class="row form-group col-12 dataForm">
+									<div class="col-3">
+										<label class="control-label col-12 req">구분</label>
+										<select id="payDivision" name="payDivision" class="form-control col-12  req" data-name="결제 구분" onclick="changeDivision()">
+											<option>미선택</option>
+											<option value="G">발생비용</option>
+											<option value="D">입금비용</option>
+										</select>
+									</div>
+									<div class="col-4">
+										<label class="control-label col-12 req">일시</label>
+										<input type="text" id="payDate" name="payDate" class="form-control col-12 req date-single-time-picker tac"  data-name="결제 일시">
+									</div>
+
+								</div>
+								<div class="row form-group">
+									<div class="row col-12">
+										<div class="col-3">
+											<label class="control-label col-12 req">방법</label>
+											<input type="text" id="payMethod" name="payMethod" class="form-control col-12 req"  data-name="결제 방법">
+										</div>
+										<div class="col-5">
+											<label class="control-label col-12 req">내용</label>
+											<input type="text" id="payComment" name="payComment" class="form-control col-12 req" data-name="결제 내용" >
+										</div>
+										<div class="col-2">
+											<label class="control-label col-12 req">금액</label>
+											<input type="number" id="payAmount" name="payAmount" class="form-control col-12 req tar"  data-name="결제 금액" min="-999999999"  max="999999999" value="0" >
+										</div>
+										<div class="col-2">
+											<div class="float-right">
+												<button type="button" class="btn btn-black" onclick="savePayment()"><i class="">이력 추가</i></button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" th:inline="javascript">
+			$(document).ready(function() {
+				initDatatablePayment();
+			});
+
+			initDatatablePayment = function(){
+				var baseColumns = [
+					{ "name" : "payDate", "title" : "일시","data" : "pay_date","className" : "dt-head-center dt-body-center",width:'120px'},
+					{ "name" : "amtG",    "title" : "발생비용",
+					  "data" : function (row, type, set) { return numberWithCommas( row["amt_g"] ); },
+					  "className" : "dt-head-center dt-body-right",width:'100px'},
+					{ "name" : "amtD",    "title" : "입금비용",
+					  "data" : function (row, type, set) { return numberWithCommas( row["amt_d"] ); },
+					  "className" : "dt-head-center dt-body-right",width:'100px'},
+					{ "name" : "payComment",   "title" : "내용","data" : "pay_comment","className" : "dt-head-center dt-body-left"},
+					{ "name" : "create_id",   "title" : "작성자","data" : "create_id","className" : "dt-head-center dt-body-center",width:'100px'},
+					{ "name" : "create_date",   "title" : "작성일","data" : "create_date","className" : "dt-head-center dt-body-center",width:'120px'},
+				];
+
+				datatablePayment = $("#datatablePayment").DataTable({
+					"searching" : false
+					,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+					,"paging": true
+					,"bPaginate": true
+					,"responsive": true
+					,"language": lang_kor
+					,"ordering": false
+					,"bLengthChange" : false
+					,"bInfo":false
+					,"ajax" : {
+						"url" : "/manage/user/payment-list-v"
+						,"method" : "post"
+						, "beforeSend": function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						}
+						,"data" : function(d) {
+							//d.userEmail     = [[${userEmail}]];
+						}
+					},"processing": true
+					,"serverSide": true
+					,"order" :
+						[ [0, 'desc'] ]
+					,"createdRow": function(row, data) {
+						  if ( data.deleteYn === "Y" ) {
+							  $(row).css('background-color', '#DC3545');
+						  } else if ( data.secretYn === "Y" ) {
+							  $(row).css('background-color', '#e9e9e9');
+						  }
+					  }
+					,"initComplete": function(settings, json) {}
+					,"columns": baseColumns
+					,"drawCallback": function (settings) {
+				        // Here the response
+				        var dataTotal = settings.json.dataTotal;
+				        console.log(dataTotal);
+
+				        if(dataTotal !== null  ){
+/*
+					        if(dataTotal !== undefined){
+								$('#totalAmount').val(numberWithCommas( dataTotal.amt_g !== null ? dataTotal.amt_g : 0  ));
+								$('#depsitAmount').val(numberWithCommas( dataTotal.amt_d !== null ? dataTotal.amt_d : 0 ));
+								$('#balanceAmount').val(numberWithCommas( dataTotal.amt_g !=== null && dataTotal.amt_d !== null ? dataTotal.amt_g - dataTotal.amt_d : 0));
+							}
+*/
+						}
+				    }
+				});
+			}
+
+		</script>
+		<style>
+		    #attach-file-list .filebox img {
+			    width: 70%;
+			    height: auto;
+			}
+
+			.ck-editor__editable { height: 200px; }
+
+			.board_photo{position: relative;width: 150px;height: 150px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 5px;}
+			.board_photo img{width: 100%; height: 100%;}
+			.board_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+
+			.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+			.board_btn.thumnail {top: 5px;left: 5px;}
+			.board_btn.thumnail.check {background-color: greenyellow;}
+			.board_btn.delete {top: 5px;right: 5px;}
+			.control-label {justify-content: unset !important;}
+
+			.way-table .box-label{display: inline-block;min-width: 90%;color: #FFF;border: 1px solid #999999;border-radius: 5px;background-color: #999999;text-align: center;}
+
+			.way-table .box-label.product     {background-color: #d8530e;border-color: #d8530e;}
+			.way-table .box-label.cancel      {background-color: #f30b0b;border-color: #f30b0b;}
+			.way-table .box-label.payment     {background-color: #309115;border-color: #309115;}
+			.way-table .box-label.reservation {background-color: #feff00;border-color: #feff00;}
+		</style>
+	</div>
+</body>
+</html>

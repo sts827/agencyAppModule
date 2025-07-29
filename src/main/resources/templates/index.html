@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${company != null} ? ${company.siteName}">웨이플러스</title>
+    <meta name="description" content="">
+    <meta property="og:title" content="웨이플러스">
+    <meta property="og:description" content="">
+    <head th:replace="~{inc/common-header :: include}" />
+    <head th:replace="~{inc/header :: header-script}" />
+</head>
+<body>
+<section th:replace="~{inc/header :: layer-popup}" />
+<section th:replace="~{inc/header :: bar-popup}" />
+<header th:replace="~{inc/header :: header-nav}" />
+<section class="wrap">
+GIT PUSH Webhook TEST
+
+
+    <button type="button" onclick="location.href='/user/login'" th:if="${session.login} == null">로그인으로</button>
+    <button type="button" onclick="location.href='/user/logout'" th:if="${session.login} != null">로그아웃</button>
+    <!--리뷰 등록 페이지용 TEST 연구소 공유 후 삭제예정
+    * css 적용 안되어 있음-->
+    <form id="review-write-form">
+        <!--!!비회원 전용!!-->
+        <div th:if="${session.login} == null">
+            개인정보수집동의 내용입니다.
+            <label>
+                <input type="checkbox" id="terms-checkbox" >
+                동의합니다
+            </label>
+        </div>
+        <!--!!비회원 전용!!-->
+        <input type="hidden" name="productTourId" value="0"/>
+        <input type="hidden" name="productTourId" value="0"/>
+        <label>
+            <input type="text" name="title" required/>
+        </label>
+        <textarea id="ck-editor" name="content"></textarea>
+        <div>
+            <span>파일첨부</span>
+            <input type="file" id="attach" name="attach" onchange="putFile(this, 2);" style="width:0;height:0;visibility: hidden;" multiple="multiple" accept=".jpg, .jpeg, .png, .zip"/>
+        </div>
+        <div>
+            <div>
+                <button type="button" onclick="uploadFile('attach');">첨부파일등록</button>
+                <div id="attach-file-list"></div>
+            </div>
+        </div>
+    </form>
+    <button type="button" onclick="fnReviewWrite()">
+        리뷰 저장
+    </button>
+    <!--리뷰 등록 페이지용 TEST 공유 후 삭제예정--->
+
+    <button type="button" class="btn" onclick="fnUsePoint(110)">포인트 테스트</button>
+</section>
+<footer th:replace="~{inc/footer :: footer}" />
+<script th:inline="javascript">
+    let ckEditor;
+    ClassicEditor.create(document.querySelector('#ck-editor'), {
+            toolbar: [],
+            heading: {}
+    })
+    .then(editor => {
+        ckEditor = editor;
+    })
+    .catch(error => {
+        console.error('에디터 초기화 중 오류가 발생했습니다.', error);
+    });
+
+    fnReviewWrite = function() {
+        if ( [[${session.login}]] === null || [[${session.login}]] === undefined ) {//비회원
+            if ( !$('#terms-checkbox').prop('checked') ) {
+                alert("약관에 동의해주세요.")
+                return false;
+            }
+        }
+
+        // const formInputs = document.querySelector('#review-write-form').querySelectorAll('input[required], textarea[required]');//ckeditor 사용 안할시
+        const formInputs = $('#review-write-form input[required], #review-write-form p');
+        formInputs.each(function(index, element) {
+            if (
+                ($(element).prop('tagName') === 'INPUT' && $(element).val().trim() === '') ||
+                ($(element).prop('tagName') === 'P' && $(element).text().trim() === '')
+            ) {
+                alert('빈 칸을 입력해주세요.');
+
+                if ($(element).prop('tagName') === 'INPUT') {
+                    $(element).focus();
+                } else {
+                    $('#review-write-form .ck-content').focus();
+                }
+
+                return false;
+            }
+        });
+
+        $('#ck-editor').text(ckEditor.getData());
+        $.ajax({
+            url : '/board/review-write'
+            , type : 'POST'
+            , enctype: 'multipart/form-data'
+            , contentType : false
+            , processData : false
+            , data : new FormData($('#review-write-form')[0])
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            }
+            , success : function(data) {
+                if (data.result === 'success') {
+                    alert(data.message)
+                    location.reload();
+                } else {
+                    alert(data.error)
+                }
+            }
+            ,error : function(xhr, code, errorMsg) {
+                console.log(xhr, code, errorMsg);
+            }
+        })
+    }
+
+    fnUsePoint = function(point){
+        $.ajax({
+            url : '/user/point/use',
+            type : 'PUT',
+            data : `userEmail=admin&userToken=31c30ccb-83c0-42bb-9ddf-18d26b14d8f6&usedType=test&usedPoint=${point}`,
+            dataType : 'JSON',
+            success : function(data) {
+                console.log(data);
+                if (typeof data.result != "undefined" && data.result === "error") {
+                    alert(data.message);
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        })
+    }
+</script>
+</body>
+</html>

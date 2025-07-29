@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}"/>
+<body class="hold-transition sidebar-mini layout-fixed">
+
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <div class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">코드 관리</h1>
+        </div>
+        <section class="content">
+            <div class="container-fluid">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="card-body">
+							<input type="hidden" id="selectedGroupId" name="selectedGroupId">
+							<table id="datatable" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+						<div class="btn-group float-right">
+							<button type="button" class="btn btn-primary" data-toggle="tooltip" title="등록" onclick="codeItemModal('I')" ><i class="fa fa-plus"></i></button>
+						</div>
+					</div>
+				</div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- popup window -->
+
+	<!-- 코드그룹 -->
+	<div class="modal fade func-modal codeItem-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4>코드 그룹</h4>
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+				</div>
+
+				<div class="modal-body">
+					<input type="hidden" name="selectedGroupId" id="selectedGroupId" value=""/>
+					<form id="formCodeItem" name="formCodeItem" class="form-horizontal form-label-left">
+						<input type="hidden" name="codeItemId" id="codeItemId" value=""/>
+						<input type="hidden" name="codeDepth" id="codeDepth" value=""/>
+						<input type="hidden" name="mode" id="mode" value=""/>
+						<input type="hidden" name="sort" id="sort" value=""/>
+						<div class="form-group" id="upperCodeDiv" style="display: none;">
+							<label class="control-label col-md-12 col-sm-3 col-xs-12">상위코드 <span class="required">*</span></label>
+							<div class="col-md-6 col-sm-6 col-xs-12">
+								<input type="text" name="upperCode" id="upperCode" data-name="상위코드" class="form-control col-md-7 col-xs-12 req" placeholder="상위">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">코드 <span class="required">*</span></label>
+							<div class="col-md-12 col-sm-6 col-xs-12">
+								<input type="text" name="code" id="code" data-name="코드" class="form-control col-md-12 col-xs-12 req" placeholder="코드를 입력">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">코드이름 <span class="required">*</span></label>
+							<div class="col-md-12 col-sm-6 col-xs-12">
+								<input type="text" name="name" id="name" data-name="코드이름" class="form-control col-md-12 col-xs-12 req" placeholder="코드이름을 입력">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">코드약칭</label>
+							<div class="col-md-12 col-sm-6 col-xs-12">
+								<input type="text" name="codeAcronym" id="codeAcronym" data-name="코드약칭" class="form-control col-md-12 col-xs-12"
+									   placeholder="코드약칭을 입력" maxLength="3" pattern="[A-Z0-9]{3}+$">
+								<small>영문 대문자, 숫자만 입력 가능합니다.</small>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">코드설명 </label>
+							<div class="col-md-12 col-sm-6 col-xs-12">
+								<textarea name="codeDesc" id="codeDesc" data-name="코드설명" class="form-control col-md-12 col-xs-12" placeholder="코드설명을 입력"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">사용여부 <span class="required">*</span></label>
+							<div class="col-md-12 col-sm-6 col-xs-12">
+								<select id="useYn" name="useYn" data-name="사용여부가" class="form-control req">
+									<option value="">선택</option>
+									<option value="Y">사용</option>
+									<option value="N">사용안함</option>
+								</select>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" onclick="codeItemSave()">저장</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+    $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- AdminLTE App -->
+<script src="/js/manage/adminlte.js"></script>
+
+<script type="text/javascript" th:inline="javascript">
+	var datatable;
+	var displayed = new Set([]);
+	const __serachColumnIndex = 0;
+
+    $(document).ready(function () {
+		initDatatable();
+    });
+
+    $(window).on('load', function () {
+
+    })
+
+    function initDatatable(){
+		datatable = $("#datatable").DataTable({
+			"searching" : true
+			,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+			,"paging": false
+//			,"responsive": true
+			,"language": lang_kor
+			,"info":     false
+			,"order":false
+			,"ordering": false
+			,"serverSide": false
+			,"deferLoading": 0
+			,"bPaginate": false
+			,"bInfo":false
+			,"bFilter": false
+			,"bLengthChange" : false
+			,"processing": true
+			,"ajax" : {
+				"url" : "/manage/code/item-list"
+				,"method" : "post"
+				,"beforeSend": function (xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); }
+				,"data" : function(d) {
+//					if($("#codeItemSelect").val()!="") {d.codeItemId = $("#codeItemSelect").val(); }
+				},
+		        error:function(request,status,error) {
+		        	if(request.status !=0){
+			        	alert('처리중 시스템 장애입니다');
+			        	console.log("code:"+request.status+"\nerror:"+error);
+		        	}
+		        }
+			}
+//			,"order" : [ [0, 'desc'] ]
+			,"columns": [
+				{"name" : "pid", "title" : "pid", "data" : "pid", "className" : "dt-head-center dt-body-left", visible:false,"width": "4%"},
+				{"name" : "lev", "title" : "Level", "data" : "lev", "className" : "dt-head-center dt-body-left",visible:false,"width": "4%"},
+				{"name" : "idpath", "title" : "path", "data" : "idpath", "className" : "dt-head-center dt-body-left",visible:false,"width": "4%"},
+				{"orderable": false,"data": null,"defaultContent": "","width": "30px",
+                 "createdCell": function (td, cellData, rowData, row, col) {
+ 	                if (rowData.ccnt > 0) {
+ 	                    td.className = td.className + ' details-control';
+						$(td).css('vertical-align','middle');
+
+						if(rowData.lev == 3) {
+							$(td).css('background','none');
+							$(td).css('cursor','inherit')
+						}
+ 	                }
+	            }},
+				{ "name" : "code", "title" : "코드", "data" : "code", "className" : "dt-head-center dt-body-left"},
+	            { "name" : "name", "title" : "이름"
+					,"createdCell": function (td, cellData, rowData, row, col) {
+						if (rowData.lev > 0) {
+							td.className += td.className + ' level-' + rowData.lev;
+						}
+				      },"data" : "name","className" : "dt-head-center dt-body-left details-level","width": "20%"},
+				{ "name" : "upperCode", "title" : "상위코드", "data" : "upperCode", "className" : "dt-head-center dt-body-center","width": "8%"},
+				{ "name" : "codeAcronym", "title" : "약칭", "data" : "codeAcronym", "className" : "dt-head-center dt-body-center","width": "5%"},
+				{ "name" : "useYn", "title" : "사용 여부", "data" : "useYn", "className" : "dt-head-center dt-body-center","width": "5%"},
+/*				{ "name" : "useYn", "title" : "사용 여부",
+					"data" :
+						function (row, type, set) {
+							var html = "";
+							html +=  `<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%" ${row["useYn"] === 'Y' ? 'checked' :''} data-id='${row["code"]}'>`;
+							return html;
+						},
+					"className" : "dt-head-center dt-body-center","width": "8%"},*/
+				{ "render" :
+					function (data, type, row, meta) {
+						var html = "";
+						//console.log(meta.row);
+						html +=  `<button type="button" class="btn btn-primary" onclick="codeItemModal('I','${meta.row}')"><i class="fa fa-plus">추가</i></button>`; //
+						html +=  `<button type="button" class="btn btn-info" onclick="codeItemModal('U','${meta.row}')"><i class="fa fa-pencil-alt">수정</i></button>`;//
+						html +=  `<button type="button" class="btn btn-danger" onclick="codeItemDelete('${meta.row}')"><i class="fa fa-trash-alt">삭제</i></button>`;//
+/*
+						html += "<button type='button' class='btn btn-default' data-toggle='tooltip' title='수정' onclick='codeItemModal(\""+row["id"]+"\", \""+row["groupName"]+"\", \""+ (row["groupDesc"] == null ? '' : row["groupDesc"]) +"\", \""+row["useYn"]+"\")'><i class='fa fa-pencil-square-o'></i></button>&nbsp;";
+						html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제' onclick='codeItemDelete(\""+row["id"]+"\")'><i class='fa fa-trash'></i></button>&nbsp;";
+						if ( row["deleteYn"] === 'Y' ) {
+							  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='복구'  onclick='goRestore(\""+row["id"]+"\")' style='color:#fff;background-color:#007bff;border-color:#007bff;box-shadow:none'>복구</button>";
+						} else  {
+							  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제'  onclick='goDelete(\""+row["id"]+"\")'>삭제</button>";
+						}
+*/
+						return html;
+					},
+					"title":"기능", "className": "dt-head-center dt-body-center", "orderable" : false,"width": "15%"}
+			],
+			fnRowCallback: function(nRow, aData, iDisplayIndex) {
+/*
+				$("td:lt(4)", nRow).mouseover(function() {
+					this.style.cursor = "pointer"
+				});
+				$("td:lt(4)", nRow).mouseout(function() {
+					this.style.cursor = "default"
+				});
+				$("td:lt(3)", nRow).click(function() {
+					$("#selectedGroupId").val(aData["id"]);
+					datatableDetail.ajax.reload();
+				});
+*/
+			 },drawCallback: function( settings ) {
+	//			console.log("drawCallback");
+	// 			console.log('#datatable drawCallback~~!!');
+	// 			console.log('drawCallback~~!!');
+	// 			$('#datatable_processing',$('#datatable').parent()).hide();
+				fnInitBootstrapToggle();
+		    },initComplete: function(settings, json) {
+	// 	    	console.log("initComplete");
+		    	//datatable.columns( __serachColumnIndex ).search('^(0-)$', true, false).draw();
+		    	datatableSearch();
+			}
+		});
+/*
+		.on('init.dt',function(){
+			console.log('datatable init.dt event!!');
+			setTimeout(function(){
+				datatableSearch();
+    		}, 10);
+		});//datatableGroup
+*/
+
+		$('#datatable tbody').on('click', 'tr td.details-control', function () {
+	        var tr = $(this).closest('tr');
+	        var row = datatable.row(tr);
+	        var lev = row.data().lev;
+	        var key = row.data().code+'-';
+	        var ccnt = row.data().ccnt;
+	        //console.log(key, ccnt);
+
+	        if(ccnt > 1 && displayed.has(key) ){
+				var subTree = fnFindTreeFind( key );
+
+				if(subTree !== undefined && subTree.size > 0){
+					subTree.forEach(( _key ) => {
+						console.log(_key);
+						if (displayed.has( _key )) {
+				            displayed.delete( _key );
+
+				            var _tr = fnFindDatatableRowToTr( _key.replace('-','') );
+
+				            if( $(_tr).hasClass('details') )
+								$(_tr).removeClass('details');
+				        }
+					});
+				}
+	        }
+
+	        if (displayed.has(key)) {
+	            displayed.delete(key);
+	            tr.removeClass('details');
+	        } else {
+	            displayed.add(key);
+	            tr.addClass('details');
+	        }
+
+	        datatableSearch();
+	    });
+	}
+
+	datatableSearch = function(){
+        var regex = "^(0-";
+        displayed.forEach(function (value) {
+			//console.log(value);
+
+			var tr = fnFindDatatableRowToTr(value.replace('-',''));
+			if($(tr) !== undefined) $(tr).addClass('details');
+
+            regex = regex + "|" + value;
+        });
+        regex = regex + ")$";
+		//console.log(regex);
+        datatable.columns( [__serachColumnIndex] ).search(regex, true, false).draw();
+	}
+
+	fnFindDatatableRowToTr = function(findStr){
+		var tr;
+		datatable.rows().data().filter(function(v,i){
+		    //console.log(i,v);
+		    if(v.code === findStr){
+		        //console.log(datatable.rows(i).nodes()[0]);
+		        tr = $( datatable.rows(i).nodes()[0] );
+		    }
+		});
+	    return tr;
+	}
+
+	fnFindTreeFind = function(findStr, txt){
+		var tree = new Set([]);
+
+		datatable.rows().data().filter( function ( data, index ) {
+		    if( data.pid == findStr && data.ccnt >= 1 ){
+				var findkey = data.code+'-';
+		        //console.log(txt, findkey, data.ccnt );
+		        tree.add(findkey);
+				var subTree = fnFindTreeFind( findkey, txt+txt );
+
+				if(subTree !== undefined && subTree.size >= 1){
+					//console.log('subTree', subTree);
+					subTree.forEach((v) => {
+						//console.log('subTreeVal',v);
+						tree.add(v);
+					});
+				}
+		    }
+		});
+
+		return tree;
+	}
+
+
+	function countUpperCode(findText){
+		var count = 0;
+			datatable.rows().data().each(function(v,i){
+			  //console.log(i,v.upperCode );
+			    count += v.upperCode == findText ? 1 : 0;
+			})
+		return count + 1;
+	}
+
+	function codeItemModal(mode, rowNo){//코드 항목 모달 오픈
+		$("#formCodeItem #mode").val(mode);
+
+		if(rowNo === undefined){
+			//추가
+			$("#formCodeItem #upperCodeDiv").hide();
+			$("#formCodeItem #upperCode").attr('disabled', true);
+			$("#formCodeItem #code").removeAttr('readOnly').val("");
+			$('#formCodeItem #name').val("");
+			$('#formCodeItem #codeAcronym').val("");
+			$('#formCodeItem #codeDesc').val("");
+			$('#formCodeItem #codeDepth').val(1);
+			$('#formCodeItem #useYn option').eq(0).prop('selected', true);
+			$('#formCodeItem #sort').val( countUpperCode('') );
+
+		} else {
+			var _data = datatable.row(rowNo).data();
+			console.log(_data);
+
+			if(mode == 'I'){
+				//추가
+				$("#formCodeItem #code").removeAttr('readOnly').removeAttr('disabled').val("");
+				$('#formCodeItem #name').val("");
+				$('#formCodeItem #codeAcronym').val("");
+				$('#formCodeItem #codeDesc').val("");
+				$('#formCodeItem #codeDepth').val("");
+				$('#formCodeItem #sort').val( countUpperCode(_data.code) );
+
+				$("#formCodeItem #upperCodeDiv").show();
+				$("#formCodeItem #upperCode").val(_data.code).removeAttr('disabled').attr('readOnly', true);
+			} else if(mode == 'U') {
+				$("#formCodeItem #code").removeAttr('readOnly').attr('disabled', true).val(_data.code);
+				$('#formCodeItem #name').val(_data.name);
+				$('#formCodeItem #codeAcronym').val(_data.codeAcronym);
+				$('#formCodeItem #codeDesc').val(_data.codeDesc);
+				$('#formCodeItem #codeDepth').val(_data.codeDepth);
+				$('#formCodeItem #sort').val( _data.sort );
+				$('#formCodeItem #useYn').val( _data.useYn ).prop('selected',true);
+
+				if(_data.lev == 1 ){
+					$("#formCodeItem #upperCodeDiv").hide();
+					$("#formCodeItem #upperCode").removeAttr('readOnly').attr('disabled', true).val("");
+				} else { //하위 노드
+					$("#formCodeItem #upperCodeDiv").show();
+					$("#formCodeItem #upperCode").val(_data.upperCode).attr('readOnly', true);
+				}
+			}
+		}
+
+		$('.codeItem-modal').modal("show");
+	}
+
+	function codeItemSave(){//코드 분류 등록 및 수정
+
+		if (checkForm ("formCodeItem") && confirm ("저장하시겠습니까?")) {
+			$("#formCodeItem #code").attr('disabled', false);
+			$.ajax({
+				url : "/manage/code/item-save" ,
+				type : "POST" ,
+				data : $("#formCodeItem").serialize(),
+				dataType : "json" ,
+				beforeSend: function (xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+				success : function(res) {
+					if ("success" == res.result) {
+						alert("저장되었습니다.");
+						datatable.ajax.reload(); //데이터 테이블 리로드
+						$('.codeItem-modal').modal("hide");
+					}else if("duplicate" == res.result){
+						alert(res.message);
+					}else {
+						alert(res.message);
+					}
+				},
+	        	error:function(request,status,error) {
+	        		alert('처리중 시스템 장애입니다');
+	        		console.log("code:"+request.status+"\nerror:"+error);
+	        	}
+			});
+		}
+	}
+
+	function codeItemDelete(rowNo){
+		var _data = datatable.row(rowNo).data();
+
+		if(_data.ccnt > 0){
+			alert("하위 노드 제거 후 진행하여주십시오.");
+		} else if (confirm ("삭제 하시겠습니까?")) {
+			$.ajax({
+				url : "/manage/code/item-delete",
+				type : "POST" ,
+				data : {"code" : _data.code} ,
+				dataType : "json" ,
+				beforeSend: function (xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+				success : function(res) {
+					if(res.result == "cntFail"){
+						alert(res.message);
+					}else if(res.result = "success"){
+						alert("삭제 되었습니다.");
+						datatable.ajax.reload();
+					}
+				},
+	        	error:function(request,status,error) {
+	        		alert('처리중 시스템 장애입니다');
+	        		console.log("code:"+request.status+"\nerror:"+error);
+	        	}
+			});
+		}
+	}
+
+	fnInitBootstrapToggle = function () {
+        console.log('fnInitBootstrapToggle');
+        setTimeout(function () {
+            $('#datatable input[data-toggle="toggle"]')
+                .bootstrapToggle()
+                .change(function (e) {
+                    selector = '';
+                    code = '';
+                    useYn = 'Y';
+
+                    $.each(this.attributes, function () {
+                        if (this.name == 'data-id') {
+                            code = this.value;
+                            selector = `input[name=useYn][data-id=${code}]`;
+                            if (!$(selector).prop('checked')) {
+                                useYn = 'N';
+                            }
+                        }
+                    });
+                    //fnMenuUseYnUpdate(menuId, useYn);
+                });
+        }, 200);
+    }
+</script>
+<style>
+	td.details-control {
+	    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAMDSURBVHjarFXdS5NRGH/eufyK2ZZWvqKiyZQQpQ9hNKVIHZLzpq7Ey8SbQhG66R+IPqCuCqKLrsK8kbCMhcOwNdimglZ24WSVHyxzVjqZQ9+P0/Mcz1upE7vwjB/nnOfjt3Oej/NKkHqYEGmIA4h0saahITYQiljr2x2lFHszIgthQeQgDgpSEGQJRByxikgiVARLdSoiy0QcRVR2dHRc8fv9nmg0OqvrukagNclIRzbCNjPFwbiATlWAcPT39z9VFGWD7TJIRzZkK3y2kEriSvmyLJ+LRCIfySmpJZk3Nsiuf+pmLaGLrDnYxLonO9mr7wMsoSY4MdmSD/oeExySJBJAsSoOBoN3HQ5H07KyDI+/PoI3S0M8OGTEpM1I0VR7uA6ull6D3PQ8CAQCHqfTeQPFMxRXI5O2rq6uhvb29k4NNOlO+DYMx4bRH386gv0DXYeZ5AxE1iJw4Ug9FBcWl8VisYnR0dFZSpJJEB5qbW29JEmS6d2SD3wxH2gaUmsqqLoG3roh8NYO8T1mB1TUjf0Yg7f4p+TT1tZ2WdzSbBBml5eXn6SAeqKvQVWRTFdBUdFZVf9kjuRch4QKknu+ebi8oqKCfLMpjmZRtOlWqzWXlFPxKXRQ8LISBFyBLaXgq/fz2ek9y+fPq1/4bLFYrEYDmLfXD8WMTrazsv4OVVN5qtaVjc0ywWsbOrPRTvF4/JfNZsuTM2SYW53nKT01cJrP4y3j3NjYi7xDQU4Bl6PvT9FFmkn05Vo4HJ4gpSvfxeO2GS+VJ8AYioghnZDWjXIjl09PT38gDjIxCFd6enr6sCz05sJmqLJWcSIOdDzRV8nBsy5kdosdWorcVEp6b2/vc9HfSppxh1AoFHe73faSopKyM3k1EF4J49XnttSizvgOqm3VcKvmJsjZMoyMjAxibz9Bjph4LFK33mJykT2YfMgaXrrY8Wd2Voo4/6Ke3Xt/n0UT0e2tl2+03n49Dlm7vTg7nq+FhYV5g4jWez1f//vAZgj9+l4PrLTfn4DfAgwAXP8AAdHdgRsAAAAASUVORK5CYII=') no-repeat 8px 6px;
+	    cursor: pointer;
+	    background-origin:content-box;
+	}
+	tr.details td.details-control {
+	    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAALbSURBVHjarFVNTFNBEJ4tFVuw0gaj1Jhe5OdgJV5Iaw+CGAMKIdET4Sgh4SIHDcYLN07oiZOGqyFcjOECISEhwRpoGxLExAMVAi9NadIgWNLW8t7bdWa7L0Ap6oFtvsy+3Zlvd2ZnpnYoP2yICsQFRKWa0zARhwhdzXmpob3km6k1J8KFuIyoVqSgyLKIDOIAkUcYCFHuVkTmQFxF3BoYGHgWDodnk8mkxjk3CTSnNdojHaXrULanyOhW1xGB6enpD7quH4ozBu2RDukqmxOkTLlU5/V6721sbHwjI57Pi9z8vNgdHhY7PT0i1d0tdl+8FNmZGcGzWUlMumSDttcUB2PqAShWvuXl5bFAINDB9/chMzEBuYWF4rGMgsSACQECTRyhENQMDkJFbS0sLS3NhkKh16i1TXG1XtIzNDT0oL+//zmYJtt7Mwa5xc+Al0AmDlwKJKMfrunaNhibm+Bsa4MbPt/NdDq9GovFNHokmyKs6e3tfcIYs+XDYciGvwA3TQnT5EXJaW6qdQ65lRU8dBHIpq+v76ny0m4RVjU2Nt4h7w7m5qRhKY4OOALp0mhqaiLbKoqjXSVtpdvtrqXNfDwuldE3qMcblBs/WlulLGxtSelyudxWAZQmtkx90zTgb8M0DPlQTNeLaYJuH68UWU6ZTGbP4/FcqfB64XciIZ/2e/CuSixVCMeErAJvnfxG25+qikybqsvc+vr6qrx+e7uKkXEEQ8WNcxXPorx0v10SxuPxNeIgLovw1+Tk5EfKZ3dHBzj8/qIxt0gUkUWMh1TW14Pn8SNKIz41NfVJ1bd+IrGj0ejblpaWhwVNA210FA6iEfSPFV203EZnq5ubwTcyAs6GBohEInPBYPAVbmiKtHzpHabTIvnuvVjr6hIx/20R9fvF185OkRgfF4WdndLSq7NK77yag/OsjnOqfaVSqYRFRPN/tS/2nw32otov/KvBsvP+C/gjwAC23ACdhngbNwAAAABJRU5ErkJggg==') no-repeat 8px 6px;
+	    background-origin:content-box;
+	}
+	td.details-control.level-2 {
+	    padding-left:30px;
+	}
+	tr.details td.details-control.level-2 {
+	    padding-left:30px;
+	}
+	td.details-control.level-3 {
+	    padding-left:50px;
+	}
+	tr.details td.details-control.level-3 {
+	/*     padding-left:50px; */
+	}
+	td.details-level.level-2 {
+		background:  url(/images/arrow/arrow_down_right_b2.png) no-repeat 25px 25px;
+	    padding-left:40px;
+	}
+	tr.details td.details-level.level-2 {
+	    padding-left:40px;
+	}
+	td.details-level.level-3 {
+		background:  url(/images/arrow/arrow_down_right_b2.png) no-repeat 45px 25px;
+	    padding-left:60px;
+	}
+	tr.details td.details-level.level-3 {
+	    padding-left:60px;
+	}
+
+	td.details-level.arrow {
+		background:  url(/images/arrow_r.png) no-repeat 0px 12px;
+	}
+
+	input:invalid {
+	  border: 3px solid red;
+	}
+</style>
+
+</body>
+</html>

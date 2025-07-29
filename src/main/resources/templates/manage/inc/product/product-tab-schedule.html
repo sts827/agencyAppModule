@@ -1,0 +1,567 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+	<div th:fragment="product-tab-schedule(strClass, strDataId)" th:class="${strClass}" th:id="${strDataId}">
+		<div class="title-div">
+            <h3>세부일정</h3>
+            <div class="info-toggle schedule">
+                <button class="arrow down" type="button" th:style="|background-image:url('@{/images/icons/arrow_down.svg}')|"></button>
+            </div>
+        </div>
+        <form class="schedule-info">
+            <div class="row-div">
+                <div class="detail-schedule-text-box">
+                    <h5>일정일수*</h5>
+                    <select class="detail-schedule-select" name="optionType">
+                        <option value="notUse">세부일정 사용안함</option>
+                    </select>
+                    <img src="/images/icon/text-info.svg" style="margin-left: 21px; margin-right: 5px;" alt="">
+                    <p class="detail-schedule-caution-text">선택한 일수에따라 일정입력칸이 조정됩니다.</p>
+                </div>
+                <div class="detail-schedule-box">
+                    <div class="detail-schedule-day-tab-box">
+                        <!--스크립트에서 추가-->
+                    </div>
+                    <div id="detail-schedule-content-box-list">
+                        <!--스크립트에서 추가-->
+                    </div>
+                </div>
+                <ul class="buttons">
+                    <li class="cancel"><button type="button" onclick="resetScheduleInfo()">취소하기</button></li>
+                    <li class="save"><button type="button" onclick="saveProductDetailSchedule()">저장하기</button></li>
+                </ul>
+            </div>
+        </form>
+
+		<script th:inline="javascript">
+			$(function () {
+					const optionSortItem = document.querySelector('#detail-schedule-content-box-list').querySelectorAll('.detail-schedule-content-box');
+					optionSortItem.forEach((item, index)=>{
+						const scheduleBox = item.querySelectorAll('ul');
+						for(let i = 0; i < scheduleBox.length; i++){
+							scheduleBox[i].querySelector('.detail-schedule-order-text').textContent = `일정#${Number(i + 1)}`;
+							initScheduleItemSwiper(scheduleBox[i]);
+						}
+
+						item.querySelector('.detail-schedule-content-inner-box').querySelectorAll('.detail-schedule-item-image-box').forEach((item)=>{
+							Zoom(`.${item.querySelector('img').getAttribute('class')}`);
+						})
+						initScheduleItemSortable(index+1);
+					})
+
+					//세부일정 일정일수(14일기준)
+					for (let i = 1; i <= 14; i++) {
+						document.querySelector('.detail-schedule-select').insertAdjacentHTML('beforeend',
+							`<option value="${i}">${i}일</option>`)
+					}
+					//세부일정 선택시 이벤트
+					document.querySelector('.detail-schedule-select').addEventListener('change', function () {
+						const dayValue = this.value;
+						if ( dayValue === 'notUse' ) {
+							document.querySelector('.detail-schedule-box').style.display = 'none';
+						}
+						//세부일정 사용시
+						else {
+							document.querySelectorAll(`.detail-schedule-content-box`).forEach((item)=>{
+								item.style.display = 'none';
+							})
+							document.querySelector('.detail-schedule-box').style.display = 'block';
+							const dayTabBox = document.querySelector('.detail-schedule-day-tab-box');
+
+							//노출되어 있는 노출이 선택한 일수보다 낮을 경우
+							for (let i = 1; i <= dayValue; i++) {
+								if ( dayTabBox.children[i-1] !== undefined ) {
+									dayTabBox.children[i-1].style.display = 'block';
+								}
+								else {
+									dayTabBox.insertAdjacentHTML('beforeend',
+										`<button type="button" class="tab-btn" data-btn-order-num="${i}" style="display: block;" onclick="showContentBox(this, ${i})">${i}일차</button>`
+									);
+									document.querySelector('#detail-schedule-content-box-list').insertAdjacentHTML('beforeend',
+										`
+									<div id="detail-schedule-content-box-${i}" class="detail-schedule-content-box">
+										<div id="detail-schedule-content-item-${i}">
+											<!--스크립트에서 추가-->
+										</div>
+										<div class="add-schedule-btn" onclick="addDetailScheduleItem(${i})">
+											<img src="/images/icon/+-white-10x10.svg" class="add-detail-schedule-item-btn-img" alt="">
+											<p class="add-schedule-btn-text">일정 추가</p>
+										</div>
+									</div>`);
+								}
+							}
+
+							//노출되어 있는 노출이 선택한 일수보다 높을 경우
+							for (let i = dayTabBox.children.length; i > dayValue; i--) {
+								dayTabBox.children[i-1].style.display = 'none';
+							}
+						}
+					})
+					initScheduleItemSortable();
+			})
+
+			function showContentBox(e, num) {
+				//버튼 액티브 효과
+				document.querySelectorAll('.tab-btn').forEach((item)=>{
+					item.classList.remove('active');
+				})
+				e.classList.add('active');
+
+				//일차별 버튼에 클릭에 속해있는 일정 보임
+				document.querySelectorAll(`.detail-schedule-content-box`).forEach((item)=>{
+					item.style.display = 'none';
+				})
+				document.querySelector(`#detail-schedule-content-box-${num}`).style.display = 'block';
+			}
+
+			let priceSequenceValue = 0;
+			let addedPriceSetList;
+			let loadedEndDate;
+			let detailSchedulePlaceParents = "";
+
+			$.widget.bridge('uibutton', $.ui.button)
+
+			function saveProductDetailSchedule() {
+				if( confirm("해당 정보를 저장하시겠습니까?") ){
+					if ( document.getElementById("product-tour-id").value === "" || document.getElementById("product-tour-id").value === null ) {
+						alert("기본정보를 먼저 저장해주세요.");
+					} else {
+						const ajaxJson = {
+							"detailScheduleList" : [],
+						} ;
+
+						const detailScheduleType = document.querySelector('.detail-schedule-select').value;
+						//일자별 사용여부 체크
+						if ( detailScheduleType !== "notUse" ) {
+							let passFlag = true;
+
+							const dayItem = document.querySelectorAll('.detail-schedule-content-box');
+							//날짜별 일정 추가가 안되어 있는 곳 체크
+							for ( let i = 0; i < detailScheduleType; i++ ) {
+								if ( dayItem[i].querySelectorAll('.schedule-item').length === 0 ) {
+									const elNum = dayItem[i].id.lastIndexOf("-")+1;
+									alert(`${dayItem[i].id.substring(elNum)}일차 일정을 추가해 주세요.`);
+									document.querySelector(`.detail-schedule-day-tab-box [data-btn-order-num="${dayItem[i].id.substring(elNum)}"]`).click();
+									passFlag = false;
+									break;
+								}
+							}
+
+							if ( passFlag ) {
+								let scheduleList = [];
+								const tabBox = document.querySelector('.detail-schedule-day-tab-box');
+								//일차별
+								for (const item of tabBox.children) {
+									//노출되어 있는 일차만 가져옴
+									if ( item.style.display !== 'none' ) {
+										refreshOrderNumber(item.dataset.btnOrderNum)
+										const contentBox = document.querySelector(`#detail-schedule-content-box-${item.dataset.btnOrderNum}`);
+										if ( contentBox.querySelectorAll('ul').length > 0 ) {
+											//각 일차에 속한 일정들
+											for ( const ulItem of contentBox.querySelectorAll('ul') ) {
+												scheduleList.push({
+													"productTourId" : document.getElementById("product-tour-id").value
+													, "detailId" : ulItem.querySelector('input[name="detail_id"]')?.value
+													, "detailSequence" : ulItem.querySelector('input[name="schedule_item_order"]').value
+													, "detailCategory" : item.dataset.btnOrderNum
+													, "detailTitle" : ulItem.querySelector('input[name="detail_title"]').value
+													, "address" : ulItem.querySelector('input[name="day_address"]').value
+													, "tourspotId" : ulItem.querySelector('input[name="spot_id"]').value
+													, "dayText" : ulItem.querySelector('input[name="day_text"]').value
+													, "attachImage" : ulItem.querySelector('input[name="imageNums"]').value
+													, "detailType" : "use"
+													, "registerType" : "add"
+												});
+											}
+										}
+									}
+								}
+								ajaxJson.detailScheduleList = scheduleList;
+
+								$.ajax({
+									url : '/manage/product/add-product-detail-schedule'
+									, type : 'POST'
+									, contentType : 'application/json'
+									, data : JSON.stringify(ajaxJson)
+									, beforeSend : function (xhr) {
+										xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+									}
+									, success : function(data) {
+										if ( data.result === 'success' ) {
+											document.getElementById('schedule-info').value = 'Y';
+											alert(data.message)
+										}
+									}
+								});
+							}
+						}
+						else {
+							let scheduleList = [];
+							scheduleList.push({ "productTourId" : document.getElementById("product-tour-id").value,
+												"detailType" : "notUse" });
+							ajaxJson.detailScheduleList = scheduleList;
+
+							$.ajax({
+								url : '/manage/product/add-product-detail-schedule'
+								, type : 'POST'
+								, contentType : 'application/json'
+								, data : JSON.stringify(ajaxJson)
+								, beforeSend : function (xhr) {
+									xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+								}
+								, success : function(data) {
+									if ( data.result === 'success' ) {
+										document.getElementById('schedule-info').value = 'Y';
+										alert(data.message)
+									}
+								}
+							});
+						}
+					}
+				}
+			}
+
+			function selectConnectPlace() {
+				const parentsDiv = detailSchedulePlaceParents;
+				const selectedPlace = document.querySelector('.place-item-box.active');
+
+				parentsDiv.querySelector('.connect-place-box-input').value = selectedPlace.querySelector('.place-item-name').textContent;
+				parentsDiv.querySelector('.detail-schedule-address-input').value = selectedPlace.querySelector('.place-item-address').textContent;
+				parentsDiv.querySelector('input[name="spot_id"]').value = selectedPlace.querySelector('#place-item-id').value;
+				parentsDiv.querySelector('.detail-schedule-item-image-list').querySelector('.place-image-box')?.remove();
+				parentsDiv.querySelector('.detail-schedule-item-image-list > .swiper-wrapper').insertAdjacentHTML('beforeend',`
+					<div class="detail-schedule-item-image-box swiper-slide place-image-box">
+						<img src="${selectedPlace.querySelector('#place-item-image').value}" style="object-fit: cover;" alt="">
+					</div>
+				`)
+
+				closeConnectPlaceModal();
+				detailSchedulePlaceParents = "";
+			}
+
+			function closeConnectPlaceModal() {
+				document.querySelector('.connect-place-select-modal-box').style.display = "none";
+				document.querySelector('#search-form').reset();
+				document.querySelector('#place-item-list').innerHTML = "";
+			}
+
+			function addDetailScheduleItem(num) {
+				const contentBox = document.querySelector(`#detail-schedule-content-box-${num}`);
+				const childLength = contentBox.querySelector(`#detail-schedule-content-item-${num}`).children.length
+				contentBox.querySelector(`#detail-schedule-content-item-${num}`).insertAdjacentHTML('beforeend',
+				`
+				<ul class="schedule-item">
+					<li class="detail-schedule-content-inner-box">
+						<p class="detail-schedule-order-text">일정#${childLength+1}</p>
+						<div class="detail-schedule-item-box">
+							<div class="detail-schedule-first-line">
+								<div class="detail-schedule-name-box">
+									<label class="detail-schedule-name-label">
+										일정명*
+										<input type="text" name="day_text" class="detail-schedule-name-input" placeholder="일정명을 입력해주세요.">
+									</label>
+								</div>
+								<div class="detail-schedule-address-box">
+									<label class="detail-schedule-address-label">
+										주소
+										<input type="text" name="day_address" class="detail-schedule-address-input" placeholder="주소" readonly>
+									</label>
+								</div>
+							</div>
+							<div class="detail-schedule-second-line">
+								<label class="detail-schedule-title-label">
+									일정내용
+									<input type="text" name="detail_title" class="detail-schedule-title-input" placeholder="일정내용을 입력해주세요.">
+								</label>
+							</div>
+							<div class="detail-schedule-third-line">
+								<div style="display:flex;">
+									<div id="detail-schedule-item-image-list" class="swiper-container detail-schedule-item-image-list">
+										<div class="swiper-wrapper">
+										<!--스크립트에서 처리-->
+										</div>
+										<div class="schedule-swiper-button-prev"></div>
+										<div class="schedule-swiper-button-next"></div>
+									</div>
+									<input type="hidden" id="imageNums" name="imageNums"/>
+									<input type="file" id="attach" name="attach" accept="image/*" hidden/>
+									<button type="button" onclick="uploadDetailScheduleImage(this);" style="min-width: 70px; height: 70px; background: url('/images/icon/upload-rectangle.svg')"></button>
+								</div>
+								<div style="display: flex;">
+									<div class="connect-place-box">
+										<label class="connect-place-box-label">
+											연결 장소
+											<input type="text" class="connect-place-box-input" placeholder="연결 장소">
+										</label>
+									</div>
+									<button type="button" class="choose-place-btn" onclick="showConnectPlaceModal(this)">
+										장소 선택
+									</button>
+								</div>
+							</div>
+							<input type="hidden" name="spot_id">
+						</div>
+						<div class="delete-schedule-btn">
+							<button type="button" onclick="deleteDetailScheduleItem(this, ${num})">
+								<img src="/images/icon/x-black-box-15x15.svg" style="width: 15px; height: 15px;" alt="">
+							</button>
+						</div>
+						<input type="hidden" name="schedule_item_order">
+					</li>
+				</ul>
+				`);
+				new Swiper(`.swiper-container`, {
+					slidesPerView: "auto",  // 한 번에 보여줄 슬라이드 개수
+					spaceBetween: 8,  // 슬라이드 간의 간격 (px)
+					draggable: false,
+					navigation: {
+						nextEl: `.schedule-swiper-button-next`,
+						prevEl: `.schedule-swiper-button-prev`,
+					},
+				});
+				initScheduleItemSortable(num);
+			}
+
+			function uploadDetailScheduleImage(e) {
+				const fileInput = e.parentElement.querySelector("#attach");
+				const formData = new FormData();
+
+				fileInput.click();
+
+				function handleFileChange() {
+					fileInput.removeEventListener('change', handleFileChange);
+
+					let file = fileInput.files[0];
+					formData.append('file', file);
+
+					$.ajax({
+						url: "/manage/product/upload-tour-detail-schedule-image",
+						type: "POST",
+						processData: false,
+						contentType: false,
+						data: formData,
+						beforeSend: function (xhr) {
+							xhr.setRequestHeader(
+								[[${_csrf.headerName}]], [[${_csrf.token}]]
+							);
+						},
+						success: function (data) {
+							if ( data.result === "success" ) {
+								const imageList = e.closest(".schedule-item").querySelector("#detail-schedule-item-image-list");
+								imageList.querySelector('.swiper-wrapper').insertAdjacentHTML('beforeend',
+									`<div class="detail-schedule-item-image-box swiper-slide">
+										<img class="schedule-item-images-${data.imageNum}" src="/upload/${data.uploadFilename}" style="object-fit: cover;" alt="">
+										<button type="button" class="detail-schedule-item-image-delete-btn" onclick="deleteDetailScheduleImage(this)">
+											<img src="/images/icon/x-black-box-15x15.svg" alt="">
+										</button>
+										<input type="hidden" name="image_num" value="${data.imageNum}">
+									 </div>`
+								);
+
+								initScheduleItemSwiper(e);
+
+								const imageNumInput = e.closest(".schedule-item").querySelector("#imageNums");
+								imageNumInput.value =  imageNumInput.value + "," + data.imageNum;
+							}
+							fileInput.removeEventListener('change', handleFileChange);
+							fileInput.value = null;
+
+							Zoom(`.schedule-item-images-${data.imageNum}`);
+						}
+					});
+				}
+
+				fileInput.addEventListener('change', handleFileChange);
+			}
+
+			function deleteDetailScheduleImage(e) {
+				if ( confirm("삭제하시겠습니까?") ) {
+					const imageBox = e.closest('.swiper-slide');
+					const imageBoxRootBox = imageBox.closest('.schedule-item');
+					const imageNum = imageBox.querySelector('input[name="image_num"]').value;
+
+					imageBoxRootBox.querySelector("#imageNums").value = imageBoxRootBox.querySelector("#imageNums").value.replace(imageNum, "");
+					imageBox.remove();
+				}
+			}
+
+			function deleteDetailScheduleItem(obj, num) {
+				if ( confirm("삭제하시겠습니까?") ) {
+					const item = obj.closest('.schedule-item');
+					item.remove();
+					refreshOrderNumber(num);
+				}
+			}
+
+			function refreshOrderNumber(num) {
+				const optionSortItem = document.querySelector(`#detail-schedule-content-item-${num}`).querySelectorAll('.schedule-item');
+				for(let i = 0; i < optionSortItem.length; i++){
+					optionSortItem[i].querySelector(".detail-schedule-order-text").textContent = `일정#${Number(i + 1)}`;
+					optionSortItem[i].querySelector("input[name='schedule_item_order']").value = Number(i + 1);
+				}
+			}
+/*
+			//뒤에서부터 n자리마다 원하는 문자 넣기
+			function insertSpecialCharReverse(str, n, char){
+				const regex = new RegExp(`(.)(?=(.{${n}})+$)`, "g");
+				return str.toString().replace(regex, `$1${char}`);
+			}
+*/
+			//날짜범위안에 있는 모든 날짜 구하기
+			function findDatesInRange(startDate, endDate) {
+				const start = new Date(startDate);
+				const end = new Date(endDate);
+				const result = [];
+
+				while (start <= end) {
+					const year = start.getFullYear();
+					const month = String(start.getMonth() + 1).padStart(2, '0');
+					const day = String(start.getDate()).padStart(2, '0');
+					const formattedDate = `${year}-${month}-${day}`;
+					result.push(formattedDate);
+
+					// 다음 날짜로 이동
+					start.setDate(start.getDate() + 1);
+				}
+
+				return result;
+			}
+
+			function initScheduleItemSortable(num) {
+				$(`#detail-schedule-content-item-${num}`).sortable({
+					items: $(`.schedule-item`),
+					forcePlaceholderSize: true,
+					placeholder: 'box-line',
+					start: function (a,item) {
+					},
+					stop: function (a,item) {
+						refreshOrderNumber(num);
+					}
+				})
+			}
+
+			function initScheduleItemSwiper(e) {
+				const con = e.closest(".schedule-item").querySelector('.swiper-container')
+				const next = e.closest(".schedule-item").querySelector('.schedule-swiper-button-next')
+				const prev = e.closest(".schedule-item").querySelector('.schedule-swiper-button-prev')
+				new Swiper(con, {
+					slidesPerView: "auto",  // 한 번에 보여줄 슬라이드 개수
+					spaceBetween: 8,  // 슬라이드 간의 간격 (px)
+					draggable: false,
+					navigation: {
+						nextEl: next,
+						prevEl: prev,
+					},
+				});
+			}
+
+
+			resetScheduleInfo = function(){
+				if(confirm("취소하시겠습니까?")){
+					// TODO..주영님
+				}
+			}
+
+			function saveProductDetailSchedule() {
+				if( confirm("해당 정보를 저장하시겠습니까?") ){
+					if ( document.getElementById("product-tour-id").value === "" || document.getElementById("product-tour-id").value === null ) {
+						alert("기본정보를 먼저 저장해주세요.");
+					} else {
+						const ajaxJson = {
+							"detailScheduleList" : [],
+						} ;
+
+						const detailScheduleType = document.querySelector('.detail-schedule-select').value;
+						//일자별 사용여부 체크
+						if ( detailScheduleType !== "notUse" ) {
+							let passFlag = true;
+
+							const dayItem = document.querySelectorAll('.detail-schedule-content-box');
+							//날짜별 일정 추가가 안되어 있는 곳 체크
+							for ( let i = 0; i < detailScheduleType; i++ ) {
+								if ( dayItem[i].querySelectorAll('.schedule-item').length === 0 ) {
+									const elNum = dayItem[i].id.lastIndexOf("-")+1;
+									alert(`${dayItem[i].id.substring(elNum)}일차 일정을 추가해 주세요.`);
+									document.querySelector(`.detail-schedule-day-tab-box [data-btn-order-num="${dayItem[i].id.substring(elNum)}"]`).click();
+									passFlag = false;
+									break;
+								}
+							}
+
+							if ( passFlag ) {
+								let scheduleList = [];
+								const tabBox = document.querySelector('.detail-schedule-day-tab-box');
+								//일차별
+								for (const item of tabBox.children) {
+									//노출되어 있는 일차만 가져옴
+									if ( item.style.display !== 'none' ) {
+										refreshOrderNumber(item.dataset.btnOrderNum)
+										const contentBox = document.querySelector(`#detail-schedule-content-box-${item.dataset.btnOrderNum}`);
+										if ( contentBox.querySelectorAll('ul').length > 0 ) {
+											//각 일차에 속한 일정들
+											for ( const ulItem of contentBox.querySelectorAll('ul') ) {
+												scheduleList.push({
+													"productTourId" : document.getElementById("product-tour-id").value
+													, "detailId" : ulItem.querySelector('input[name="detail_id"]')?.value
+													, "detailSequence" : ulItem.querySelector('input[name="schedule_item_order"]').value
+													, "detailCategory" : item.dataset.btnOrderNum
+													, "detailTitle" : ulItem.querySelector('input[name="detail_title"]').value
+													, "address" : ulItem.querySelector('input[name="day_address"]').value
+													, "tourspotId" : ulItem.querySelector('input[name="spot_id"]').value
+													, "dayText" : ulItem.querySelector('input[name="day_text"]').value
+													, "attachImage" : ulItem.querySelector('input[name="imageNums"]').value
+													, "detailType" : "use"
+													, "registerType" : "add"
+												});
+											}
+										}
+									}
+								}
+								ajaxJson.detailScheduleList = scheduleList;
+
+								$.ajax({
+									url : '/manage/product/add-product-detail-schedule'
+									, type : 'POST'
+									, contentType : 'application/json'
+									, data : JSON.stringify(ajaxJson)
+									, beforeSend : function (xhr) {
+										xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+									}
+									, success : function(data) {
+										if ( data.result === 'success' ) {
+											document.getElementById('schedule-info').value = 'Y';
+											alert(data.message)
+										}
+									}
+								});
+							}
+						} else {
+							let scheduleList = [];
+							scheduleList.push({ "productTourId" : document.getElementById("product-tour-id").value,
+												"detailType" : "notUse" });
+							ajaxJson.detailScheduleList = scheduleList;
+
+							$.ajax({
+								url : '/manage/product/add-product-detail-schedule'
+								, type : 'POST'
+								, contentType : 'application/json'
+								, data : JSON.stringify(ajaxJson)
+								, beforeSend : function (xhr) {
+									xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+								}
+								, success : function(data) {
+									if ( data.result === 'success' ) {
+										document.getElementById('schedule-info').value = 'Y';
+										alert(data.message)
+									}
+								}
+							});
+						}
+					}
+				}
+			}
+
+		</script>
+    </div>
+</body>
+</html>

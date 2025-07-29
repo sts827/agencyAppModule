@@ -1,0 +1,274 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.PolicyManageMapper">
+	<!--################################### policy ###################################-->
+	<select id="selectCountPolicy" parameterType="HashMap" resultType="Integer">
+		SELECT count(*)
+		  FROM policy a
+		  left outer join policy_category b on a.policy_type = b.id
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+					  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='tsTitle')" >and title LIKE CONCAT('%', #{searchKey}, '%')</if>
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and a.title like concat('%',#{titleLike},'%')</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and a.id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and a.title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	and content=#{content}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyType)" >	and policy_type=#{policyType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyVersion)" >	and policy_version=#{policyVersion}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and a.use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and a.create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and a.create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and a.last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and a.last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and a.delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and a.delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and a.delete_date=#{deleteDate}	</if>
+
+			and a.delete_yn = 'N'
+		</where>
+	</select>
+
+	<select id="selectListPolicy" parameterType="HashMap" resultType="Policy">
+	SELECT * FROM (
+		SELECT @rownum:=@rownum+1 AS rownum,
+		       a.id, a.title, content, policy_type,b.title policy_type_title, policy_version, a.use_yn, a.create_id, a.create_date, a.last_update_id, a.last_update_date, a.delete_yn, a.delete_id, a.delete_date
+		  FROM policy a
+		  left outer join policy_category b on a.policy_type = b.id
+		  join (SELECT @rownum:= 0) rnum
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+					  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='tsTitle')" >and title LIKE CONCAT('%', #{searchKey}, '%')</if>
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and a.title like concat('%',#{titleLike},'%')</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and a.id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and a.title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	and content=#{content}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyType)" >	and policy_type=#{policyType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyVersion)" >	and policy_version=#{policyVersion}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and a.use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and a.create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and a.create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and a.last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and a.last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and a.delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and a.delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and a.delete_date=#{deleteDate}	</if>
+			and a.delete_yn = 'N'
+		</where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+		    	ORDER BY
+		        <choose>
+		            <when test="sort=='id'" >	a.id	</when>
+					<when test="sort=='title'" >	a.title	</when>
+					<when test="sort=='content'" >	content	</when>
+					<when test="sort=='policyType'" >	a.policy_type	</when>
+					<when test="sort=='policyTypeTitle'" >	b.policy_type_title	</when>
+					<when test="sort=='policyVersion'" >	policy_version	</when>
+					<when test="sort=='useYn'" >	a.use_yn	</when>
+					<when test="sort=='createId'" >	a.create_id	</when>
+					<when test="sort=='createDate'" >	a.create_date	</when>
+					<when test="sort=='lastUpdateId'" >	a.last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	a.last_update_date	</when>
+					<when test="sort=='deleteYn'" >	a.delete_yn	</when>
+					<when test="sort=='deleteId'" >	a.delete_id	</when>
+					<when test="sort=='deleteDate'" >	a.delete_date	</when>
+		            <otherwise>rownum</otherwise>
+		        </choose>
+		        <choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+		    	ORDER BY <foreach item="item" index="index" collection="listSort" separator=",">
+		    	<choose>
+		    		<when test="item.sort=='id'" >	a.id	</when>
+					<when test="item.sort=='title'" >	a.title	</when>
+					<when test="item.sort=='content'" >	content	</when>
+					<when test="item.sort=='policyType'" >	a.policy_type	</when>
+					<when test="item.sort=='policyTypeTitle'" >	b.policy_type_title	</when>
+					<when test="item.sort=='policyVersion'" >	policy_version	</when>
+					<when test="item.sort=='useYn'" >	a.use_yn	</when>
+					<when test="item.sort=='createId'" >	a.create_id	</when>
+					<when test="item.sort=='createDate'" >	a.create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	a.last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	a.last_update_date	</when>
+					<when test="item.sort=='deleteYn'" >	a.delete_yn	</when>
+					<when test="item.sort=='deleteId'" >	a.delete_id	</when>
+					<when test="item.sort=='deleteDate'" >	a.delete_date	</when>
+		        </choose>
+		    	<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<select id="selectOnePolicy" parameterType="HashMap" resultType="Policy">
+		SELECT id, title, content, policy_type, policy_version,
+		       use_yn, create_id, create_date, last_update_id,
+		       last_update_date, delete_yn, delete_id, delete_date
+		  FROM policy
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	and content=#{content}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyType)" >	and policy_type=#{policyType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyVersion)" >	and policy_version=#{policyVersion}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+		</where>
+	</select>
+
+	<insert id="insertPolicy" parameterType="Policy" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO policy
+               (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	title,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	content,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyType)" >	policy_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policySubType)" >	policy_sub_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyVersion)" >	policy_version,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id,	</if>
+                create_date, last_update_date)
+        VALUES (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	#{title},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	#{content},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyType)" >	#{policyType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policySubType)" >	#{policySubType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyVersion)" >	#{policyVersion},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	#{useYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	#{createId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	#{lastUpdateDate},	</if>
+                now(),now())
+    </insert>
+
+	<update id="updatePolicy" parameterType="Policy">
+        Update policy
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	title=#{title},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	content=#{content},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyType)" >	policy_type=#{policyType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policySubType)" >	policy_sub_type=#{policySubType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyVersion)" >	policy_version=#{policyVersion},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			last_update_date=now()
+        </set>
+        <where>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id=#{id}</if>
+        </where>
+    </update>
+
+    	<update id="deletePolicy" parameterType="Policy">
+        Update policy
+        <set>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	delete_id=#{deleteId},	</if>
+        	delete_date=now(),
+			delete_yn = 'Y'
+        </set>
+        <where>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id=#{id}</if>
+        </where>
+    </update>
+<!-- // -->
+
+	<!--################################### policy ###################################-->
+	<select id="selectCountPolicyCategory" parameterType="HashMap" resultType="Integer">
+		SELECT count(*)
+		  FROM policy_category
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+					  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='tsTitle')" >and title LIKE CONCAT('%', #{searchKey}, '%')</if>
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(orderNum)" >	and order_num=#{orderNum}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<choose>
+				<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">start_date=#{startDate},</when>
+				<otherwise>start_date=null,</otherwise>
+			</choose>
+			<choose>
+				<when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">expire_date=#{expireDate},</when>
+				<otherwise>expire_date=null,</otherwise>
+			</choose>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+
+			and delete_yn = 'N'
+		</where>
+	</select>
+
+	<select id="selectListPolicyCategory" parameterType="HashMap" resultType="PolicyCategory">
+	SELECT * FROM (
+		SELECT @rownum:=@rownum+1 AS rownum,
+		       id, title, note, order_num, use_yn, start_date, expire_date, create_id, create_date, last_update_id, last_update_date
+		  FROM policy_category
+		  join (SELECT @rownum:= 0) rnum
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+					  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='tsTitle')" >and title LIKE CONCAT('%', #{searchKey}, '%')</if>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(orderNum)" >	and order_num=#{orderNum}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">and start_date=#{startDate}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	and expire_date=#{expireDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			and use_yn = 'Y'
+		</where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+		    	ORDER BY
+		        <choose>
+		            <when test="sort=='id'" >	id	</when>
+					<when test="sort=='title'" >	title	</when>
+					<when test="sort=='useYn'" >	use_yn	</when>
+		            <otherwise>order_num</otherwise>
+		        </choose>
+		        <choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<select id="selectOnePolicyCategory" parameterType="HashMap" resultType="PolicyCategory">
+		SELECT id, title, note, order_num, use_yn, start_date, expire_date, create_id, create_date, last_update_id, last_update_date
+		  FROM policy_category
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(orderNum)" >	and order_num=#{orderNum}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	and start_date=#{startDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	and expire_date=#{expireDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<link rel="stylesheet" th:href="@{/css/manage/product-add.css}" href="/css/manage/product-add.css">
+<link rel="stylesheet" th:href="@{/css/manage/product-add-editor.css}" href="/css/manage/product-add-editor.css">
+<link rel="stylesheet" th:href="@{/css/manage/product-add-default-editor.css}" href="/css/manage/product-add-default-editor.css">
+<link rel="stylesheet" th:href="@{/plugin/pagination/pagination.css}" href="/plugin/pagination/pagination.css">
+<link rel="stylesheet" th:href="@{/plugin/daterangepicker/css/common.css}" href="/plugin/daterangepicker/css/common.css">
+<script src="/plugin/smooth-zoom/smooth-zoom.js"></script>
+<script src="/plugin/pagination/Pagination.min.js"></script>
+<script src="/js/manage/product/product-common.js"></script>
+
+
+<style>
+    .box-line {
+        border: 1px solid red;
+    }
+
+    /******* FullCalendar *******/
+    /*날짜, 버튼 부분*/
+    .fc-toolbar-chunk div {
+        display: flex;
+    }
+    .fc .fc-button {
+        all: unset;
+    }
+    .fc .fc-button {
+
+    }
+    .fc .fc-toolbar.fc-header-toolbar {
+        margin-bottom: 4px;
+    }
+    .fc .fc-toolbar-title {
+        font: 600 24px Pretendard;
+        color: #222222;
+    }
+    .fc .fc-button-primary:hover {
+        all: unset;
+    }
+    .fc .fc-button-primary:hover {
+        cursor: pointer;
+    }
+    .fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active {
+        all: unset;
+    }
+    .fc .fc-button-primary:not(:disabled).fc-button-active:focus, .fc .fc-button-primary:not(:disabled):active:focus {
+        all: unset;
+    }
+    .fc .fc-button-primary:focus {
+        all: unset;
+    }
+    .fc .fc-button:focus {
+        all: unset;
+    }
+    .fc-icon-chevron-left:before {
+        all: unset;
+    }
+    .fc-icon-chevron-left {
+        margin-right : 18px; background: url('/images/icon/left-arrow-gray-6x12.svg') no-repeat center top / cover; background-size: 9px 21px;
+    }
+    .fc-icon-chevron-right:before {
+        all: unset;
+    }
+    .fc-icon-chevron-right {
+        margin-left : 18px; background: url('/images/icon/right-arrow-gray-6x12.svg') no-repeat center top / cover; background-size: 9px 22px;
+    }
+    /*달력부분*/
+    .item-block {
+        height: 0 !important;
+        margin-top: 23px;
+        border: none;
+    }
+    .fc-theme-standard .fc-scrollgrid {
+        border-top: 2px solid #333333; border-bottom: 2px solid #333333; border-left: none;
+    }
+    .fc-theme-standard .fc-scrollgrid th {
+        width: 100%; height: 55px; background-color: #EEEEEE;
+    }
+    .fc .fc-scrollgrid-section > * {
+        border-right: none;
+    }
+    thead .fc-scroller-harness .fc-scrollgrid-sync-inner {
+        height: 100%; display: flex; justify-content: center; align-items: center;
+    }
+    thead .fc-col-header-cell-cushion {
+        font: 500 18px Pretendard;
+        color: #222222;
+    }
+    .fc .fc-daygrid-day-top {
+        all: unset;
+    }
+    .fc .fc-daygrid-day-number {
+        padding-left: 13px;
+    }
+    tbody a {
+        font: 400 17px Pretendard;
+        color: #222222;
+    }
+    .fc-day-sat a {
+        color: #0062D4;
+    }
+    .fc-day-sun a {
+        color: #E74133;
+    }
+    .fc-daygrid-day-events {
+        margin-right: 9px;
+    }
+    .fc-event-title.fc-sticky {
+        font: 500 14px Pretendard;
+        color: #333333;
+    }
+    .fc-direction-ltr .fc-daygrid-event.fc-event-start, .fc-direction-rtl .fc-daygrid-event.fc-event-end {
+        margin-left: 15px;
+    }
+    .fc-event-title-container {
+        height: 26px;
+        cursor: pointer;
+    }
+    .fc-daygrid-event {
+        border-radius: 5px;
+    }
+</style>
+<body class="hold-transition sidebar-mini layout-fixed">
+<section class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <main class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0" th:text="|${menuName} 상품 ${mode eq 'I'?'등록':'수정'}|"></h1>
+        </div>
+        <div class="container-fluid p-0">
+			<input class="radio-check" id="basic-info" type="hidden" value="N">
+            <input class="radio-check" id="product-info" type="hidden" value="N">
+            <input class="radio-check" id="price-info" type="hidden" value="N">
+            <input class="radio-check" id="schedule-info" type="hidden" value="N">
+            <input type="hidden" id="product-tour-id" th:value="${productId}">
+            <input type="hidden" id="product-sub-category-id" th:value="${productInfo.productCategoryId}">
+
+            <input type="hidden" value="" id="product-status" name="productStatus">
+
+            <div class="product-input-wrapper">
+				<div th:replace="~{/manage/inc/product/product-tab-basic :: product-tab-basic('product-tab','tab1' )}"/>
+            </div>
+            <div class="product-input-wrapper">
+				<div th:replace="~{/manage/inc/product/product-tab-template :: product-tab-template('product-tab','tab2' )}"/>
+            </div>
+            <div class="product-input-wrapper">
+				<div th:replace="~{/manage/inc/product/product-tab-price :: product-tab-price('product-tab','tab3' )}"/>
+            </div>
+            <div class="product-input-wrapper">
+				<div th:replace="~{/manage/inc/product/product-tab-schedule :: product-tab-schedule('product-tab','tab4' )}"/>
+            </div>
+        </div>
+        <div id="product-util-buttons">
+<th:block th:if="${mode eq 'I'}">
+            <button id="preview" type="button" class="preview" th:onclick="previewProduct()">미리보기</button>
+            <button id="temp-save" type="button" class="flag" th:onclick="productTempSave()">임시저장</button>
+            <button id="cancel" type="button" class="cancel" th:onclick="registCancel()">취소하기</button>
+            <button id="save" type="button" class="save" th:onclick="registProduct()">등록하기</button>
+</th:block>
+<th:block th:if="${mode eq 'U'}">
+            <button type="button" class="cancel" onclick="goList()">목록으로</button>
+            <button type="button" class="cancel" onclick="goBack()">뒤로가기</button>
+
+            <button type="button" class="cancel" th:onclick="deleteProduct([[${productId}]])">삭제하기</button>
+</th:block>
+        </div>
+    </main>
+
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</section>
+
+<div th:replace="~{/manage/inc/product/product-modal-template :: product-modal-template('show-modal','modal' )}"/>
+<div th:replace="~{/manage/inc/product/product-modal-schedule-add :: product-modal-schedule-add('schedule-add-modal-box','' )}"/>
+<div th:replace="~{/manage/inc/product/product-modal-schedule-modify :: product-modal-schedule-modify('schedule-modify-modal-box','' )}"/>
+<div th:replace="~{/manage/inc/product/product-modal-place :: product-modal-place('connect-place-select-modal-box','' )}"/>
+<!-- ./wrapper -->
+
+<script th:inline="javascript">
+	let startDate = new Date().toISOString().split('T')[0];
+	let endDate   = new Date().toISOString().split('T')[0];
+	let priceTypeSelect;
+	let basicPriceOptionLength = 0;
+	let modifyPriceTypeSelect;
+
+	const days = ['일', '월', '화', '수', '목', '금', '토'];
+	let postJson = {
+		basicPriceList: [],
+		deleteBasicPriceOptionList: [],
+		fixPriceList: [],
+		priceSequence: '0',
+		dayList: {
+			0 : [], 1 : [], 2 : [], 3 : [], 4 : [], 5 : [], 6 : [],
+		}
+	};
+	let copyPostJson = postJson;
+
+	const ajaxJson = {
+		"priceOptionList" : {
+			copyPostJson
+			, "fixPriceList" : []
+			, "deleteBasicPriceOptionList" : []
+		},
+		"productInfo" : {
+			"productTourId" : document.getElementById("product-tour-id").value
+			, "registerType" : [[${mode}]]== 'I' ? "add":"modify"
+		}
+	} ;
+
+	let calendar;
+	const color = ["#f15454","#d5a16b","#d5d56f"
+		,"#53b453","#B2B2FF","#FFB2B2FF","#D24133FF"
+		,"#A2B7BFFF","#B2FFFFFF","#FFB2F5"]
+
+	$(document).ready(function(event){
+		$(".product-input-wrapper .title-div").on("click",showProductInputWrapper);
+		$(".product-input-wrapper .info-toggle:eq(2)").click();
+
+		$(".switch-box").on("click",switchButton);
+        //$(".product-input-wrapper form .buttons").on("click",setFlagButtons);
+
+	});
+
+	fnNextWrapper = function( e ){
+		let currentWrapper = $(e).closest('.product-input-wrapper');
+		let nextWrapper = currentWrapper.next();
+
+		currentWrapper.find(".title-div > .info-toggle").click();
+
+		if( !nextWrapper.hasClass('active') ){
+			nextWrapper.find(".title-div > .info-toggle").click();
+		}
+	}
+
+	showProductInputWrapper = function(event){
+        event.stopPropagation();
+        let productWrapper = event.target.closest(".product-input-wrapper");
+        let button = $('button.arrow',$(productWrapper));
+		$(productWrapper).toggleClass("active");
+
+		if( button.hasClass("down") ){
+			button
+				.css('backgroundImage',"url(/images/icons/arrow_up.svg)")
+				.removeClass('down')
+				.addClass('up')
+			;
+		} else {
+			button
+				.css('backgroundImage',"url(/images/icons/arrow_down.svg)")
+				.removeClass('up')
+				.addClass('down')
+		}
+
+		if( $( '.price-info' ,$(productWrapper)).length == 1 ){
+			if ( productWrapper.querySelector('.price-select').value === 'calender' ) {
+                document.querySelector('.fix-price-box').style.display = 'none';
+                document.querySelector('.calendar-box').style.display = 'flex';
+                initCalendar()
+            }
+		}
+    }
+
+    switchButton = function(event){
+        // 중요 input태그와 .switch-box의 mark-up 구조및 순서는 fixed!!
+        // input태그 다음 .switch-box태그가 와야함
+        let target= event.target.closest(".switch-box").previousElementSibling; // input checkbox를 가리킴;
+        let switchBox = event.target.closest(".switch-box");
+        let noChecked = switchBox.querySelector(".status li.no-checked");
+        let checked = switchBox.querySelector(".status li.checked");
+
+        let chkButton = $(target).is(':checked');
+        $(target).prop('checked',!chkButton);
+        if(!chkButton){
+            $(noChecked).removeClass("active");
+            $(checked).addClass("active");
+            $(target).val("Y") // 서버에 보내는 값
+        }else{
+            $(checked).removeClass("active");
+            $(noChecked).addClass("active");
+            $(target).val("N")// 서버에 보내는 값
+        }
+    }
+
+	registCancel = function () {
+        if ( confirm("저장한 정보는 임시 저장되지만 저장하지 않은 정보는 사라집니다.\n등록 취소하시겠습니까?") ) {
+            if ( $("#product-tour-id").val() !== '' ) {
+                let data = formSerialize($('#basic-info-add-form')[0]);
+                const jsonData = JSON.parse(data);
+                jsonData.productTourId = document.getElementById('product-tour-id').value;
+                jsonData.productMenuId = document.getElementById('product-menu-id').value;
+                const newData = JSON.stringify(jsonData);
+                data = newData;
+
+                $.ajax({
+                    url: "/manage/product/saveProduct"
+                    , data : `{"productInfo" : ${data}}`
+                    , type : 'POST'
+                    , contentType:"application/json;utf-8"
+                    , beforeSend:function(xhr){
+                        xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                    },
+                    success:function(data){
+                        if ( data.result === 'success' ) {
+                            location.href = `/manage${[[${listUrl}]]}`;
+                        }
+                        else {
+                            alert(data.message);
+                        }
+                    },
+                    error:function(){
+
+                    }
+                })
+            }
+            else {
+                location.href = `/manage${[[${listUrl}]]}`;
+            }
+        }
+    }
+
+    registProduct = function(){
+        let postFlag = true;
+        const radioInput = document.querySelectorAll('.radio-check');
+        //기본정보, 상품정보, 판매가격설정이 저장되어 있는지 체크
+        for ( let i = 0; i < radioInput.length; i++) {
+            if( radioInput[i].id !== 'schedule-info' ){
+                if ( radioInput[i].value === "N" ) {
+                    postFlag = false;
+
+                    let infoTitle = document.querySelector(`.${radioInput[i].id}`).closest('.product-input-wrapper').querySelector("h3").innerText.replace("*",'');
+                    alert(`먼저 ${infoTitle} 정보를 저장해주세요.`)
+                    break;
+                }
+            }
+        }
+
+        if ( postFlag ) {
+            $("#basic-info-add-form input[name='productStatus']").val("S")
+            let data = $('#basic-info-add-form').serialize();
+            data += `&productTourId=${$('#product-tour-id').val()}`;
+            $.ajax({
+                url: "/manage/product/registProduct",
+                data: data,
+                type: "post",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                },
+                success: function (data) {
+                    alert(data.message);
+                    location.href = `/manage/product/${[[${typeCode}]]}`;
+                },
+                error: function () {
+
+                }
+            })
+        }
+    }
+
+    goList = function () {
+        if ( confirm("저장되지 않은 내용은 사라집니다. 목록으로 이동하시겠습니까?") ) {
+            location.href = `/manage/product/${[[${typeCode}]]}`;
+        }
+    }
+
+    goBack = function () {
+        if ( confirm("저장되지 않은 내용은 사라집니다. 뒤로가시겠습니까?") ) {
+            window.history.back();
+        }
+    }
+
+	function deepCopy(obj) {
+		if (typeof obj !== 'object' || obj === null) {
+			return obj;
+		}
+
+		let copy;
+
+		if (Array.isArray(obj)) {
+			copy = [];
+			for (const item of obj) {
+				copy.push(deepCopy(item));
+			}
+		} else {
+			copy = {};
+			for (const key in obj) {
+				if (obj.hasOwnProperty(key)) {
+					copy[key] = deepCopy(obj[key]);
+				}
+			}
+		}
+
+		return copy;
+	}
+
+    function initStartDatePicker() {
+		$("#startDatePicker").daterangepicker({
+			singleDatePicker:true,
+			"minDate": moment(),
+			"maxDate": moment().add(12, 'month'),
+			startDate: new Date().toISOString().split('T')[0],
+			locale: {
+				format: 'YYYY.MM.DD',
+				applyLabel: "적용",
+				cancelLabel: "취소",
+				daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+				monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
+			}
+		}, function(start, end, label) {
+
+		});
+		$('#startDatePicker').on('apply.daterangepicker', function(ev, picker) {
+			const privateStartDate = picker.startDate.format('YYYY-MM-DD');
+			$(this).text(privateStartDate.replaceAll('-', '. '));
+			$(this).append(`<img src="/images/icon/calendar.svg" style="position:absolute; width: 15px; height: 17px; right: 9px;" alt="">`);
+			startDate = privateStartDate;
+			postJson.startDate = privateStartDate;
+
+		});
+		$("#startDatePicker").text(startDate.replaceAll('-', '. '));
+		$("#startDatePicker").append(`<img src="/images/icon/calendar.svg" style="position:absolute; width: 15px; height: 17px; right: 9px;" alt="">`);
+		postJson.startDate = startDate;
+	}
+
+	function initEndDatePicker() {
+		$("#endDatePicker").daterangepicker({
+			singleDatePicker:true,
+			"minDate": moment(),
+			"maxDate": moment().add(12, 'month'),
+			startDate: new Date().toISOString().split('T')[0],
+			locale: {
+				format: 'YYYY.MM.DD',
+				applyLabel: "적용",
+				cancelLabel: "취소",
+				daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+				monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
+			},
+		});
+		$("#endDatePicker").on('apply.daterangepicker', function(ev, picker) {
+			const privateEndDate = picker.startDate.format('YYYY-MM-DD');
+			$(this).text(privateEndDate.replaceAll('-', '. '));
+			$(this).append(`<img src="/images/icon/calendar.svg" style="position:absolute; width: 15px; height: 17px; right: 9px;" alt="">`);
+			endDate = privateEndDate;
+			postJson.endDate = privateEndDate;
+		});
+		$("#endDatePicker").text(endDate.replaceAll('-', '. '));
+		$("#endDatePicker").append(`<img src="/images/icon/calendar.svg" style="position:absolute; width: 15px; height: 17px; right: 9px;" alt="">`);
+		postJson.endDate = endDate;
+	}
+
+</script>
+<!-- AdminLTE App -->
+<script src="/js/manage/adminlte.js"></script>
+
+</body>
+</html>

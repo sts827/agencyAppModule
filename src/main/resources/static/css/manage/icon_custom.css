@@ -1,0 +1,24 @@
+.icon-custom-menu-open {
+	display: inline-block;
+  	height: 20px;
+  	width: 20px;
+	background-image: url('/images/icon/menu-open.svg');
+}
+
+.icon-custom-menu-close {
+	display: inline-block;
+  	height: 20px;
+  	width: 20px;
+	background-image: url('/images/icon/menu-close.svg');
+}
+
+.icon-custom-menu-select{
+	display: inline-block;
+  	height: 14px;
+  	width: 9px;
+	background-image: url('/images/icon/menu-select-default.svg');
+}
+
+.icon-custom-menu-select:hover {
+	background-image: url('/images/icon/menu-select-hover.svg');
+}

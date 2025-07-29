@@ -1,0 +1,126 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.common.MessageSenderMapper">
+    <select id="selectMailServer" parameterType="String" resultType="SettingMailServer">
+        SELECT id, alarm_type,
+               smtp_email, smtp_username,
+               smtp_server, smtp_port,
+               smtp_authorize_required, smtp_secure_type,
+               smtp_login_id, smtp_login_pw,
+               smtp_use_yn, create_id, create_date
+          FROM setting_mail_server
+         WHERE delete_yn = 'N' AND smtp_use_yn = 'Y' AND alarm_type = #{value}
+    </select>
+
+    <select id="selectMailFormat" parameterType="Integer" resultType="SettingMailFormat">
+        SELECT id, server_id, title, mail_content
+          FROM setting_mail_format
+         WHERE delete_yn = 'N' AND use_yn = 'Y' AND id = #{value}
+           AND (start_date IS NULL OR start_date &lt; now())
+           AND (expire_date IS NULL OR expire_date &gt; now())
+    </select>
+
+    <select id="selectMailReceiverList" parameterType="Integer" resultType="SettingMailReceiver">
+        SELECT id, server_id, email, username, start_date, expire_date, use_yn
+          FROM setting_mail_receiver
+         WHERE delete_yn = 'N' AND use_yn = 'Y' AND server_id = #{value}
+           AND (start_date IS NULL OR start_date &lt; now())
+           AND (expire_date IS NULL OR expire_date &gt; now())
+    </select>
+
+    <select id="selectMessageSetting" parameterType="String" resultType="SettingMessage">
+        SELECT id, alarm_type,
+               api_corp, api_type,
+               api_use_time, api_queue_type, use_yn,
+               create_id, create_date
+          FROM setting_message
+         WHERE delete_yn = 'N' AND use_yn = 'Y' AND alarm_type = #{value}
+    </select>
+
+    <select id="selectMessageFormat" parameterType="Integer" resultType="SettingMessageFormat">
+        SELECT id, message_id,
+               template_code, title, content,
+               start_date, expire_date, use_yn,
+               create_id, create_date
+          FROM setting_message_format
+         WHERE delete_yn = 'N' AND use_yn = 'Y' AND id = #{value}
+           AND (start_date IS NULL OR start_date &lt; now())
+           AND (expire_date IS NULL OR expire_date &gt; now())
+    </select>
+
+    <select id="selectMessageReceiverList" parameterType="Integer" resultType="SettingMessageReceiver">
+        SELECT id, message_id, mobile, username, start_date, expire_date, use_yn
+          FROM setting_message_receiver
+         WHERE delete_yn = 'N' AND use_yn = 'Y' AND message_id = #{value}
+           AND (start_date IS NULL OR start_date &lt; now())
+           AND (expire_date IS NULL OR expire_date &gt; now())
+    </select>
+
+    <insert id="insertMessageQueue" parameterType="MessageQueue">
+        INSERT INTO message_queue
+           SET message_type = #{messageType},
+               queue_type = #{queueType},
+               subject = #{subject},
+               content = #{content},
+               content_type = #{contentType},
+               to_name = #{toName},
+               to_address = #{toAddress},
+               send_status_code = #{sendStatusCode},
+               send_request_time = now(),
+               send_request_userid = #{sendRequestUserid},
+               <choose>
+                <when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sendApplyTime)">
+                send_apply_time = #{sendApplyTime},
+                </when>
+                <otherwise>
+                send_apply_time = now(),
+                </otherwise>
+               </choose>
+               create_id = #{createId},
+               create_date = now()
+    </insert>
+
+    <select id="selectPendingMessageQueueCount" parameterType="String" resultType="Integer">
+        SELECT count(*) FROM message_queue
+         WHERE delete_yn = 'N' AND message_type = #{value}
+           AND send_apply_time &lt; now() AND send_status_code = 'A'
+    </select>
+
+    <select id="selectPendingMessageQueue" resultType="MessageQueue">
+        SELECT id, message_type, queue_type,
+               subject, content, content_type,
+               to_name, to_address,
+               send_request_time, send_request_userid,
+               send_apply_time, send_status_code,
+               send_result, send_result_time, send_result_message
+          FROM message_queue
+         WHERE delete_yn = 'N' AND message_type = #{value}
+           AND send_apply_time &lt; now() AND send_status_code = 'A'
+    </select>
+
+    <select id="selectPendingMessageQueueGroupCount" parameterType="String" resultType="MessageGroupCount">
+        SELECT message_type, to_address, send_status_code, count(*) cnt
+          FROM message_queue
+         WHERE delete_yn = 'N' AND message_type = #{value}
+           AND send_apply_time &lt; now() AND send_status_code = 'A'
+         GROUP BY message_type, to_address, send_status_code
+    </select>
+
+    <update id="updatePendingSummaryMessageSendComplete" parameterType="HashMap">
+        UPDATE message_queue
+           SET send_status_code = #{statusCode},
+               send_result_time = #{resultTime}, send_result = #{result}, send_result_message = #{resultMessage},
+               last_update_id = #{lastUpdateId}, last_update_date = now()
+         WHERE delete_yn = 'N' AND message_type = #{messageType} AND to_address = #{to}
+    </update>
+
+    <update id="updatePendingNormalMessageSendComplete" parameterType="HashMap">
+        UPDATE message_queue
+           SET send_status_code = #{statusCode},
+               send_result_time = #{resultTime}, send_result = #{result}, send_result_message = #{resultMessage},
+               last_update_id = #{lastUpdateId}, last_update_date = now()
+         WHERE delete_yn = 'N' AND message_type = #{messageType} AND queue_type = 'normal'
+           AND to_address = #{to} AND id = #{id}
+    </update>
+</mapper>

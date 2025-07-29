@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">포인트 등록</h1>
+        </div>
+        <div class="manage-content mb-4">
+            <form id="funcScheduleForm">
+
+            <div class="input-box">
+                <div class="row mb-3 form-inline">
+                    <div class="input-area-half">
+                        <label class="input-label">회원선택</label>
+                        <input type="text" class="form-control inline-two" id="customerEmail" name="userEmail" placeholder="사용자 ID(E-mail)" readonly="readonly" onclick="fnPopupCustomerOpen()" />
+                        <input type="text" class="form-control inline-two" id="customerName" name="userName" placeholder="사용자명" readonly="readonly" onclick="fnPopupCustomerOpen()" />
+                    </div>
+                    <div class="input-area-half">
+                        <label class="input-label">포인트구분</label>
+                        <input type="hidden" id="accrued-type" name="accruedType" />
+                        <select class="form-control inline-one" name="accruedCode">
+                            <option th:each="${pointCode != null} ? item : ${pointCode}"
+                                    th:value="${item.code}" th:text="${item.name}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3 form-inline">
+                    <div class="input-area-quad">
+                        <label class="input-label">포인트</label>
+                        <input type="number" class="form-control inline-one" id="point-accrued" name="pointAccrued" placeholder="포인트" />
+                    </div>
+                    <div class="input-area-quad">
+                        <label class="input-label">유효기한</label>
+                        <input type="text" id="expire-date" name="expireDate" class="form-control inline-one datepicker" readonly="readonly" />
+                    </div>
+                    <div class="input-area-quad">
+                        <button type="button" class="btn btn-dark" th:onclick="fnSetDatetime('expire-date', 'NULL')">없음</button>
+                        <button type="button" class="btn btn-default" th:onclick="fnSetDatetime('expire-date', '1w')">1주일</button>
+                        <button type="button" class="btn btn-default" th:onclick="fnSetDatetime('expire-date', '1M')">1달</button>
+                        <button type="button" class="btn btn-default" th:onclick="fnSetDatetime('expire-date', '3M')">3달</button>
+                        <button type="button" class="btn btn-default" th:onclick="fnSetDatetime('expire-date', '1y')">1년</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        <div class="manage-control">
+            <button type="button" class="btn btn-dark" onclick="history.back()">취소하기</button>
+            <button type="button" class="btn btn-primary" th:onclick="${record != null} ? 'fnUpdatePointRecord()' : 'fnCreatePointRecord()'">저장하기</button>
+        </div>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <div th:replace="~{/manage/inc/manage-popup :: modal-schedule}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $('.datepicker').daterangepicker({
+            autoUpdateInput: true,
+            singleDatePicker:true,
+            showDropdowns: true,
+            showCustomRangeLabel:false,
+            drops:"auto",
+            locale: {
+                format: 'YYYY-MM-DD',
+                applyLabel: "적용",
+                cancelLabel: "취소",
+                daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                separator:separator
+            }
+        }, function(start, end, label){});
+        for(let i=0; i<$('.datepicker').length; i++){
+            if($('.datepicker').eq(i).attr('data-default') === undefined){
+                $('.datepicker').eq(i).val('')
+            }
+        }
+    });
+
+    fnSetDatetime = function(item, period){
+        let dateType, adder;
+        if(period === null || period === 'NULL'){
+            dateType = null;
+            $('#'+item).val('');
+        }else{
+            dateType = period.substring(period.length, 1);
+            adder = period.substring(0, period.length-1);
+            $('#'+item).val(moment().add(adder, dateType).format('YYYY-MM-DD'));
+        }
+    }
+
+    fnCreatePointRecord = function(){
+        let form = $('#funcScheduleForm');
+        $(form).find('#accrued-type').val($(form).find('select[name=accruedCode] option:selected').text());
+        if($(form).find('#customerEmail').val() === ''){
+            alert('포인트를 부여할 사용자를 선택해주세요.');
+        } else if(!formValidCheck($('#point-accrued'), 'input', 'is-invalid', 'count')){
+            alert('포인트를 입력해주세요.');
+        } else {
+            $.ajax({
+                url : `/manage/point/record/create`,
+                type : "POST",
+                data : $(form).serialize(),
+                success : function(data) {
+                    if (typeof data.result != "undefined" && data.result == "error") {
+                        alert(data.error);
+                        return;
+                    } else {
+                        if( data.result === "success" ){
+                            alert(data.message);
+                            location.replace('/manage/point/record/list');
+                        }else{
+                            alert(data.message);
+                        }
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            })
+        }
+    }
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}"/>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">회사정보관리</h1>
+        </div>
+        <div class="manage-content">
+            <h3 class="title">회사정보</h3>
+            <div class="container-fluid p-0">
+                <form id="company-info-form">
+                <div class="row form-group">
+                    <label class="col-md-1 col-form-label" for="site-name">사이트명*</label>
+                    <div class="col-md-11">
+                        <input type="text" class="form-control" id="site-name" name="siteName" placeholder="사이트명"
+                               required="required" th:value="${info != null} ? ${info.siteName}" />
+                        <p class="form-check-label text-muted mt-1">고객에게 노출되는 사이트명을 입력해주세요.</p>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-1 col-form-label" for="company-name">상호명*</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="company-name" name="companyName"
+                               placeholder="사업자등록 상호명" required="required" th:value="${info != null} ? ${info.companyName}" />
+                    </div>
+                    <label class="col-md-1 col-form-label text-center" for="company-owner">대표자명*</label>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" id="company-owner" name="companyOwner"
+                               placeholder="사업자등록증 대표자명" required="required" th:value="${info != null} ? ${info.companyOwner}" />
+                    </div>
+                    <label class="col-md-1 col-form-label text-center" for="company-registration-no">사업자등록번호*</label>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="company-registration-no"
+                               name="companyRegistrationNo" placeholder="사업자등록번호" required="required" th:value="${info != null} ? ${info.companyRegistrationNo}" />
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-1 col-form-label" for="company-tell">전화번호*</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="company-tell" name="companyTell" placeholder="대표전화"
+                               required="required" th:value="${info != null} ? ${info.companyTell}" />
+                    </div>
+                    <label class="col-md-1 col-form-label text-center" for="company-fax">팩스번호</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="company-fax" name="companyFax" placeholder="팩스번호" th:value="${info != null} ? ${info.companyFax}" />
+                    </div>
+                    <label class="col-md-1 col-form-label text-center" for="company-email">이메일주소</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="company-email" name="companyEmail"
+                               placeholder="이메일주소" th:value="${info != null} ? ${info.companyEmail}" />
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-1 col-form-label" for="company-cs-tell">고객센터*</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="company-cs-tell" name="companyCsTell"
+                               placeholder="고객센터" required="required" th:value="${info != null} ? ${info.companyCsTell}" />
+                    </div>
+                    <label class="col-md-1 col-form-label text-center" for="company-cs-time">운영안내</label>
+                    <div class="col-md-7">
+                        <input type="text" class="form-control" id="company-cs-time" name="companyCsTime"
+                               placeholder="고객센터 운영시간" th:value="${info != null} ? ${info.companyCsTime}" />
+                    </div>
+                </div>
+                <div class="row form-group justify-content-between">
+                    <div class="col-md-6 row p-0 m-0">
+                        <label class="col-md-2 col-form-label" for="company-tourism-registration-no">관광사업등록번호</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="company-tourism-registration-no"
+                                   name="companyTourismRegistrationNo" placeholder="관광사업등록번호" th:value="${info != null} ? ${info.companyTourismRegistrationNo}"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6 row justify-content-between">
+                        <label class="col-md-auto col-form-label" for="company-mail-order-registration-no">통신판매업신고번호</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="company-mail-order-registration-no"
+                                   name="companyMailOrderRegistrationNo" placeholder="통신판매업 신고번호" th:value="${info != null} ? ${info.companyMailOrderRegistrationNo}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group justify-content-between">
+                    <div class="col-md-6 row p-0 m-0">
+                        <label class="col-md-2 col-form-label" for="company-address-road">도로명주소</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="company-address-road"
+                                   name="companyAddressRoad" placeholder="도로명주소" th:value="${info != null} ? ${info.companyAddressRoad}" readonly="readonly" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 row justify-content-between">
+                        <label class="col-md-2 col-form-label" for="company-address-jibun">지번주소</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="company-address-jibun"
+                                   name="companyAddressJibun" placeholder="지번주소" th:value="${info != null} ? ${info.companyAddressJibun}" readonly="readonly" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <label class="col-md-1 col-form-label" for="company-address-zipcode">우편번호</label>
+                    <div class="col-md-1">
+                        <input type="text" class="form-control" id="company-address-zipcode"
+                               name="companyAddressZipcode" placeholder="우편번호" th:value="${info != null} ? ${info.companyAddressZipcode}" readonly="readonly" />
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-default" onclick="fnSearchAddressKakao()">주소검색</button>
+                    </div>
+                    <label class="col-md-1 col-form-label" for="company-address-detail">세부주소</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="company-address-detail"
+                               name="companyAddressDetail" placeholder="세부주소" th:value="${info != null} ? ${info.companyAddressDetail}" />
+                    </div>
+                </div>
+                    <input type="hidden" id="company-latitude" name="companyLatitude" th:value="${info != null} ? ${info.companyLatitude}" />
+                    <input type="hidden" id="company-longitude" name="companyLongitude" th:value="${info != null} ? ${info.companyLongitude}" />
+                </form>
+            </div>
+        </div>
+        <div class="manage-control">
+            <button type="button" class="btn btn-dark" onclick="location.reload()">취소하기</button>
+            <button type="button" class="btn btn-primary" onclick="fnSaveCompanyInfo()">저장하기</button>
+        </div>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    fnSaveCompanyInfo = function(){
+        let form = $('#company-info-form');
+        $.ajax({
+            url: '/manage/company/info',
+            type : "POST",
+            data : $(form).serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    if( data.result === "success" ){
+                        alert(data.message);
+                        location.reload();
+                    }else{
+                        alert(data.message);
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnSearchAddressKakao = function (){
+        new daum.Postcode({
+            oncomplete: function(data) {
+                let roadAddr = data.roadAddress;
+                $('#company-address-jibun').val(data.jibunAddress);
+                $('#company-address-road').val(roadAddr);
+                $('#company-address-zipcode').val(data.zonecode);
+                if(roadAddr !== ''){
+                    let extraRoadAddr = '';
+                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                        extraRoadAddr += data.bname;
+                    }
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    if(extraRoadAddr !== ''){
+                        extraRoadAddr = ' (' + extraRoadAddr + ')';
+                    }
+                    $('#company-address-detail').val(extraRoadAddr);
+                }else{
+                    $('#company-address-detail').val('');
+                }
+
+                $.ajax({
+                    url:'https://dapi.kakao.com/v2/local/search/address.json?query='+encodeURIComponent(roadAddr),
+                    type : 'GET',
+                    headers: {'Authorization' : `KakaoAK [(${DAPI_KEY})]`},
+                    dataType : 'JSON',
+                    success : function(res) {
+                        if(res.documents.length > 0){
+                            var addr = res.documents[0].road_address;
+                            $('#company-latitude').val(addr.y);
+                            $('#company-longitude').val(addr.x);
+                        }
+                    },
+                    error : function(xhr, code, errorMsg) { },
+                    beforeSend : function() { },
+                    complete : function() { }
+                });
+            }
+        }).open();
+    }
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

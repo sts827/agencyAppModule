@@ -1,0 +1,16 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+	<section class="content-wrapper" th:fragment="terms-view">
+        <div class="table">
+			<div>
+				<h1>약관 보기</h1>
+				<div th:text="${content.title}"></div>
+				<div>
+					<div th:text="${content.createDate}"></div>
+				</div>
+				<div th:utext="${content.content}"></div>
+			</div>
+        </div>
+    </section>
+</body>
+</html>

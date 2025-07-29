@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <div class="content-wrapper">
+	    <div class="content-header">
+			<h1 class="m-0" > 예약관리</h1>
+	    </div>
+	    <section class="content">
+	      <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0 search-body">
+							<div class="row">
+								<div class="form-inline col-5 p-0">
+									<div class="form-inline col-4">
+					                    <select id="dateType" name="dateType" class="form-control col-md-12" onchange="fnChangeRange(this)">
+											<option value="" >일자선택</option>
+											<option value="receipt">접수일자</option>
+											<option value="travelFrom">여행출발일</option>
+											<option value="travelTo">여행복귀일</option>
+					                	</select>
+									</div>
+									<div class="form-inline col-8 p-0">
+		                             	<label class="col-3 p-0">기간</label>
+										<input type="text" id="dateRange" name="dateRange" class="form-control col-9 p-0 date-range-picker-from tac" disabled>
+									</div>
+								</div>
+								<div class="form-inline col-md-3 p-0">
+	                             	<label class="col-3">예약상태</label>
+				                    <select id="reservationCode" name="reservationCode" class="form-control col-9">
+										<option value="" >미선택</option>
+										<option value="0">접수</option>
+										<option value="1">처리중</option>
+										<option value="2">입금대기</option>
+										<option value="3">확약</option>
+										<option value="4">완료</option>
+				                	</select>
+								</div>
+								<div class="form-inline col-3">
+									<input type="text" id="searchKey" name="searchKey" class="form-control col-md-12 " placeholder="고객명, 연락처, 이메일을 입력해주세요">
+								</div>
+								<div class="col-1 clearfix">
+									<div class="btn-group float-right">
+										<button type="button" class="btn btn-primary" id="searchBtn"><i class="fa fa-search"></i> 검색</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+<!--/*
+			<div class="row mb-10">
+				<div class="col-md-12">
+					<div class="float-left">
+			            <button class="tab-btn active" data-id="all" th:onclick="fnSetcategoryId()">전체</button>
+		<th:block th:each="item : ${listCategory}">
+			            <button class="tab-btn" th:text="${item.title}"  th:data-id="${item.id}" th:onclick="fnSetcategoryId([[${item.id}]])" >항목</button>
+		</th:block>
+			        </div>
+			        <div class="float-right">
+						<button type="button" class="btn btn-primary pull-right" onclick="goCategory()">카테고리 관리?</button>
+				1	</div>
+				</div>
+	        </div>
+*/-->
+			<div class="row form-group">
+				<div class="col-md-12">
+					<div class="float-right">
+						<button type="button" class="btn btn-primary pull-right" onclick="goInsert()">등록하기</button>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0">
+							<table id="datatable" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+	      </div>
+	    </section>
+	  </div>
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <aside class="control-sidebar control-sidebar-dark">
+	  </aside>
+	</div>
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<script src="/js/manage/adminlte.js"></script>
+
+	<script type="text/javascript" th:inline="javascript">
+	var datatable;
+	var reservation = [[${reservationYn}]] === 'Y' ? true : false;
+
+	$(document).ready(function() {
+		var _dateOption = _daterangepickerOptionRangeOnlyDate;
+		delete _dateOption.maxDate;
+		_dateOption.autoUpdateInput = false;
+		_dateOption.locale.cancelLabel='지우기';
+		//console.log( _dateOption );
+
+		/*daterangepicker custom made*/
+		$('.date-range-picker-from')
+			.daterangepicker(_dateOption, function(start, end, label) {})
+			.on('apply.daterangepicker', function(ev, picker) {
+				var format = _dateOption.locale.format;
+				$(this).val(picker.startDate.format(format) + separator + picker.endDate.format(format));
+			}).on('cancel.daterangepicker', function(ev, picker) {
+				$(this).val('');
+			});
+
+		initDatatable();
+	});
+
+	initDatatable = function(){
+		//$('#bbsId').trigger('change');
+		var baseColumns = [
+			{ "name" : "id", "title" : "고유번호", "data" : "id", "className" : "dt-head-center dt-body-left",visible:false},
+			{ "name" : "travelScheduleDt", "title" : "여행일자", "data" : "travelScheduleDt", "className" : "dt-head-center dt-body-center",width:"200px"},
+			{ "name" : "reservationCode", "title" : "예약상태코드",
+			  "data" : function (row, type, set) {
+						//console.log(`${row["applyCode"]}`);
+					if( row["cancelYn"] === 'N' ){
+						var strclass = "box-label";
+						switch(row["reservationCode"]){
+							case "0": strclass+=" receipt";     break; //접수
+							case "1": strclass+=" progressing"; break; //처리중
+							case "2": strclass+=" waiting";    break; //입금대기
+							case "3": strclass+=" promise";    break; //확약
+							case "4": strclass+=" complete";    break; //완료
+							default : strclass+=" "; break;
+						}
+
+						var html = `<span class="${strclass}">${row["reservationCodeName"]}</span>`;
+					} else {
+						html = `<span class="box-label progressing">취소처리</span>`;
+					}
+					return html;
+				},
+				//"reservationCode",
+			  "className" : "dt-head-center dt-body-center",width:"100px"},
+			{ "name" : "userName", "title" : "예약자명", "data" : "userName","className" : "dt-head-center dt-body-center",width:"100px"},
+			//{ "name" : "userMobile", "title" : "연락처", "data" : "userMobile", "className" : "dt-head-center dt-body-center",width:"120px"},
+			{ "name" : "userMobile", "title" : "연락처",
+			  "data" : function (row, type, set) {
+					var html = "";
+						html +=`${row['userMobile']}`
+						html +=`<br>${row['userEmail']}`
+					return html;
+				},
+			  "className" : "dt-head-center dt-body-center",width:"120px"},
+			{ "name" : "productTitle", "title" : "상품명", "data" : "productTitle", "className" : "dt-head-center dt-body-center"},
+			{ "name" : "createDate", "title" : "접수일자", "data" : "createDate", "className" : "dt-head-center dt-body-center",width:"100px"},
+			{ "name" : "func_btns", "title":"기능",
+				"data" :
+					function (row, type, set) {
+						var html = "";
+						html += `<div class="form-inline justify-content-center">`;
+						html += "<button type='button' class='btn btn-default' data-toggle='tooltip' title='상세' onclick='goEdit(\""+row["id"]+"\")'>상세</button>&nbsp;";
+						if ( row["deleteYn"] === 'Y' ) {
+							  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='복구'  onclick='goRestore(\""+row["id"]+"\")' style='color:#fff;background-color:#007bff;border-color:#007bff;box-shadow:none'>복구</button>";
+						} else  {
+							  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제'  onclick='goDelete(\""+row["id"]+"\")'>삭제</button>";
+						}
+						html += `</div>`;
+						return html;
+					},
+			   "className": "dt-head-center dt-body-center", "orderable" : false, "width":"160px"},
+		];
+
+		datatable = $("#datatable").DataTable({
+			"searching" : false
+			,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+			,"paging": true
+			,"bPaginate": true
+			,"responsive": true
+			,"language": lang_kor
+			,"ordering": true
+			,"bLengthChange" : false
+			,"bInfo":false
+			,"ajax" : {
+				"url" : "/manage/reservation/list"
+				,"method" : "post"
+				, "beforeSend": function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				}
+				,"data" : function(d) {
+					if( $('#dateType option:selected').index() > 0 ){
+						d.dateType = $('#dateType option:selected').val();
+						var dateRange = $('#dateRange').val().split(separator);
+						d.dateFrom = dateRange[0];
+						d.dateTo   = dateRange[1];
+					}
+					if ($('#reservationCode').val() != "")  d.reservationCode = $('#reservationCode').val();
+					if ($('#searchKey').val().trim() != "") d.searchKey = $('#searchKey').val().trim();
+
+				}
+			},"processing": true
+			,"serverSide": true
+			,"order" :
+				[ [6, 'desc'] ]
+			,"createdRow": function(row, data) {
+				  if ( data.deleteYn === "Y" ) {
+					  $(row).css('background-color', '#DC3545');
+				  } else if ( data.secretYn === "Y" ) {
+					  $(row).css('background-color', '#e9e9e9');
+				  }
+			  }
+			,"initComplete": function(settings, json) {
+    			//fnInitBootstrapToggle();
+  			}
+			,"columns": baseColumns
+		});
+	};
+	fnSetcategoryId =function(id){
+		$('.tab-btn').removeClass('active');
+
+		if(id !== undefined){
+			$('#categoryId').val(id);
+			$(`.tab-btn[data-id='${id}']`).addClass('active');
+		}else{
+			$('#categoryId').val('');
+			$(`.tab-btn[data-id='all']`).addClass('active');
+		}
+
+		$("#searchBtn").trigger('click');
+	}
+
+	$("#searchBtn").click(function() {
+		if( datatable !== undefined)
+			datatable.ajax.reload();
+	});
+
+	$("#resetBtn").click(function() {
+		searchReset();
+		//datatable.column( 4 ).visible(true);
+		datatable.ajax.reload();
+	});
+
+	goCategory = function() {
+		location.href = "/manage/inquiry/category?params="+getParams();
+	}
+
+	goInsert = function() {
+		location.href = `/manage/reservation/form?mode=I&params=`+getParams();
+	}
+
+	goEdit = function(id) {
+		location.href = `/manage/reservation/form?mode=U&id=`+id+"&params="+getParams();
+	}
+
+	goDelete = function(id){
+		if(confirm("삭제하시겠습니까?")){
+			$.ajax({
+				url : '/manage/reservation/delete',
+				type : "POST",
+				data : {"id" : id},
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				},
+				success : function(res){
+					if("success" == res.result){
+						alert("삭제 " + res.message);
+						datatable.ajax.reload();
+					}else{
+						alert(res.message)
+					}
+				}
+			})
+		}
+	}
+
+	goRestore = function(id){
+		if(confirm("복구하시겠습니까?")){
+			$.ajax({
+				url : '/manage/reservation/restore',
+				type : "POST",
+				data : {"id" : id},
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				},
+				success : function(res){
+					if("success" == res.result){
+						alert("복구 " + res.message);
+						datatable.ajax.reload();
+					}else{
+						alert(res.message)
+					}
+				}
+			})
+		}
+	}
+
+	fnChangeRange = function(target){
+		//$(target).index();
+		var idx = $('option:selected',$(target)).index();
+		var txt = $('option:selected',$(target)).text();
+		if( idx > 0 ){
+			$('#dateRange').prop('disabled', false);
+			$('#dateRange').siblings('label').text(txt);
+		} else {
+			$('#dateRange').prop('disabled', true);
+			$('#dateRange').siblings('label').text('기간');
+		}
+
+	}
+
+	fnUseYnUpdate = function( id, Yn){
+		//if(confirm("수정 하시겠습니까?")  ){
+			var formData = new FormData();
+			formData.append("mode", "U");
+			formData.append("id", id);
+			formData.append("useYn", Yn);
+
+			$.ajax({
+				url : '/manage/inquiry/contents-save',
+				type : "POST",
+				data : formData,
+				enctype: 'multipart/form-data',
+				contentType : false,
+				processData : false,
+				dataType : "json",
+				beforeSend: function (xhr) {
+						xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+				},
+				success : function(res) {
+					if (res.result === "success" ) {
+						//alert(res.message);
+	                    //preList();
+					}else {
+						//alert(res.message);
+	                    return;
+					}
+				}
+			});
+		//}
+	}
+	fnInitBootstrapToggle = function(){
+		setTimeout(function(){
+			$('.content input[data-toggle="toggle"]')
+				.bootstrapToggle()
+				.change(function(e){
+					selector = '';
+					id='';
+					yn = 'Y';
+					type = this.name;
+
+					$.each(this.attributes, function() {
+			         	if(this.name =='data-id'){
+							id = this.value;
+							selector = `input[name=${type}][data-id=${id}]`;
+
+							if(!$(selector).prop('checked')){yn = 'N';}
+							switch(type){
+								case 'useYn': fnUseYnUpdate(id, yn); break;
+								case 'deleteYn':break;
+							}
+						}
+			        });
+
+			        if(type = 'useYn'){
+				        if(yn==='N'){
+							$(this).closest('tr').css('background-color','#E6E6E6');
+						} else {
+							$(this).closest('tr').css('background-color','unset');
+						}
+					}
+				});
+		},200);
+	}
+	</script>
+	<style>
+		.way-table .box-label{display: inline-block;min-width: 90%;color: #FFF;border: 1px solid #999999;border-radius: 5px;background-color: #999999;text-align: center;}
+
+		.way-table .box-label.checking,
+		.way-table .box-label.receipt     {background-color: #d8530e;border-color: #d8530e;}
+		.way-table .box-label.progressing {background-color: #e30b0b;border-color: #e30b0b;}
+		.way-table .box-label.waiting     {background-color: #f30b0b;border-color: #f30b0b;}
+		.way-table .box-label.promise     {background-color: #108115;border-color: #108115;}
+		.way-table .box-label.complete    {background-color: #309115;border-color: #309115;}
+	</style>
+
+	</body>
+</html>

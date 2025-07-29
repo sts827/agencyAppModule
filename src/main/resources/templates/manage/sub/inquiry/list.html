@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <!-- Preloader -->
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+
+	  <!-- Navbar -->
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <!-- /.navbar -->
+
+	  <!-- Main Sidebar Container -->
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0" th:text="${reservationYn eq 'N' ? '문의관리' : '예약관리'}"> 문의 관리</h1>
+	    </div>
+	    <!-- /.content-header -->
+
+	    <!-- Main content -->
+	    <section class="content">
+	      <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0 search-body">
+							<div class="row">
+								<input type="hidden" id="categoryId" name="categoryId">
+	                            <input type="hidden" id="contLike"  maxlength="30">
+								<div class="form-inline col-md-4">
+	                             	<label class="col-3">제목</label>
+	                             	<input type="text" id="titleLike" class="form-control col-8" placeholder="제목 입력" maxlength="30">
+								</div>
+								<div class="form-inline col-md-6" id="divInquiryMode">
+									<label class="col-md-2" for="company-name">처리 상태</label>
+				                    <select id="applyCode" name="applyCode" class="form-control col-md-4">
+										<option value="" >전체</option>
+										<option value="0">접수</option>
+										<option value="1">처리중</option>
+										<option value="2">처리완료</option>
+				                	</select>
+								</div>
+								<div class="form-inline col-md-6"  id="divReservationMode">
+									<div class="form-inline col-md-6">
+										<label class="col-md-4" for="company-name">예약 상태</label>
+					                    <select id="reservationCode" name="reservationCode" class="form-control col-md-8">
+											<option value="" >전체</option>
+											<option value="0">접수</option>
+											<option value="1">처리중</option>
+											<option value="2">처리완료</option>
+					                	</select>
+									</div>
+									<div class="form-inline col-md-6">
+										<label class="col-md-4" for="company-name">취소 상태</label>
+					                    <select id="cancelCode" name="cancelCode" class="form-control col-md-8">
+											<option value="" >전체</option>
+											<option value="0">접수</option>
+											<option value="1">처리중</option>
+											<option value="2">처리완료</option>
+					                	</select>
+				                	</div>
+								</div>
+
+								<div class="col-md-2 clearfix">
+									<div class="btn-group float-right">
+										<button type="button" class="btn btn-primary" id="searchBtn"><i class="fa fa-search"></i> 검색</button>
+<!--/*										<button type="button" class="btn btn-danger" id="resetBtn"><i class="fa fa-undo"></i> 리셋</button>*/-->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mb-10">
+				<div class="col-md-12">
+					<div class="float-left">
+			            <button class="tab-btn active" data-id="all" th:onclick="fnSetcategoryId()">전체</button>
+		<th:block th:each="item : ${listCategory}">
+			            <button class="tab-btn" th:text="${item.title}"  th:data-id="${item.id}" th:onclick="fnSetcategoryId([[${item.id}]])" >항목</button>
+		</th:block>
+			        </div>
+<!--/*
+			        <div class="float-right">
+						<button type="button" class="btn btn-primary pull-right" onclick="goCategory()">카테고리 관리?</button>
+					</div>
+*/-->
+				</div>
+	        </div>
+<!--/*
+			<div class="row form-group">
+				<div class="col-md-12">
+					<div class="float-right">
+						<button type="button" class="btn btn-primary pull-right" onclick="goInsert()">등록하기</button>
+					</div>
+				</div>
+			</div>
+*/-->
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0">
+							<table id="datatable" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+	      </div>
+	    </section>
+	    <!-- /.content -->
+	  </div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashinquiry demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashinquiry.js"></script>
+	-->
+
+	<script type="text/javascript" th:inline="javascript">
+	var datatable;
+	var reservation = [[${reservationYn}]] === 'Y' ? true : false;
+
+	$(document).ready(function() {
+
+		if(reservation){
+			$('#divInquiryMode').hide();
+			$('#divReservationMode').show();
+		}  else {
+			$('#divInquiryMode').show();
+			$('#divReservationMode').hide();
+		}
+
+		//console.log('initDatatable');
+		initDatatable();
+	});
+
+	initDatatable = function(){
+		//$('#bbsId').trigger('change');
+		var baseColumns = [
+			{ "name" : "id", "title" : "고유번호", "data" : "id", "className" : "dt-head-center dt-body-left", "width":"5%"},
+			{ "name" : "categoryName", "title" : "카테고리", "data" : "categoryName", "className" : "dt-head-center dt-body-left", "width":"10%"},
+			{ "name" : "applyCodeName", "title" : "접수상태",
+			  "data" : function (row, type, set) {
+						//console.log(`${row["applyCode"]}`);
+						var strclass = "box-label";
+						switch(row["applyCode"]){
+							case "0": strclass+=" receipt"; break;
+							case "1": strclass+=" progressing"; break;
+							case "2": strclass+=" complete"; break;
+							default : strclass+=" "; break;
+						}
+						var html = `<span class="${strclass}">${row["applyCodeName"]}</span>`;
+						//html +=  `<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%" ${row["useYn"] === 'Y' ? 'checked' :''} data-id='${row["id"]}'>`;
+						return html;
+					},
+			  "className" : "dt-head-center dt-body-center", "width":"5%", "visible":!reservation},
+			{ "name" : "applyCodeName", "title" : "예약상태",
+			  "data" : function (row, type, set) {
+						//console.log(`${row["applyCode"]}`);
+					if( row["cancelYn"] === 'N' ){
+						var strclass = "box-label";
+						switch(row["reservationCode"]){
+							case "0": strclass+=" receipt"; break;
+							case "1": strclass+=" progressing"; break;
+							case "2": strclass+=" complete"; break;
+							default : strclass+=" "; break;
+						}
+
+						var html = `<span class="${strclass}">${row["reservationCodeName"]}</span>`;
+					} else {
+						html = `<span class="box-label progressing">취소처리</span>`;
+					}
+					return html;
+				},
+			  "className" : "dt-head-center dt-body-center", "width":"5%", "visible":reservation},
+			{ "name" : "applyCodeName", "title" : "취소상태",
+			  "data" : function (row, type, set) {
+					var html= "";
+					if( row["cancelYn"] === 'Y' ){
+						//console.log(`${row["applyCode"]}`);
+						var strclass = "box-label";
+						switch(row["cancelCode"]){
+							case "0": strclass+=" receipt"; break;
+							case "1": strclass+=" progressing"; break;
+							case "2": strclass+=" complete"; break;
+							default : strclass+=" "; break;
+						}
+
+						html = `<span class="${strclass}">${row["cancelCodeName"]}</span>`;
+						//html +=  `<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%" ${row["useYn"] === 'Y' ? 'checked' :''} data-id='${row["id"]}'>`;
+					} else {
+						html = `<span class="box-label complete">미요청</span>`;
+					}
+
+					return html;
+				},
+			  "className" : "dt-head-center dt-body-center", "width":"5%", "visible":reservation},
+			{ "name" : "customerName", "title" : "문의자","data" : "customerName","className" : "dt-head-center dt-body-left"},
+			{ "name" : "title", "title" : "제목","data" : "title","className" : "dt-head-center dt-body-left"},
+			{ "name" : "secretYn", "title" : "비밀글", "data" : "secretYn", "className" : "dt-head-center dt-body-center", "width":"5%"},
+			{ "name" : "deleteYn", "title" : "삭제여부", "data" : "deleteYn", "className" : "dt-head-center dt-body-center", "width":"5%"},
+			{ "name" : "lastUpdateDate", "title" : "최종수정일시", "data" : "lastUpdateDate", "className" : "dt-head-center dt-body-center", "width":"10%"},
+			{ "name" : "func_btns", "title":"기능",
+				"data" :
+					function (row, type, set) {
+						var html = "";
+						html += `<div class="form-inline justify-content-center">`;
+						html += "<button type='button' class='btn btn-default' data-toggle='tooltip' title='수정' onclick='goEdit(\""+row["id"]+"\")'>수정</button>&nbsp;";
+						if ( row["deleteYn"] === 'Y' ) {
+							  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='복구'  onclick='goRestore(\""+row["id"]+"\")' style='color:#fff;background-color:#007bff;border-color:#007bff;box-shadow:none'>복구</button>";
+						} else  {
+							  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제'  onclick='goDelete(\""+row["id"]+"\")'>삭제</button>";
+						}
+						html += `</div>`;
+						return html;
+					},
+			   "className": "dt-head-center dt-body-center", "orderable" : false, "width":"160px"},
+		];
+
+		datatable = $("#datatable").DataTable({
+			"searching" : false
+			,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+			,"paging": true
+			,"bPaginate": true
+			,"responsive": true
+			,"language": lang_kor
+			,"ordering": false
+			,"bLengthChange" : false
+			,"bInfo":false
+			,"ajax" : {
+				"url" : "/manage/inquiry/contents-list"
+				,"method" : "post"
+				, "beforeSend": function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				}
+				,"data" : function(d) {
+					d.reservationYn = [[${reservationYn}]];
+					if ($('#applyCode').val() != "")       {d.applyCode       = $('#applyCode').val();	}
+					if ($('#reservationCode').val() != "") {d.reservationCode = $('#reservationCode').val();	}
+					if ($('#cancelCode').val() != "")      {d.cancelCode      = $('#cancelCode').val();	}
+
+					if ($('#categoryId').val() != ""){d.categoryId = $('#categoryId').val();	}
+	 				if ($('#titleLike').val() != "") {d.titleLike = $('#titleLike').val();	}
+	 				if ($('#contLike').val() != "")  {d.contLike = $('#contLike').val();	}
+				}
+			},"processing": true
+			,"serverSide": true
+			,"order" :
+				[ [0, 'desc'] ]
+			,"createdRow": function(row, data) {
+				  if ( data.deleteYn === "Y" ) {
+					  $(row).css('background-color', '#DC3545');
+				  } else if ( data.secretYn === "Y" ) {
+					  $(row).css('background-color', '#e9e9e9');
+				  }
+			  }
+			,"initComplete": function(settings, json) {
+    			fnInitBootstrapToggle();
+  			}
+			,"columns": baseColumns
+		});
+	};
+	fnSetcategoryId =function(id){
+		$('.tab-btn').removeClass('active');
+
+		if(id !== undefined){
+			$('#categoryId').val(id);
+			$(`.tab-btn[data-id='${id}']`).addClass('active');
+		}else{
+			$('#categoryId').val('');
+			$(`.tab-btn[data-id='all']`).addClass('active');
+		}
+
+		$("#searchBtn").trigger('click');
+	}
+
+	$("#searchBtn").click(function() {
+		if( datatable !== undefined)
+			datatable.ajax.reload();
+	});
+
+	$("#resetBtn").click(function() {
+		searchReset();
+		//datatable.column( 4 ).visible(true);
+		datatable.ajax.reload();
+	});
+
+	goCategory = function() {
+		location.href = "/manage/inquiry/category?params="+getParams();
+	}
+
+	goInsert = function() {
+		location.href = `/manage/inquiry/${reservation ? 'reservation' : 'inquiry'}/form?mode=I&params=`+getParams();
+	}
+
+	goEdit = function(id) {
+		location.href = `/manage/inquiry/${reservation ? 'reservation' : 'inquiry'}/form?mode=U&id=`+id+"&params="+getParams();
+	}
+
+	goDelete = function(id){
+		if(confirm("삭제하시겠습니까?")){
+			$.ajax({
+				url : '/manage/inquiry/contents-delete',
+				type : "POST",
+				data : {"id" : id},
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				},
+				success : function(res){
+					if("success" == res.result){
+						alert("삭제되었습니다.");
+						datatable.ajax.reload();
+					}else{
+						alert(res.message)
+					}
+				}
+			})
+		}
+	}
+
+	goRestore = function(id){
+		if(confirm("복구하시겠습니까?")){
+			$.ajax({
+				url : '/manage/inquiry/contents-restore',
+				type : "POST",
+				data : {"id" : id},
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				},
+				success : function(res){
+					if("success" == res.result){
+						alert("복구 " + res.message);
+						datatable.ajax.reload();
+					}else{
+						alert(res.message)
+					}
+				}
+			})
+		}
+	}
+
+	fnUseYnUpdate = function( id, Yn){
+		//if(confirm("수정 하시겠습니까?")  ){
+			var formData = new FormData();
+			formData.append("mode", "U");
+			formData.append("id", id);
+			formData.append("useYn", Yn);
+
+			$.ajax({
+				url : '/manage/inquiry/contents-save',
+				type : "POST",
+				data : formData,
+				enctype: 'multipart/form-data',
+				contentType : false,
+				processData : false,
+				dataType : "json",
+				beforeSend: function (xhr) {
+						xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+				},
+				success : function(res) {
+					if (res.result === "success" ) {
+						//alert(res.message);
+	                    //preList();
+					}else {
+						//alert(res.message);
+	                    return;
+					}
+				}
+			});
+		//}
+	}
+	fnInitBootstrapToggle = function(){
+		setTimeout(function(){
+			$('.content input[data-toggle="toggle"]')
+				.bootstrapToggle()
+				.change(function(e){
+					selector = '';
+					id='';
+					yn = 'Y';
+					type = this.name;
+
+					$.each(this.attributes, function() {
+			         	if(this.name =='data-id'){
+							id = this.value;
+							selector = `input[name=${type}][data-id=${id}]`;
+
+							if(!$(selector).prop('checked')){yn = 'N';}
+							switch(type){
+								case 'useYn': fnUseYnUpdate(id, yn); break;
+								case 'deleteYn':break;
+							}
+						}
+			        });
+
+			        if(type = 'useYn'){
+				        if(yn==='N'){
+							$(this).closest('tr').css('background-color','#E6E6E6');
+						} else {
+							$(this).closest('tr').css('background-color','unset');
+						}
+					}
+				});
+		},200);
+	}
+	</script>
+	<style>
+		.way-table .box-label{display: inline-block;min-width: 90%;color: #FFF;border: 1px solid #999999;border-radius: 5px;background-color: #999999;text-align: center;}
+
+		.way-table .box-label.checking    {background-color: #d8530e;border-color: #d8530e;}
+		.way-table .box-label.progressing {background-color: #f30b0b;border-color: #f30b0b;}
+		.way-table .box-label.complete    {background-color: #309115;border-color: #309115;}
+	</style>
+
+	</body>
+</html>

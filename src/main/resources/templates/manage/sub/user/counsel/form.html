@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0">상담내용</h1>
+	    </div>
+		<form id="saveCounselForm" name="saveCounselForm" enctype="multipart/form-data">
+			<input type="hidden" name="createId"  th:value="${session.login.userEmail}">
+
+			<div class="manage-content mb-10">
+				<h3 class="title">고객정보
+					<button type="button" class="btn btn-black" id="searchCustomerBtn"><i class="fa fa-search"></i></button>
+				</h3>
+				<div class="container-fluid p-0">
+					<div class="row form-group">
+						<label class="col-md-2 req" for="userEmail">이메일</label>
+						<input type="text" class="form-control col-md-2 req" name="userEmail" id="userEmail" data-name="이메일">
+						<label class="col-md-2 req" for="userName">고객명</label>
+						<input type="text" class="form-control col-md-2" name="userName" id="userName"  data-name="고객명">
+						<label class="col-md-2 req" for="userMobile">고객연락처</label>
+						<input type="text" class="form-control col-md-2" name="userMobile" id="userMobile" data-name="연락처">
+					</div>
+		    	</div>
+		    </div>
+
+			<div class="manage-content mb-10">
+				<h3 class="title">상담정보</h3>
+				<div class="container-fluid p-0">
+					<input type="hidden" name="createId"  th:value="${session.login.userEmail}">
+
+					<div class="row form-group ">
+						<label class="col-md-2 req" for="requestRelation">고객과 관계</label>
+						<select class="form-control col-md-2 req" name="requestRelation" id="requestRelation"  data-name="고객과 관계" onclick="fnSelectReation()">
+							<option value="">미선택</option>
+							<option value="self">본인</option>
+							<option value="mate">배우자</option>
+							<option value="bns">형제·자매</option>
+							<option value="parents">부모</option>
+							<option value="children">자녀</option>
+						</select>
+						<label class="col-md-2 req" for="requestName">상담자명</label>
+						<input type="text" class="form-control col-md-2 req" name="requestName" id="requestName" data-name="상담자명">
+						<label class="col-md-2 req" for="requestTel">상담자 연락처</label>
+						<input type="text" class="form-control col-md-2 req" name="requestTel" id="requestTel" data-name="상담자 연락처">
+					</div>
+
+					<div class="row form-group ">
+						<label class="col-md-2 req" for="requestCategory">요청유형</label>
+						<select class="form-control col-md-2 req" name="requestCategory" id="requestCategory" data-name="요청유형">
+							<option value="">미선택</option>
+							<option value="product">상품문의</option>
+							<option value="reservation">예약문의</option>
+							<option value="payment">결제문의</option>
+							<option value="cancel">취소문의</option>
+						</select>
+						<label class="col-md-2" for="requestSubcategory">세부 요청유형</label>
+						<input type="text" class="form-control col-md-2" name="requestSubcategory" id="requestSubcategory"  >
+						<label class="col-md-2" for="requestDate">상담일자</label>
+						<input type="text" class="form-control col-md-2 date-single-picker" name="requestDate" id="requestDate">
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2 req" for="requestName">상담고객 요청사항</label>
+						<textarea class="form-control col-md-10 req" name="requestText" data-name="상담고객 요청사항" rows="5"></textarea>
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2" for="responseName">상담사명</label>
+						<input type="text" class="form-control col-md-2" name="responseName" id="responseName"  th:value="${session.login.userName}">
+						<label class="col-md-2" for="responseCategory">처리유형</label>
+<!--/*
+						<input type="text" class="form-control col-md-2" name="responseCategory">
+*/-->
+						<select class="form-control col-md-2" name="responseCategory" id="responseCategory"></select>
+						<label class="col-md-2" for="responseSubcategory">세부처리유형</label>
+						<input type="text" class="form-control col-md-2">
+					</div>
+					<div class="row form-group ">
+						<label class="col-md-2" for="responseText">응대내용</label>
+						<textarea class="form-control col-md-10" name="responseText" rows="5"></textarea>
+					</div>
+				</div>
+			</div>
+		</form>
+		<div class="col-md-12 clearfix">
+			<div class="text-center">
+				<button type="button" class="btn btn-black"   onclick="preList()">목록으로</button>
+				<button type="button" class="btn btn-primary" onclick="fnCounselSave()">저장하기</button>
+			</div>
+		</div>
+	    <!-- /.content -->
+	</div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+
+	<div th:replace="~{/manage/inc/manage-popup-customer :: modal-customer}"/>
+
+	<!-- ./wrapper -->
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashboard.js"></script>
+	-->.
+	<script type="text/javascript" th:inline="javascript">
+		$(document).ready(function() {
+			$('#responseCategory').html(       loadMakeUpHtmlSelect('statusType', '', 'responseCategory', 'responseCategory','class',false ) );
+		});
+
+		preList = function(){
+			location.href = "/manage/user/counsel/list?params="+parmas;
+		}
+		fnReceiveSelectCustomer = function( data ){
+			$('#userEmail').val( data.userEmail );
+			$('#userName').val( data.userName );
+			$('#userMobile').val( data.userMobile );
+		}
+
+		fnSelectReation = function(){
+			var data = $('#requestRelation option:selected').val();
+
+			if(data === 'self'){
+				$('#requestName').val( $('#userName').val() );
+				$('#requestTel').val( $('#userMobile').val() );
+			}
+		}
+
+		$('#searchCustomerBtn').click(function(){
+			fnPopupCustomerOpen(fnReceiveSelectCustomer);
+			//fnPopupCustomerOpen(fnSelectCustomerTest);
+		});
+
+		fnCounselSave = function(){
+			if(checkForm('saveCounselForm') && confirm("저장하시겠습니까?")){
+				$.ajax({
+					url : '/manage/user/counsel',
+					type : "POST",
+					data : $('#saveCounselForm').serialize(),
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					},
+					success : function(res){
+						if("success" == res.result){
+							alert("처리 되었습니다.");
+							preList();
+						}else{
+							alert(res.message)
+						}
+					}
+				})
+			}
+		}
+	</script>
+	<style>
+	    #attach-file-list .filebox img {
+		    width: 70%;
+		    height: auto;
+		}
+
+		.ck-editor__editable { height: 200px; }
+
+		.board_photo{position: relative;width: 150px;height: 150px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 5px;}
+		.board_photo img{width: 100%; height: 100%;}
+		.board_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+
+		.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+		.board_btn.thumnail {top: 5px;left: 5px;}
+		.board_btn.thumnail.check {background-color: greenyellow;}
+		.board_btn.delete {top: 5px;right: 5px;}
+		.control-label {justify-content: unset !important;}
+
+		.way-table .box-label{display: inline-block;min-width: 90%;color: #FFF;border: 1px solid #999999;border-radius: 5px;background-color: #999999;text-align: center;}
+
+		.way-table .box-label.product     {background-color: #d8530e;border-color: #d8530e;}
+		.way-table .box-label.cancel      {background-color: #f30b0b;border-color: #f30b0b;}
+		.way-table .box-label.payment     {background-color: #309115;border-color: #309115;}
+		.way-table .box-label.reservation {background-color: #feff55;border-color: #feff55;color: #000;}
+	</style>
+	</body>
+</html>

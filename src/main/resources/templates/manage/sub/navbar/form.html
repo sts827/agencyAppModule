@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<th:block th:replace="~{/inc/header :: header-script}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <form id="main-nav-form">
+        <div class="content-header">
+            <h1 class="m-0">상단바 설정</h1>
+        </div>
+        <div class="manage-content filter">
+            <div class="row form-inline">
+                <div class="input-area-half">
+                    <label class="input-label double">상단바 확장 유형*</label>
+                    <select class="form-control inline-short" id="navbar-type" name="expandType">
+                        <option value="HAMBURGER" th:selected="${navbar != null and navbar.expandType == 'HAMBURGER'} ? 'selected'">버튼 클릭</option>
+                        <option value="HOVER" th:selected="${navbar != null and navbar.expandType == 'HOVER'} ? 'selected'">마우스 오버</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="alt-input-label">서브메뉴를 보여줄 방식을 선택해주세요.(PC화면)</label>
+            </div>
+        </div>
+        <div class="manage-content no-pd mt-4 notice-pc">
+            <div class="input-box">
+                <label class="alt-input-label m-0">미리보기 기능은 현재 설정된 기능으로만 동작합니다.</label>
+                <div class="content-header mb-3">
+                    <label class="alt-input-title">PC</label>
+                    <label class="alt-input-label">해상도 768px 이상</label>
+                </div>
+                <div id="navbar-pc" class="navbar-preview pc">
+                    <div class="header" th:replace="~{/inc/header :: header-nav}"></div>
+                </div>
+            </div>
+            <div class="input-box">
+                <div class="content-header mb-3">
+                    <label class="alt-input-title">Mobile</label>
+                    <label class="alt-input-label">해상도 767px 이하</label>
+                </div>
+                <div id="navbar-mobile" class="navbar-preview mobile">
+                    <div class="header" th:replace="~{/inc/header :: header-nav}"></div>
+                </div>
+            </div>
+        </div>
+        <div class="manage-content mt-4">
+            <div class="input-box">
+                <input type="hidden" name="ciImageId" th:value="${navbar != null} ? ${navbar.ciImageId}:0" />
+                <input type="hidden" name="ciImageUrl" th:value="${navbar != null} ? ${navbar.ciImageUrl}:''" />
+                <div class="row form-inline image-field">
+                    <div class="input-area-half">
+                        <label class="input-label">CI 이미지*</label>
+                        <input type="file" class="form-control inline-one" id="image" name="ci-image" accept="image/*" />
+                    </div>
+                    <div class="input-area-half">
+                        <label class="input-label">폰트색*</label>
+                        <input type="color" class="form-control" id="color-code-font" data-target-id="color-text-font" name="fontColor" value="#222222" th:value="${navbar != null} ? ${navbar.fontColor} : '#222222'" />
+                        <input type="text" class="form-control with-input-color" data-target-id="color-code-font" id="color-text-font" maxlength="9" value="#222222" th:value="${navbar != null} ? ${navbar.fontColor} : '#222222'" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="alt-input-label">권장 CI 이미지 비율 : 3:1 (ex 180px*60px) </label>
+                </div>
+                <div class="row form-inline image-field">
+                    <div class="input-area-half">
+                        <label class="input-label">배경색*</label>
+                        <input type="color" class="form-control" id="color-code-bg" data-target-id="color-text-bg" name="backgroundColor" value="#FFFFFF" th:value="${navbar != null} ? ${navbar.backgroundColor} : '#FFFFFF'" />
+                        <input type="text" class="form-control with-input-color" data-target-id="color-code-bg" id="color-text-bg" maxlength="9" value="#FFFFFF" th:value="${navbar != null} ? ${navbar.backgroundColor} : '#FFFFFF'" />
+                    </div>
+                    <div class="input-area-half">
+                        <label class="input-label">밑줄색*</label>
+                        <input type="color" class="form-control" id="color-code-bd" data-target-id="color-text-bd" name="borderColor" value="#CCCCCC" th:value="${navbar != null} ? ${navbar.borderColor} : '#CCCCCC'" />
+                        <input type="text" class="form-control with-input-color" data-target-id="color-code-bd" id="color-text-bd" maxlength="9" value="#CCCCCC" th:value="${navbar != null} ? ${navbar.borderColor} : '#CCCCCC'" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="manage-control">
+            <button type="button" class="btn btn-dark" onclick="history.back()">취소하기</button>
+            <button type="button" class="btn btn-primary" th:onclick="fnSaveNavBar()">저장하기</button>
+        </div>
+        </form>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    fnSaveNavBar = function(){
+        let form = $('#main-nav-form');
+        $.ajax({
+            url : "/manage/navbar/save",
+            type : "POST",
+            enctype: 'multipart/form-data',
+            contentType : false,
+            processData : false,
+            data :  new FormData($(form)[0]),
+            dataType : "json",
+            success : function(data){
+                if( data.result === "success" ){
+                    alert(data.message);
+                    location.reload();
+                }else{
+                    alert(data.message);
+                    console.log(data);
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    $(document).ready(function(){
+        $('#navbar-type').change(function(e){
+           if(e.target.value == 'HAMBURGER'){
+               $('#hamburger').removeClass('hide');
+           } else{
+               $('#hamburger').addClass('hide');
+           }
+        });
+
+        $('#color-code-font, #color-text-font').change(function(e){
+            let item = $(e.target);
+            if(formValidCheck(item, 'input', 'is-invalid', 'hex-color')){
+                $('#'+$(item).attr('data-target-id')).val($(item).val());
+                $('.header').css('color', $(item).val());
+            }
+        });
+        $('#color-code-bg, #color-text-bg').change(function(e){
+            let item = $(e.target);
+            if(formValidCheck(item, 'input', 'is-invalid', 'hex-color')){
+                $('#'+$(item).attr('data-target-id')).val($(item).val());
+                $('.header').css('background-color', $(item).val());
+            }
+        });
+        $('#color-code-bd, #color-text-bd').change(function(e){
+            let item = $(e.target);
+            if(formValidCheck(item, 'input', 'is-invalid', 'hex-color')){
+                $('#'+$(item).attr('data-target-id')).val($(item).val());
+                $('.header').css('border-color', $(item).val());
+            }
+        });
+
+        $('#image').change(function(e){
+            let files = e.target.files;
+            if(files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    if (!files[i].type.startsWith("image/")) continue;
+
+                    const images = document.getElementsByClassName('header-logo-image');
+                    for (let j=0; j < images.length; j++){
+                        let img = images[j];
+                        img.file = files[i];
+                        img.classList.add('header-logo-image');
+                        const reader = new FileReader();
+                        reader.onload = (el) => {
+                            img.src = el.target.result;
+                        };
+                        reader.readAsDataURL(files[i]);
+                    }
+                }
+            }
+        });
+    });
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

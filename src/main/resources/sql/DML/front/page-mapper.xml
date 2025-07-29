@@ -1,0 +1,808 @@
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.front.PageMapper">
+<!--
+	 * 테이블별로 Select(count,list,one), Insert, Update, Delete 순으로 펑션 정리 희망!!!
+-->
+	<select id="selectUserPageFooterInfo" resultType="SettingCompanyInfo">
+		SELECT site_name, company_name, company_owner,
+			   company_registration_no,
+			   company_mail_order_registration_no,
+			   company_tourism_registration_no,
+			   company_tell, company_fax, company_email,
+			   company_cs_time, company_cs_tell,
+			   company_address_zipcode, company_address_jibun,
+			   company_address_road, company_address_detail,
+			   company_latitude, company_longitude
+		FROM setting_company_info
+		ORDER BY id DESC LIMIT 1
+	</select>
+
+	<select id="selectMainNoticePopupLayerList" parameterType="HashMap" resultType="MainNoticePopup">
+		SELECT id, time_key,
+			   notice_type, content_type,
+			   image_id_pc, image_url_pc,
+			   image_background_pc, image_text_pc, visible_yn_pc,
+			   image_id_mobile, image_url_mobile,
+			   image_background_mobile, image_text_mobile, visible_yn_mobile,
+			   title_text, notice_text,
+			   link_url, link_target,
+			   one_day_yn, one_week_yn,
+			   start_date, expire_date,
+			   order_number, use_yn
+		  FROM main_notice_popup
+		 WHERE delete_yn = 'N' AND use_yn = 'Y' AND notice_type = 'layer'
+			   AND (start_date IS NULL OR start_date &lt; #{now})
+			   AND (expire_date IS NULL OR expire_date &gt; #{now})
+			   <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(list)">
+				AND time_key NOT IN
+				<foreach collection="list" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			   </if>
+		 ORDER BY order_number, id DESC
+	</select>
+
+	<select id="selectMainNoticePopupBarList" parameterType="HashMap" resultType="MainNoticePopup">
+		SELECT id, time_key,
+			   notice_type, content_type,
+			   image_id_pc, image_url_pc,
+			   image_background_pc, image_text_pc, visible_yn_pc,
+			   image_id_mobile, image_url_mobile,
+			   image_background_mobile, image_text_mobile, visible_yn_mobile,
+			   title_text, notice_text,
+			   link_url, link_target,
+			   one_day_yn, one_week_yn,
+			   start_date, expire_date,
+			   order_number, use_yn
+		  FROM main_notice_popup
+		 WHERE delete_yn = 'N' AND use_yn = 'Y' AND notice_type = 'notice-bar'
+			   AND (start_date IS NULL OR start_date &lt; #{now})
+			   AND (expire_date IS NULL OR expire_date &gt; #{now})
+			   <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(list)">
+				AND time_key NOT IN
+				<foreach collection="list" item="item" separator="," open="(" close=")">
+					#{item}
+				</foreach>
+			   </if>
+		 ORDER BY order_number, id DESC
+	</select>
+
+	<select id="selectNavbar" resultType="SettingNavbar">
+		SELECT id, expand_type,
+			   ci_image_id, ci_image_url,
+			   background_color, border_color, font_color,
+			   create_id, create_date
+		  FROM setting_navbar
+		 ORDER BY id DESC LIMIT 1
+	</select>
+
+	<select id="selectUserMenuList" resultType="MenuUser">
+		SELECT menu_id, upper_menu_id, menu_name, menu_url, menu_type, menu_sort, menu_desc, use_yn, main_expose_type,
+			   CASE WHEN upper_menu_id IS NULL THEN 0
+					ELSE (SELECT CASE WHEN upper_menu_id IS NULL THEN 1 ELSE 2 END FROM menu_user mu2 WHERE mu2.menu_id = mu.upper_menu_id)
+				   END depth
+		  FROM menu_user mu
+		 WHERE delete_yn = 'N' AND use_yn = 'Y' AND navbar_yn = 'Y'
+		 ORDER BY menu_sort, upper_menu_id
+	</select>
+
+	<select id="selectListMenuUser" parameterType="HashMap" resultType="MenuUser">
+		SELECT *
+		  FROM(
+			SELECT @rownum:=@rownum+1 AS rownum,
+				   menu_id, upper_menu_id, menu_name, menu_url, menu_type, menu_sub_type, menu_sort, menu_acronym,menu_desc, navbar_yn, use_yn, delete_yn,
+				   main_expose_yn, main_expose_type, create_id, create_date, last_update_id, last_update_date
+			  FROM menu_user a
+			  join (SELECT @rownum:= 0) rnum
+			<where>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(isExpose)" >	and main_expose_type is not null	</if>
+
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	and upper_menu_id=#{upperMenuId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	and menu_name=#{menuName}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	and menu_url=#{menuUrl}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	and menu_type=#{menuType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSubType)" >	and menu_sub_type=#{menuSubType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	and menu_sort=#{menuSort}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuAcronym)" >	and menu_acronym=#{menuAcronym}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	and menu_desc=#{menuDesc}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(navbarYn)" >	and navbar_yn=#{navbarYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeYn)" >	and main_expose_yn=#{mainExposeYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeType)" >	and main_expose_type=#{mainExposeType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+				and delete_yn='N'
+			 </where>
+		  ) a
+	</select>
+
+	<select id="selectOneMenuUser" parameterType="HashMap" resultType="MenuUser">
+        SELECT menu_id, upper_menu_id, menu_name, menu_url, menu_type, menu_sub_type, menu_sort, menu_acronym,menu_desc, navbar_yn, use_yn,
+               main_expose_yn, main_expose_type, delete_yn, create_id, create_date, last_update_id, last_update_date
+          FROM menu_user a
+          join (SELECT @rownum:= 0) rnum
+         <where>
+         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	and upper_menu_id=#{upperMenuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	and menu_name=#{menuName}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	and menu_url=#{menuUrl}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	and menu_type=#{menuType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSubType)" >	and menu_sub_type=#{menuSubType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	and menu_sort=#{menuSort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuAcronym)" >	and menu_acronym=#{menuAcronym}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	and menu_desc=#{menuDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(navbarYn)" >	and navbar_yn=#{navbarYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeYn)" >	and main_expose_yn=#{mainExposeYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mainExposeType)" >	and main_expose_type=#{mainExposeType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			and delete_yn='N'
+         </where>
+	</select>
+
+<!--################################### policy ###################################-->
+	<select id="selectOnePolicy" parameterType="HashMap" resultType="Policy">
+		SELECT id, title, content, policy_type, policy_version, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+		  FROM policy
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	and content=#{content}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyType)" >	and policy_type=#{policyType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyVersion)" >	and policy_version=#{policyVersion}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+		</where>
+	</select>
+<!--################################### Inquiry ###################################-->
+
+<!--################################### InquiryContent ###################################-->
+	 <select id="selectCountInquiryContent" parameterType="HashMap" resultType="Integer">
+		SELECT count(id) FROM inquiry_content
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	and category_id=#{categoryId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	and content=#{content}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(comment)" >	and comment=#{comment}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentDate)" >	and comment_date=#{commentDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	and apply_code=#{applyCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(consultingMethod)" >	and consulting_method=#{consultingMethod}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	and tags=#{tags}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	and secret_yn=#{secretYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupJson)" >	and group_json=#{groupJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airJson)" >	and air_json=#{airJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleJson)" >	and vehicle_json=#{vehicleJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthJson)" >	and berth_json=#{berthJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelStartingPoint)" >	and travel_starting_point=#{travelStartingPoint}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelScheduleJson)" >	and travel_schedule_json=#{travelScheduleJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airTypeRequest)" >	and air_type_request=#{airTypeRequest}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airScheduleJson)" >	and air_schedule_json=#{airScheduleJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleType)" >	and vehicle_type=#{vehicleType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleCount)" >	and vehicle_count=#{vehicleCount}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthType)" >	and berth_type=#{berthType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerName)" >	and customer_name=#{customerName}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPass)" >	and customer_pass=#{customerPass}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPhone)" >	and customer_phone=#{customerPhone}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerEmail)" >	and customer_email=#{customerEmail}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+		 </where>
+	</select>
+
+	<select id="selectListInquiryContent" parameterType="HashMap" resultType="InquiryContent">
+		SELECT *
+		  FROM(
+			SELECT @rownum:=@rownum+1 AS rownum,
+					a.id, category_id, b.category_name,
+					title, content, comment,
+					comment_date, apply_code,
+					case when apply_code = 0 then '접수' when apply_code = 1 then '처리중' when apply_code = 2 then '답변완료' end apply_code_name,
+					consulting_method, tags,
+					secret_yn, group_json, air_json, vehicle_json, berth_json,
+					travel_starting_point, travel_schedule_json, air_type_request, air_schedule_json,
+					vehicle_type, vehicle_count, berth_type, customer_name, customer_pass, customer_phone,
+					customer_email, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date,
+				   u.user_name, u.user_mobile
+			  FROM inquiry_content a
+			  left join (select id, title category_name from inquiry_category) b on b.id = a.category_id
+			  left join `user` u on a.create_id = u.user_email
+			  join (SELECT @rownum:= 0) rnum
+			 <where>
+			 	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	and category_id=#{categoryId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	and content=#{content}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(comment)" >	and comment=#{comment}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentDate)" >	and comment_date=#{commentDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	and apply_code=#{applyCode}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(consultingMethod)" >	and consulting_method=#{consultingMethod}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	and tags=#{tags}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	and secret_yn=#{secretYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupJson)" >	and group_json=#{groupJson}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airJson)" >	and air_json=#{airJson}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleJson)" >	and vehicle_json=#{vehicleJson}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthJson)" >	and berth_json=#{berthJson}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelStartingPoint)" >	and travel_starting_point=#{travelStartingPoint}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelScheduleJson)" >	and travel_schedule_json=#{travelScheduleJson}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airTypeRequest)" >	and air_type_request=#{airTypeRequest}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airScheduleJson)" >	and air_schedule_json=#{airScheduleJson}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleType)" >	and vehicle_type=#{vehicleType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleCount)" >	and vehicle_count=#{vehicleCount}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthType)" >	and berth_type=#{berthType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerName)" >	and customer_name=#{customerName}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPass)" >	and customer_pass=#{customerPass}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPhone)" >	and customer_phone=#{customerPhone}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerEmail)" >	and customer_email=#{customerEmail}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			 </where>
+
+			 <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+				ORDER BY
+				<choose>
+					<when test="sort=='id'" >	id	</when>
+					<when test="sort=='categoryId'" >	category_id	</when>
+					<when test="sort=='title'" >	title	</when>
+					<when test="sort=='content'" >	content	</when>
+					<when test="sort=='comment'" >	comment	</when>
+					<when test="sort=='commentDate'" >	comment_date	</when>
+					<when test="sort=='applyCode'" >	apply_code	</when>
+					<when test="sort=='consultingMethod'" >	consulting_method	</when>
+					<when test="sort=='tags'" >	tags	</when>
+					<when test="sort=='secretYn'" >	secret_yn	</when>
+					<when test="sort=='groupJson'" >	group_json	</when>
+					<when test="sort=='airJson'" >	air_json	</when>
+					<when test="sort=='vehicleJson'" >	vehicle_json	</when>
+					<when test="sort=='berthJson'" >	berth_json	</when>
+					<when test="sort=='travelStartingPoint'" >	travel_starting_point	</when>
+					<when test="sort=='travelScheduleJson'" >	travel_schedule_json	</when>
+					<when test="sort=='airTypeRequest'" >	air_type_request	</when>
+					<when test="sort=='airScheduleJson'" >	air_schedule_json	</when>
+					<when test="sort=='vehicleType'" >	vehicle_type	</when>
+					<when test="sort=='vehicleCount'" >	vehicle_count	</when>
+					<when test="sort=='berthType'" >	berth_type	</when>
+					<when test="sort=='customerName'" >	customer_name	</when>
+					<when test="sort=='customerPass'" >	customer_pass	</when>
+					<when test="sort=='customerPhone'" >	customer_phone	</when>
+					<when test="sort=='customerEmail'" >	customer_email	</when>
+					<when test="sort=='createId'" >	create_id	</when>
+					<when test="sort=='createDate'" >	create_date	</when>
+					<when test="sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="sort=='deleteYn'" >	delete_yn	</when>
+					<when test="sort=='deleteId'" >	delete_id	</when>
+
+					<otherwise>rownum</otherwise>
+				</choose>
+				<choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+				ORDER BY  <foreach item="item" index="index" collection="listSort" separator=",">
+				<choose>
+					<when test="item.sort=='id'" >	id	</when>
+					<when test="item.sort=='categoryId'" >	category_id	</when>
+					<when test="item.sort=='title'" >	title	</when>
+					<when test="item.sort=='content'" >	content	</when>
+					<when test="item.sort=='comment'" >	comment	</when>
+					<when test="item.sort=='commentDate'" >	comment_date	</when>
+					<when test="item.sort=='applyCode'" >	apply_code	</when>
+					<when test="item.sort=='consultingMethod'" >	consulting_method	</when>
+					<when test="item.sort=='tags'" >	tags	</when>
+					<when test="item.sort=='secretYn'" >	secret_yn	</when>
+					<when test="item.sort=='groupJson'" >	group_json	</when>
+					<when test="item.sort=='airJson'" >	air_json	</when>
+					<when test="item.sort=='vehicleJson'" >	vehicle_json	</when>
+					<when test="item.sort=='berthJson'" >	berth_json	</when>
+					<when test="item.sort=='travelStartingPoint'" >	travel_starting_point	</when>
+					<when test="item.sort=='travelScheduleJson'" >	travel_schedule_json	</when>
+					<when test="item.sort=='airTypeRequest'" >	air_type_request	</when>
+					<when test="item.sort=='airScheduleJson'" >	air_schedule_json	</when>
+					<when test="item.sort=='vehicleType'" >	vehicle_type	</when>
+					<when test="item.sort=='vehicleCount'" >	vehicle_count	</when>
+					<when test="item.sort=='berthType'" >	berth_type	</when>
+					<when test="item.sort=='customerName'" >	customer_name	</when>
+					<when test="item.sort=='customerPass'" >	customer_pass	</when>
+					<when test="item.sort=='customerPhone'" >	customer_phone	</when>
+					<when test="item.sort=='customerEmail'" >	customer_email	</when>
+					<when test="item.sort=='createId'" >	create_id	</when>
+					<when test="item.sort=='createDate'" >	create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="item.sort=='deleteYn'" >	delete_yn	</when>
+					<when test="item.sort=='deleteId'" >	delete_id	</when>
+
+				</choose>
+				<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+			) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+		 LIMIT #{itemStartPosition}, #{pagePerSize}
+		 </if>
+	</select>
+
+	<select id="selectOneInquiryContent" parameterType="HashMap" resultType="InquiryContent">
+		SELECT a.id, category_id, b.category_name,
+				title, content, comment,
+				comment_date, apply_code,
+				case when apply_code = 0 then '접수' when apply_code = 1 then '접수확인' when apply_code = 2 then '처리중' when apply_code = 3 then '답변완료' end apply_code_name,
+				consulting_method, tags,
+				secret_yn, group_json, air_json, vehicle_json, berth_json,
+				travel_starting_point, travel_schedule_json, air_type_request, air_schedule_json,
+				vehicle_type, vehicle_count, berth_type, customer_name, customer_pass, customer_phone,
+				customer_email, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date,
+				u.user_name, u.user_mobile
+		  FROM inquiry_content a
+		  left join (select id, title category_name from inquiry_category) b on b.id = a.category_id
+		  left join `user` u on a.create_id = u.user_email
+		  join (SELECT @rownum:= 0) rnum
+		 <where>
+		 	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and a.id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	and category_id=#{categoryId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	and content=#{content}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(comment)" >	and comment=#{comment}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentDate)" >	and comment_date=#{commentDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	and apply_code=#{applyCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(consultingMethod)" >	and consulting_method=#{consultingMethod}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	and tags=#{tags}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	and secret_yn=#{secretYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupJson)" >	and group_json=#{groupJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airJson)" >	and air_json=#{airJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleJson)" >	and vehicle_json=#{vehicleJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthJson)" >	and berth_json=#{berthJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelStartingPoint)" >	and travel_starting_point=#{travelStartingPoint}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelScheduleJson)" >	and travel_schedule_json=#{travelScheduleJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airTypeRequest)" >	and air_type_request=#{airTypeRequest}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airScheduleJson)" >	and air_schedule_json=#{airScheduleJson}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleType)" >	and vehicle_type=#{vehicleType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleCount)" >	and vehicle_count=#{vehicleCount}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthType)" >	and berth_type=#{berthType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerName)" >	and customer_name=#{customerName}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPass)" >	and customer_pass=#{customerPass}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPhone)" >	and customer_phone=#{customerPhone}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerEmail)" >	and customer_email=#{customerEmail}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+		 </where>
+	</select>
+
+	<insert id="insertInquiryContent" parameterType="InquiryContent" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO inquiry_content
+			   (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userEmail)" >	user_email,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	category_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	title,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	content,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(comment)" >	comment,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentDate)" >	comment_date,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	apply_code,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(consultingMethod)" >	consulting_method,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	tags,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	product_serial,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationYn)" >	reservation_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	secret_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupJson)" >	group_json,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airJson)" >	air_json,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleJson)" >	vehicle_json,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthJson)" >	berth_json,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelStartingPoint)" >	travel_starting_point,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelScheduleJson)" >	travel_schedule_json,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airTypeRequest)" >	air_type_request,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airScheduleJson)" >	air_schedule_json,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleType)" >	vehicle_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleCount)" >	vehicle_count,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthType)" >	berth_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerName)" >	customer_name,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPass)" >	customer_pass,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPhone)" >	customer_phone,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerEmail)" >	customer_email,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id,	</if>
+				create_date)
+		VALUES (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userEmail)" >	#{userEmail},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	#{categoryId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	#{title},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	#{content},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(comment)" >	#{comment},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentDate)" >	#{commentDate},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	#{applyCode},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(consultingMethod)" >	#{consultingMethod},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	#{tags},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	#{productSerial},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationYn)" >	#{reservationYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	#{secretYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupJson)" >	#{groupJson},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airJson)" >	#{airJson},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleJson)" >	#{vehicleJson},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthJson)" >	#{berthJson},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelStartingPoint)" >	#{travelStartingPoint},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelScheduleJson)" >	#{travelScheduleJson},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airTypeRequest)" >	#{airTypeRequest},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airScheduleJson)" >	#{airScheduleJson},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleType)" >	#{vehicleType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleCount)" >	#{vehicleCount},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthType)" >	#{berthType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerName)" >	#{customerName},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPass)" >	#{customerPass},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPhone)" >	#{customerPhone},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerEmail)" >	#{customerEmail},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	#{createId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	#{createDate},	</if>
+				now())
+	</insert>
+
+	<update id="updateInquiryContent" parameterType="InquiryContent">
+		UPDATE inquiry_content
+		<set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userEmail)" >	user_email=#{userEmail},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryId)" >	category_id=#{categoryId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	title=#{title},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(content)" >	content=#{content},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(comment)" >	comment=#{comment},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(commentDate)" >	comment_date=#{commentDate},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(applyCode)" >	apply_code=#{applyCode},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(consultingMethod)" >	consulting_method=#{consultingMethod},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tags)" >	tags=#{tags},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	product_serial=#{productSerial},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationYn)" >	reservation_yn=#{reservationYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secretYn)" >	secret_yn=#{secretYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupJson)" >	group_json=#{groupJson},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airJson)" >	air_json=#{airJson},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleJson)" >	vehicle_json=#{vehicleJson},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthJson)" >	berth_json=#{berthJson},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelStartingPoint)" >	travel_starting_point=#{travelStartingPoint},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(travelScheduleJson)" >	travel_schedule_json=#{travelScheduleJson},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airTypeRequest)" >	air_type_request=#{airTypeRequest},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(airScheduleJson)" >	air_schedule_json=#{airScheduleJson},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleType)" >	vehicle_type=#{vehicleType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(vehicleCount)" >	vehicle_count=#{vehicleCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(berthType)" >	berth_type=#{berthType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerName)" >	customer_name=#{customerName},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPass)" >	customer_pass=#{customerPass},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerPhone)" >	customer_phone=#{customerPhone},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(customerEmail)" >	customer_email=#{customerEmail},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)">and id = #{id}</if>
+		</where>
+	</update>
+
+	<update id="restoreInquiryContent" parameterType="InquiryContent">
+		UPDATE inquiry_content
+		   SET delete_yn='N'
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteInquiryContent" parameterType="InquiryContent">
+		UPDATE inquiry_content
+		   SET delete_yn='Y'
+		WHERE id = #{id}
+	</update>
+
+
+<!--################################### InquiryCategory ###################################-->
+	<select id="selectCountInquiryCategory" parameterType="HashMap" resultType="Integer">
+		SELECT count(id) FROM inquiry_category
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(orderNum)" >	and order_num=#{orderNum}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationYn)" >	and reservation_yn=#{reservationYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationSwitchYn)" >	and reservation_switch_yn=#{reservationSwitchYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupYn)" >	and group_yn=#{groupYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	and start_date=#{startDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	and expire_date=#{expireDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+		 </where>
+	</select>
+
+	<select id="selectListInquiryCategory" parameterType="HashMap" resultType="InquiryCategory">
+		SELECT *
+		  FROM(
+			SELECT @rownum:=@rownum+1 AS rownum, id, title, note, order_num, use_yn, reservation_yn,reservation_switch_yn, group_yn, delete_yn, start_date, expire_date, create_id, create_date, last_update_id, last_update_date
+			  FROM inquiry_category a
+			  join (SELECT @rownum:= 0) rnum
+			 <where>
+			 	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(orderNum)" >	and order_num=#{orderNum}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationYn)" >	and reservation_yn=#{reservationYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationSwitchYn)" >	and reservation_switch_yn=#{reservationSwitchYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupYn)" >	and group_yn=#{groupYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	and start_date=#{startDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	and expire_date=#{expireDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+
+			 </where>
+
+			 <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+				ORDER BY
+				<choose>
+					<when test="sort=='id'" >	id	</when>
+					<when test="sort=='title'" >	title	</when>
+					<when test="sort=='note'" >	note	</when>
+					<when test="sort=='orderNum'" >	order_num	</when>
+					<when test="sort=='useYn'" >	use_yn	</when>
+					<when test="sort=='groupYn'" >	group_yn	</when>
+					<when test="sort=='deleteYn'" >	delete_yn	</when>
+					<when test="sort=='startDate'" >	start_date	</when>
+					<when test="sort=='expireDate'" >	expire_date	</when>
+					<when test="sort=='createId'" >	create_id	</when>
+					<when test="sort=='createDate'" >	create_date	</when>
+					<when test="sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	last_update_date	</when>
+					<otherwise>rownum</otherwise>
+				</choose>
+				<choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+				ORDER BY  <foreach item="item" index="index" collection="listSort" separator=",">
+				<choose>
+					<when test="item.sort=='id'" >	id	</when>
+					<when test="item.sort=='title'" >	title	</when>
+					<when test="item.sort=='note'" >	note	</when>
+					<when test="item.sort=='orderNum'" >	order_num	</when>
+					<when test="item.sort=='useYn'" >	use_yn	</when>
+					<when test="item.sort=='groupYn'" >	group_yn	</when>
+					<when test="item.sort=='deleteYn'" >	delete_yn	</when>
+					<when test="item.sort=='startDate'" >	start_date	</when>
+					<when test="item.sort=='expireDate'" >	expire_date	</when>
+					<when test="item.sort=='createId'" >	create_id	</when>
+					<when test="item.sort=='createDate'" >	create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	last_update_date	</when>
+				</choose>
+				<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+			) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+		 LIMIT #{itemStartPosition}, #{pagePerSize}
+		 </if>
+	</select>
+
+	<select id="selectOneInquiryCategory" parameterType="HashMap" resultType="InquiryCategory">
+		SELECT id, title, note, order_num, use_yn,reservation_yn,reservation_switch_yn, group_yn, delete_yn, start_date, expire_date, create_id, create_date, last_update_id, last_update_date
+		  FROM inquiry_category
+		 <where>
+		 	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(title)" >	and title=#{title}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(orderNum)" >	and order_num=#{orderNum}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationYn)" >	and reservation_yn=#{reservationYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(reservationSwitchYn)" >	and reservation_switch_yn=#{reservationSwitchYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groupYn)" >	and group_yn=#{groupYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)" >	and start_date=#{startDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)" >	and expire_date=#{expireDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+		 </where>
+	</select>
+
+<!--################################### CodeItem ###################################-->
+	 <select id="selectCountCodeItem" parameterType="HashMap" resultType="Integer">
+		with recursive tree as (
+			select 1 as lev, concat(sort,'|',code) idpath, CAST(concat(0,'-') as varchar(100) ) pid,
+				   code, upper_code, name, code_desc, code_acronym, code_depth, sort, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+			  from code_item a
+			 where upper_code = ''
+			union all
+			select 1+lev as lev, concat(c.idpath,'->',p.sort,'|',p.code) as idpath, concat(c.code, '-') as pid,
+				   p.code,	p.upper_code,	p.name,	p.code_desc,p.code_acronym,	p.code_depth,	p.sort,	p.use_yn,	p.create_id,	p.create_date,	p.last_update_id,	p.last_update_date,	p.delete_yn,	p.delete_id,	p.delete_date
+			  from code_item p
+			  inner join tree c on p.upper_code = c.code)
+		select count(*)
+		  from tree
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	and code=#{code}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	and upper_code=#{upperCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	and name=#{name}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	and code_desc=#{codeDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	and code_depth=#{codeDepth}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	and code_acronym=#{codeAcronym}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	and sort=#{sort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+		 </where>
+	</select>
+
+	<select id="selectListCodeItem" parameterType="HashMap" resultType="CodeItem">
+		with recursive tree as (
+			select 1 as lev, concat(sort,'|',code) idpath, CAST(concat(0,'-') as varchar(100) ) pid,
+				   code, upper_code, name, code_desc ,code_acronym, code_depth, sort, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+			  from code_item a
+			 where upper_code = ''
+			union all
+			select 1+lev as lev, concat(c.idpath,'->',p.sort,'|',p.code) as idpath, concat(c.code, '-') as pid,
+				   p.code,	p.upper_code,	p.name,	p.code_desc ,p.code_acronym,	p.code_depth,	p.sort,	p.use_yn,	p.create_id,	p.create_date,	p.last_update_id,	p.last_update_date,	p.delete_yn,	p.delete_id,	p.delete_date
+			  from code_item p
+			  inner join tree c on p.upper_code = c.code)
+		SELECT *
+		  FROM(
+			select @rownum:=@rownum+1 AS rownum, lev, idpath, pid,
+				   (select count(code) from code_item c where c.upper_code = tree.code) ccnt,
+				   code, COALESCE(upper_code,'') upper_code, name, code_desc , COALESCE(code_acronym,'') code_acronym, code_depth, sort, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+			  from tree
+			  join (SELECT @rownum:= 0) rnum
+			 <where>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	and code=#{code}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	and upper_code=#{upperCode}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	and name=#{name}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	and code_desc=#{codeDesc}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	and code_depth=#{codeDepth}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	and code_acronym=#{codeAcronym}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	and sort=#{sort}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+			 </where>
+
+			 <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+				ORDER BY
+				<choose>
+					<when test="sort=='code'" >	code	</when>
+					<when test="sort=='upperCode'" >	upper_code	</when>
+					<when test="sort=='name'" >	name	</when>
+					<when test="sort=='codeDesc'" >	code_desc	</when>
+					<when test="sort=='codeDepth'" >	code_depth	</when>
+					<when test="sort=='codeAcronym'" >	code_acronym	</when>
+					<when test="sort=='sort'" >	sort	</when>
+					<when test="sort=='useYn'" >	use_yn	</when>
+					<when test="sort=='createId'" >	create_id	</when>
+					<when test="sort=='createDate'" >	create_date	</when>
+					<when test="sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="sort=='deleteYn'" >	delete_yn	</when>
+					<when test="sort=='deleteId'" >	delete_id	</when>
+					<when test="sort=='deleteDate'" >	delete_date	</when>
+
+					<otherwise>rownum</otherwise>
+				</choose>
+				<choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="!@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) or !@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+				ORDER BY idpath
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+				ORDER BY  <foreach item="item" index="index" collection="listSort" separator=",">
+				<choose>
+					<when test="item.sort=='code'" >	code	</when>
+					<when test="item.sort=='upperCode'" >	upper_code	</when>
+					<when test="item.sort=='name'" >	name	</when>
+					<when test="item.sort=='codeDesc'" >	code_desc	</when>
+					<when test="item.sort=='codeDepth'" >	code_depth	</when>
+					<when test="item.sort=='codeAcronym'" >	code_acronym	</when>
+					<when test="item.sort=='sort'" >	sort	</when>
+					<when test="item.sort=='useYn'" >	use_yn	</when>
+					<when test="item.sort=='createId'" >	create_id	</when>
+					<when test="item.sort=='createDate'" >	create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="item.sort=='deleteYn'" >	delete_yn	</when>
+					<when test="item.sort=='deleteId'" >	delete_id	</when>
+					<when test="item.sort=='deleteDate'" >	delete_date	</when>
+				</choose>
+				<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+			) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+		 LIMIT #{itemStartPosition}, #{pagePerSize}
+		 </if>
+	</select>
+
+	<select id="selectOneCodeItem" parameterType="HashMap" resultType="CodeItem">
+		SELECT code, upper_code, name, code_desc, code_acronym, code_depth, sort, use_yn, create_id, create_date, last_update_id, last_update_date, delete_yn, delete_id, delete_date
+		  FROM code_item a
+		  join (SELECT @rownum:= 0) rnum
+		 <where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(code)" >	and code=#{code}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)" >	and upper_code=#{upperCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(name)" >	and name=#{name}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDesc)" >	and code_desc=#{codeDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeDepth)" >	and code_depth=#{codeDepth}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(codeAcronym)" >	and code_acronym=#{codeAcronym}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort)" >	and sort=#{sort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+		 </where>
+	</select>
+
+	<select id="selectListMainBannerImage" parameterType="HashMap" resultType="MainBannerImage">
+		SELECT id, menu_id, banner_type,
+			   image_id_pc, image_url_pc,
+			   image_fit_pc, visible_yn_pc,
+			   image_id_mobile, image_url_mobile,
+			   image_fit_mobile, visible_yn_mobile,
+			   image_text_top, image_text_top_font, image_text_top_color,
+			   image_text_top_x, image_text_top_y,
+			   image_text_mid, image_text_mid_font, image_text_mid_color,
+			   image_text_mid_x, image_text_mid_y,
+			   image_text_bot, image_text_bot_font, image_text_bot_color,
+			   image_text_bot_x, image_text_bot_y,
+			   link_url, link_target,
+			   start_date, expire_date, use_yn,
+			   order_number, create_id, create_date,
+			   last_update_id, last_update_date
+		  FROM main_banner_image
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerType)">and banner_type = #{bannerType}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">and menu_id = #{menuId}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+				<if test="useYn != 'ALL'">
+					AND use_yn = #{useYn}
+				</if>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+				AND (
+						image_text_top LIKE CONCAT('%', #{searchKey}, '%')
+						OR image_text_mid LIKE CONCAT('%', #{searchKey}, '%')
+						OR image_text_bot LIKE CONCAT('%', #{searchKey}, '%')
+					)
+			</if>
+			 AND delete_yn = 'N'
+		</where>
+		 ORDER BY order_number, id DESC
+	</select>
+
+</mapper>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<link rel="stylesheet" href="/css/manage/info.css">
+<link rel="stylesheet" href="/css/manage/product-add.css">
+<body class="hold-transition sidebar-mini layout-fixed">
+<section class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <main class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">상품옵션관리</h1>
+        </div>
+        <div style="margin-bottom: 30px;">
+            <button class="tab-btn list-btn active" onclick="initDatatable('all')">전체</button>
+            <button class="tab-btn list-btn" onclick="initDatatable('tour')">상품항목</button>
+            <button class="tab-btn list-btn" style="margin-right: 0" onclick="initDatatable('rentcar')">차량옵션</button>
+        </div>
+
+        <div class="product-option-add-btn-box">
+            <button class="order-modify-btn" style="margin-bottom: 20px;" onclick="showOptionOrderChangeModal()">순서변경</button>
+            <button class="add-btn" style="margin-bottom: 20px;" onclick="showAddOptionModal()">등록하기</button>
+        </div>
+
+        <!--리스트-->
+        <table id="datatable" class="table way-table table-hover" style="width:100%; table-layout:fixed;"></table>
+    </main>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</section>
+<!--상품옵션 등록 모달-->
+<div id="product-option-add-modal-box" class="product-option-add-modal-box">
+    <div class="product-option-add-modal">
+        <div class="product-option-add-modal-inner-box" >
+            <div class="product-option-add-modal-top">
+                <p class="product-option-add-text">상품옵션등록</p>
+                <button type="button" onclick="closeAddOptionModal()">
+                    <img src="/images/icon/x-black-17x17.svg" style="width: 17px; height: 17px;" alt="">
+                </button>
+            </div>
+            <form id="option-category-add-form" class="category-text-main-box">
+                <div class="product-option-category-text-box">
+                    <p class="product-option-category-text">옵션분류*</p>
+                    <select class="product-option-category-select" name="optionType">
+                            <option th:each="list : ${productCodeList}"
+                                th:value="${list.code}" th:text="${list.name}">
+                            상품항목
+                        </option>
+                    </select>
+                </div>
+                <div class="product-option-category-text-box">
+                    <label for="product-option-category-name" class="product-option-category-text">옵션명*</label>
+                    <input type="text" id="product-option-category-name" name="optionName" class="product-option-category-input">
+                </div>
+            </form>
+            <div class="btn-group-box">
+                <button type="button" class="option-save-btn" onclick="addOption()">등록</button>
+                <button type="button" class="option-close-btn" onclick="closeAddOptionModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--상품옵션 수정 모달-->
+<div id="product-option-modify-modal-box" class="product-option-add-modal-box">
+    <!--스크립트에서 처리-->
+</div>
+<!--상품옵션 순서변경 모달-->
+<div id="product-option-order-change-modal-box" class="product-option-add-modal-box">
+    <div class="product-option-order-change-modal">
+        <div class="product-option-order-change-modal-inner-box">
+            <div class="product-option-add-modal-top">
+                <p class="product-option-add-text">상품옵션 순서 변경</p>
+                <button type="button" onclick="closeOptionOrderChangeModal()">
+                    <img src="/images/icon/x-black-17x17.svg" style="width: 17px; height: 17px;" alt="">
+                </button>
+            </div>
+            <div class="product-option-change-box">
+                <button class="tab-btn" data-order-btn="tour">상품옵션</button>
+                <button class="tab-btn" data-order-btn="rentcar" style="margin-right: 0">차량옵션</button>
+            </div>
+            <div class="product-option-order-change-modal-scroll-box">
+                <form id="option-order-change-scroll-inner-box" class="product-option-order-change-modal-scroll-inner-box">
+                <!--스크립트에서 처리-->
+                </form>
+            </div>
+            <div class="product-option-change-btn-group-box">
+                <button type="button" class="option-save-btn" onclick="modifyOptionOrder()">저장</button>
+                <button type="button" class="option-close-btn" onclick="closeOptionOrderChangeModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    $(function () {
+        initDatatable('all');
+        document.querySelectorAll('.list-btn').forEach((item)=>{
+            item.addEventListener('click', function () {
+                document.querySelectorAll('.list-btn').forEach((item)=>{
+                    item.classList.remove('active');
+                })
+                item.classList.add('active');
+            })
+        })
+
+        //순서변경용
+        document.querySelectorAll('[data-order-btn]').forEach((item)=>{
+            item.addEventListener('click', function () {
+                document.querySelectorAll('[data-order-btn]').forEach((item)=>{
+                    item.classList.remove('active');
+                })
+                item.classList.add('active');
+                document.querySelector('#option-order-change-scroll-inner-box').innerHTML = '';
+                showOptionOrderChange(`${this.dataset.orderBtn}`);
+            })
+        })
+    })
+
+    function showOptionOrderChange(type) {
+        $.ajax({
+            url : "/manage/product/product-option-list"
+            , type : "GET"
+            , data : { "optionType" : type }
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+            }
+            , success : function (data) {
+                if ( data.result === "success" ) {
+                    const scrollBox = document.querySelector('#option-order-change-scroll-inner-box');
+                    for ( const item of data.data ) {
+                        scrollBox.insertAdjacentHTML('beforeend',
+                            `<div class="option-sort-item">
+                                <img style="position: absolute; top: 23px; left: 20px;" src="/images/icon/hamburger.svg" alt="">
+                                <p class="move-box-text">${item.optionName}</p>
+                                <input type="hidden" id="option-setting-Id" value="${item.optionSettingId}">
+                                <input type="hidden" name="order_num" value="${item.optionSequence}">
+                             </div>`)
+                    }
+                    $('#option-order-change-scroll-inner-box').sortable({
+                        items: $('.option-sort-item'),
+                        start: function (a,item) {
+                            item.item[0].classList.add("active");
+                        },
+                        stop: function (a,item) {
+                            refreshOrderNumber();
+                            item.item[0].classList.remove("active");
+                        }
+                    })
+                    document.querySelector('#product-option-order-change-modal-box').style.display = 'flex';
+                }
+                else {
+                    alert(data.message);
+                }
+            }
+        })
+
+    }
+
+    function refreshOrderNumber() {
+        const optionSortItem = document.querySelectorAll('.option-sort-item');
+        for(let i = 0; i < optionSortItem.length; i++){
+            optionSortItem[i].querySelector("input[name='order_num']").value = Number(i + 1);
+        }
+    }
+
+    let datatable;
+    initDatatable = function(type){
+        datatable = $("#datatable").DataTable({
+            "searching" : false
+            ,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+            ,"paging": true
+            ,"bPaginate": true
+            ,"responsive": true
+            ,"language": lang_kor
+            ,"ordering":  false
+            ,"bLengthChange" : false
+            ,"bInfo":false
+            ,"destroy": true
+            ,"ajax" : {
+                "url" : "/manage/product/product-option-list"
+                ,"type" : "GET"
+                , "beforeSend": function (xhr) {
+                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                }
+                ,"data" : {
+                    "optionType" : type
+                }
+            }
+            ,"processing": true
+            ,"serverSide": true
+            ,"order" :
+                [ [0, 'desc'] ]
+            ,"createdRow": function(row, data) {
+                if ( data.deleteFlag === "Y" ) {
+                    $(row).css('background-color', '#DC3545');
+                }
+            }
+            ,"columns": [
+                { "name" : "rownum", "title" : "번호", "data" : "rownum", "className" : "dt-head-center dt-body-center w-80"},
+                {
+                    "name": "optionType"
+                    , "title" : "옵션분류", "data" : function (row, type, set) {
+                        let returnText = "";
+                        for ( let i = 0; i < productCodeList.length; i++) {
+                            if ( productCodeList[i].code === row.optionType ) {
+                                console.log(productCodeList[i].name)
+                                console.log(row.optionType)
+                                returnText = productCodeList[i].name;
+                                return returnText;
+                            }
+                        }
+                    }, "className" : "dt-head-center dt-body-center"
+                },
+                { "name" : "optionName", "title" : "옵션명", "data" : "optionName", "className" : "dt-head-center dt-body-center"},
+                { "name" : "func_btns", "title":"옵션관리",
+                    "data" :
+                        function (row, type, set) {
+                            return `<button class="product-option-modify-btn" onclick='showModifyOptionModal("${row["optionSettingId"]}")'>수정</button>
+                                    <button class="product-option-delete-btn" onclick='deleteOption("${row["optionSettingId"]}")'>삭제</button>`;
+                        },
+                    "className": "dt-head-center dt-body-center", "orderable" : false},
+            ]
+        });
+    }
+
+    function showAddOptionModal() {
+        document.querySelector('#product-option-add-modal-box').style.display = 'flex';
+    }
+
+    function closeAddOptionModal() {
+        document.querySelector('#product-option-add-modal-box').style.display = 'none';
+        document.querySelector('#option-category-add-form').reset();
+    }
+
+    function addOption() {
+        $.ajax({
+            url : "/manage/product/add-product-option"
+            , type : "POST"
+            , data : $("#option-category-add-form").serialize()
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            }
+            , success : function (data) {
+                if ( data.result === "success" ) {
+                    alert(data.message);
+                    location.reload();
+                }
+                else {
+                    console.log(data.message)
+                }
+            }
+        })
+    }
+
+    let productCodeList = [[${productCodeList}]]
+    function showModifyOptionModal(id) {
+        $.ajax({
+            url : "/manage/product/product-option-item"
+            , type : "GET"
+            , data : { optionSettingId : id }
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            }
+            , success : function (data) {
+                if ( data.result === "success" ) {
+                    document.querySelector('#product-option-modify-modal-box').insertAdjacentHTML('beforeend'
+                        , `
+                         <div class="product-option-add-modal">
+                            <div class="product-option-add-modal-inner-box" >
+                                <div class="product-option-add-modal-top">
+                                    <p class="product-option-add-text">상품옵션등록</p>
+                                    <button type="button" onclick="closeModifyOptionModal()">
+                                        <img src="/images/icon/x-black-17x17.svg" style="width: 17px; height: 17px;" alt="">
+                                    </button>
+                                </div>
+                                <form id="option-category-modify-form" class="category-text-main-box">
+                                    <div class="product-option-category-text-box">
+                                        <p class="product-option-category-text">옵션분류*</p>
+                                        <select class="product-option-category-select" name="optionType">
+                                            ${productCodeList.map(function (list) {
+                                                if ( list.code === data.productOptionItem.optionType) {
+                                                    return `<option value="${list.code}" selected>${list.name}</option>`
+                                                }
+                                                else {
+                                                    return `<option value="${list.code}">${list.name}</option>`
+                                                }
+                                            })}
+                                        </select>
+                                    </div>
+                                    <div class="product-option-category-text-box">
+                                        <label for="product-option-category-name2" class="product-option-category-text">옵션명*</label>
+                                        <input type="text" id="product-option-category-name2" name="optionName" value="${data.productOptionItem.optionName}" class="product-option-category-input">
+                                    </div>
+                                </form>
+                                <div class="btn-group-box">
+                                    <button type="button" class="option-save-btn" onclick="modifyOption(${data.productOptionItem.optionSettingId})">수정</button>
+                                    <button type="button" class="option-delete-btn" onclick="closeAddOptionModal()">삭제</button>
+                                    <button type="button" class="option-close-btn" onclick="closeModifyOptionModal()">닫기</button>
+                                </div>
+                            </div>
+                         </div>`);
+                    document.querySelector('#product-option-modify-modal-box').style.display = 'flex';
+                }
+                else {
+                    console.log(data.message)
+                }
+            }
+        })
+
+    }
+
+    function closeModifyOptionModal() {
+        document.querySelector('#product-option-modify-modal-box').style.display = 'none';
+        document.querySelector('#product-option-modify-modal-box').innerHTML = '';
+    }
+
+    function modifyOption(id) {
+        let postFrom = $("#option-category-modify-form").serialize();
+        postFrom += `&optionSettingId=${id}`;
+
+        $.ajax({
+            url : "/manage/product/modify-product-option"
+            , type : "POST"
+            , data : postFrom
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            }
+            , success : function (data) {
+                if ( data.result === "success" ) {
+                    alert(data.message);
+                    location.reload();
+                }
+            }
+        })
+    }
+
+    function deleteOption(id) {
+        if ( confirm("삭제하시겠습니까?") ) {
+            $.ajax({
+                url : "/manage/product/delete-product-option"
+                , type : "POST"
+                , data : { optionSettingId : id }
+                , beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                }
+                , success : function (data) {
+                    if ( data.result === "success" ) {
+                        alert(data.message);
+                        location.reload();
+                    }
+                    else {
+                        alert(data.message);
+                    }
+                }
+            })
+        }
+    }
+
+    function modifyOptionOrder() {
+        const basicPriceList = [];
+
+        const scrollBox = document.querySelector('#option-order-change-scroll-inner-box');
+        if ( scrollBox.children.length > 0 ) {
+            for ( const item of scrollBox.children ) {
+                basicPriceList.push({
+                    optionSettingId : item.querySelector('#option-setting-Id').value
+                    , optionSequence : item.querySelector('input[name="order_num"]').value
+                })
+            }
+
+            $.ajax({
+                url : "/manage/product/change-product-option-order"
+                , type : "POST"
+                , contentType : "application/json"
+                , data : JSON.stringify(basicPriceList)
+                , beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                }
+                , success : function (data) {
+                    if ( data.result === "success" ) {
+                        alert(data.message);
+                        location.reload();
+                    }
+                    else {
+                        alert(data.message);
+                    }
+                }
+            })
+        }
+        else {
+            alert("옵션 개수를 확인해주세요.");
+        }
+    }
+
+    function showOptionOrderChangeModal() {
+        $.ajax({
+            url : "/manage/product/product-option-list"
+            , type : "GET"
+            , data : { "orderType" : "orderChange" }
+            , beforeSend: function (xhr) {
+                xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+            }
+            , success : function (data) {
+                if ( data.result === "success" ) {
+                    const scrollBox = document.querySelector('#option-order-change-scroll-inner-box');
+                    for ( const item of data.data ) {
+                        scrollBox.insertAdjacentHTML('beforeend',
+                            `<div class="option-sort-item">
+                                <img style="position: absolute; top: 23px; left: 20px;" src="/images/icon/hamburger.svg" alt="">
+                                <p class="move-box-text">${item.optionName}</p>
+                                <input type="hidden" id="option-setting-Id" value="${item.optionSettingId}">
+                                <input type="hidden" name="order_num" value="${item.optionSequence}">
+                             </div>`)
+                    }
+                    $('#option-order-change-scroll-inner-box').sortable({
+                        items: $('.option-sort-item'),
+                        start: function (a,item) {
+                            item.item[0].classList.add("active");
+                        },
+                        stop: function (a,item) {
+                            refreshOrderNumber();
+                            item.item[0].classList.remove("active");
+                        }
+                    })
+                    document.querySelector('#product-option-order-change-modal-box').style.display = 'flex';
+                }
+                else {
+                    console.log(data.message);
+                }
+            }
+        })
+
+    }
+
+    function closeOptionOrderChangeModal() {
+        document.querySelector('#product-option-order-change-modal-box').style.display = 'none';
+        document.querySelector('#option-order-change-scroll-inner-box').innerHTML = '';
+        document.querySelectorAll('[data-order-btn]').forEach((item)=>{
+            item.classList.remove('active');
+        })
+    }
+
+
+</script>
+
+<!-- AdminLTE App -->
+<script src="/js/manage/adminlte.js"></script>
+<!-- AdminLTE for demo purposes -->
+<!-- 	<script src="/js/manage/demo.js"></script> -->
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<!--	<script src="/js/manage/pages/dashboard.js"></script>-->
+
+</body>
+</html>

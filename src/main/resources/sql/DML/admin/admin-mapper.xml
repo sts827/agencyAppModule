@@ -1,0 +1,182 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.admin.AdminMapper">
+    <select id="selectAdministratorUserListCount" resultType="Integer">
+        SELECT count(*) FROM user
+        WHERE user_role IN ('ADMIN', 'MANAGER')
+    </select>
+
+    <select id="selectAdministratorUserList" parameterType="HashMap" resultType="LoginUser">
+        SELECT user_email, user_token_id, user_name,
+        user_role, user_mobile
+        FROM user
+        WHERE user_role IN ('ADMIN', 'MANAGER')
+        <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+            LIMIT #{itemStartPosition}, #{pagePerSize}
+        </if>
+    </select>
+
+    <select id="selectAdministratorInfo" parameterType="String" resultType="LoginUser">
+        SELECT user_email, user_password, user_join_type,
+               user_name, user_nationality, user_birthday,
+               user_gender, user_mobile, user_tel,
+               user_addr_zipcode, user_addr_extra,
+               user_addr_jibun, user_addr_road, user_addr_detail,
+               user_role, user_class_name, user_class_code,
+               user_group_code, user_token_id,
+               user_grade_id, user_grade, user_grade_start, user_grade_end,
+               user_membership_id, user_membership_grade, user_membership_start, user_membership_end,
+               user_verified_email, user_verified_mobile,
+               user_ci, user_di, user_di_corp,
+               user_join_date, user_modify_date, last_login_date,
+               last_password_date, last_login_fail_count, account_status,
+               naver_token, naver_email, naver_join_date,
+               kakao_token, kakao_email, kakao_join_date,
+               google_token, google_email, google_join_date,
+               facebook_token, facebook_email, facebook_join_date,
+               secondary_email, privacy_retention_days, mailing_yn
+        FROM user
+        WHERE user_email = #{value}
+    </select>
+
+    <insert id="insertAdministrator" parameterType="LoginUser" useGeneratedKeys="true" keyProperty="userEmail">
+        INSERT INTO user
+            SET user_email = #{userEmail}
+            , user_password = #{userPassword}
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userJoinType)">, user_join_type = #{userJoinType}</if>
+            , user_name = #{userName}
+            , user_mobile = #{userMobile}
+            , user_tel = #{userTel}
+            , user_addr_zipcode = #{userAddrZipcode}
+            , user_addr_extra = #{userAddrExtra}
+            , user_addr_jibun = #{userAddrJibun}
+            , user_addr_road = #{userAddrRoad}
+            , user_addr_detail = #{userAddrDetail}
+            , user_nationality = #{userNationality}
+            , user_birthday = #{userBirthday}
+            , user_gender = #{userGender}
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userRole)">, user_role = #{userRole}</if>
+            , user_class_name = #{userClassName}
+            , user_class_code = #{userClassCode}
+            , user_group_code = #{userGroupCode}
+            , user_token_id = #{userTokenId}
+            , user_grade = #{userGrade}
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userVerifiedEmail)">, user_verified_email = #{userVerifiedEmail}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userVerifiedMobile)">, user_verified_mobile = #{userVerifiedMobile}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userCi)">, user_ci = #{userCi}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userDi)">, user_di = #{userDi}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userDiCorp)">, user_di_corp = #{userDiCorp}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(naverToken)">, naver_token = #{naverToken}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(naverEmail)">, naver_email = #{naverEmail}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(naverToken)">, naver_join_date = now()</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(kakaoToken)">, kakao_token = #{kakaoToken}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(kakaoEmail)">, kakao_email = #{kakaoEmail}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(kakaoToken)">, kakao_join_date = now()</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(googleToken)">, google_token = #{googleToken}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(googleEmail)">, google_email = #{googleEmail}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(googleToken)">, google_join_date = now()</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(facebookToken)">, facebook_token = #{facebookToken}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(facebookEmail)">, facebook_email = #{facebookEmail}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(facebookToken)">, facebook_join_date = now()</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secondaryEmail)">, secondary_email = #{secondary_email}</if>
+            <if test="privacyRetentionDays > 0">, privacy_retention_days = #{privacyRetentionDays}</if>
+            <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mailingYn)">, mailing_yn = #{mailingYn}</if>
+    </insert>
+
+    <insert id="insertWithdrawalAdministrator" parameterType="LoginUser">
+        INSERT INTO user_stored_withdrawal
+        (
+            user_email, user_password, user_join_type,
+            user_name, user_nationality, user_birthday, user_gender,
+            user_mobile, user_tel,
+            user_addr_zipcode, user_addr_extra,
+            user_addr_jibun, user_addr_road, user_addr_detail,
+            user_role, user_class_name, user_class_code,
+            user_group_code, user_token_id,
+            user_grade_id, user_grade, user_grade_start, user_grade_end,
+            user_membership_id, user_membership_grade, user_membership_start, user_membership_end,
+            user_verified_email, user_verified_mobile,
+            user_ci, user_di, user_di_corp,
+            user_join_date, user_modify_date, last_login_date,
+            last_password_date, last_login_fail_count, account_status,
+            naver_token, naver_email, naver_join_date,
+            kakao_token, kakao_email, kakao_join_date,
+            google_token, google_email, google_join_date,
+            facebook_token, facebook_email, facebook_join_date,
+            secondary_email, privacy_retention_days, mailing_yn,
+            delete_date, delete_id
+        )
+
+        SELECT user_email, user_password, user_join_type,
+               user_name, user_nationality, user_birthday, user_gender,
+               user_mobile, user_tel,
+               user_addr_zipcode, user_addr_extra,
+               user_addr_jibun, user_addr_road, user_addr_detail,
+               user_role, user_class_name, user_class_code,
+               user_group_code, user_token_id,
+               user_grade_id, user_grade, user_grade_start, user_grade_end,
+               user_membership_id, user_membership_grade, user_membership_start, user_membership_end,
+               user_verified_email, user_verified_mobile,
+               user_ci, user_di, user_di_corp,
+               user_join_date, user_modify_date, last_login_date,
+               last_password_date, last_login_fail_count, account_status,
+               naver_token, naver_email, naver_join_date,
+               kakao_token, kakao_email, kakao_join_date,
+               google_token, google_email, google_join_date,
+               facebook_token, facebook_email, facebook_join_date,
+               secondary_email, privacy_retention_days, mailing_yn,
+               now(), #{operator}
+          FROM user
+         WHERE user_email = #{userEmail} AND user_token_id = #{userTokenId}
+    </insert>
+
+    <delete id="deleteAdministrator" parameterType="LoginUser">
+        DELETE FROM user
+         WHERE user_email = #{userEmail} AND user_token_id = #{userTokenId}
+    </delete>
+
+    <update id="updateAdministrator" parameterType="LoginUser">
+        UPDATE user
+           SET user_modify_date = now()
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userPassword)">, user_password = #{userPassword}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userJoinType)">, user_join_type = #{userJoinType}</if>
+               , user_name = #{userName}
+               , user_mobile = #{userMobile}
+               , user_tel = #{userTel}
+               , user_addr_zipcode = #{userAddrZipcode}
+               , user_addr_extra = #{userAddrExtra}
+               , user_addr_jibun = #{userAddrJibun}
+               , user_addr_road = #{userAddrRoad}
+               , user_addr_detail = #{userAddrDetail}
+               , user_nationality = #{userNationality}
+               , user_birthday = #{userBirthday}
+               , user_gender = #{userGender}
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userRole)">, user_role = #{userRole}</if>
+               , user_class_name = #{userClassName}
+               , user_class_code = #{userClassCode}
+               , user_group_code = #{userGroupCode}
+               , user_grade = #{userGrade}
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userVerifiedEmail)">, user_verified_email = #{userVerifiedEmail}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userVerifiedMobile)">, user_verified_mobile = #{userVerifiedMobile}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userCi)">, user_ci = #{userCi}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userDi)">, user_di = #{userDi}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(userDiCorp)">, user_di_corp = #{userDiCorp}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(naverToken)">, naver_token = #{naverToken}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(naverEmail)">, naver_email = #{naverEmail}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(naverToken)">, naver_join_date = now()</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(kakaoToken)">, kakao_token = #{kakaoToken}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(kakaoEmail)">, kakao_email = #{kakaoEmail}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(kakaoToken)">, kakao_join_date = now()</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(googleToken)">, google_token = #{googleToken}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(googleEmail)">, google_email = #{googleEmail}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(googleToken)">, google_join_date = now()</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(facebookToken)">, facebook_token = #{facebookToken}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(facebookEmail)">, facebook_email = #{facebookEmail}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(facebookToken)">, facebook_join_date = now()</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(secondaryEmail)">, secondary_email = #{secondary_email}</if>
+               <if test="privacyRetentionDays > 0">, privacy_retention_days = #{privacyRetentionDays}</if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(mailingYn)">, mailing_yn = #{mailingYn}</if>
+         WHERE user_email = #{userEmail} AND user_token_id = #{userTokenId}
+    </update>
+</mapper>

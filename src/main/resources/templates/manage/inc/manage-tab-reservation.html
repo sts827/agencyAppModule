@@ -1,0 +1,125 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <div th:fragment="tab-reservation(userEmail)" class="tab-content" data-id="reservation" style="display: none;">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="container-fluid p-0">
+					<table id="datatableReservation" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" th:inline="javascript">
+			var datatableReservation;
+			$(document).ready(function() {
+				initDatatableReservation();
+			});
+
+			initDatatableReservation = function(){
+				var baseColumns = [
+					{ "name" : "id", "title" : "고유번호", "data" : "id", "className" : "dt-head-center dt-body-left",visible:false},
+					{ "name" : "travelScheduleDt", "title" : "여행일자", "data" : "travelScheduleDt", "className" : "dt-head-center dt-body-center",width:"200px"},
+					{ "name" : "reservationCode", "title" : "예약상태코드",
+					  "data" : function (row, type, set) {
+								//console.log(`${row["applyCode"]}`);
+							if( row["cancelYn"] === 'N' ){
+								var strclass = "";
+								switch(row["reservationCode"]){
+									case "0": strclass+=" status apply"; break; //접수
+									case "1": strclass+=" status reservation"; break; //처리중
+									case "2": strclass+=" status confirm"; break; //입금대기
+									case "3": strclass+=" status cancel"; break; //확약
+									case "4": strclass+=" status canceling"; break; //완료
+									default : strclass+=" "; break;
+								}
+
+								var html = `<div class="checkpoint"><div class="${strclass}">${row["reservationCodeName"]}</div></div>`;
+							} else {
+								html = `<span class="box-label progressing">취소처리</span>`;
+							}
+							return html;
+						},
+						//"reservationCode",
+					"className" : "dt-head-center dt-body-center ",width:"100px"},
+					{ "name" : "productTitle", "title" : "상품명", "data" : "productTitle", "className" : "dt-head-center dt-body-center"},
+					{ "name" : "userName", "title" : "예약자명", "data" : "userName", "className" : "dt-head-center dt-body-center",width:"100px"},
+					{ "name" : "userMobile", "title" : "연락처", "data" : "userMobile", "className" : "dt-head-center dt-body-center",width:"120px"},
+					{ "name" : "createDate", "title" : "접수일자", "data" : "createDate", "className" : "dt-head-center dt-body-center",width:"100px"},
+					{ "name" : "func_btns", "title":"기능",
+						"data" :
+							function (row, type, set) {
+								var html = "";
+								html += `<div class="form-inline justify-content-center">`;
+								html += `<button type='button' class='btn btn-default' data-toggle='tooltip' title='세부' onclick='fnGoReservationMove(${row['id']})'>세부보기</button>&nbsp;`;
+								html += `</div>`;
+								return html;
+							},
+					   "className": "dt-head-center dt-body-center", "orderable" : false, "width":"160px"},
+				];
+
+				datatableReservation = $("#datatableReservation").DataTable({
+					"searching" : false
+					,"sDom": '<"top"i>rt<"bottom"lp><"clear">'//f
+					,"paging": true
+					,"bPaginate": true
+					,"responsive": true
+					,"language": lang_kor
+					,"ordering": false
+					,"bLengthChange" : false
+					,"bInfo":false
+					,"ajax" : {
+						"url" : "/manage/reservation/list"
+						,"method" : "post"
+						, "beforeSend": function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						}
+						,"data" : function(d) {
+							d.userEmail = [[${userEmail}]];
+/*
+							if( $('#dateType option:selected').index() > 0 ){
+								d.dateType = $('#dateType option:selected').val();
+								var dateRange = $('#dateRange').val().split(separator);
+								d.dateFrom = dateRange[0];
+								d.dateTo   = dateRange[1];
+							}
+							if ($('#reservationCode').val() != "")  d.reservationCode = $('#reservationCode').val();
+							if ($('#searchKey').val().trim() != "") d.searchKey = $('#searchKey').val().trim();
+*/
+						}
+					},"processing": true
+					,"serverSide": true
+					,"order" :
+						[ [0, 'desc'] ]
+					,"createdRow": function(row, data) {
+						  if ( data.deleteYn === "Y" ) {
+							  $(row).css('background-color', '#DC3545');
+						  } else if ( data.secretYn === "Y" ) {
+							  $(row).css('background-color', '#e9e9e9');
+						  }
+					  }
+					,"initComplete": function(settings, json) {
+		    			//fnInitBootstrapToggle();
+		  			}
+					,"columns": baseColumns
+				});
+			};
+
+			fnGoReservationMove = function(id){
+				var params = `?mode=U&id=${id}&params=`;
+
+				if(id !== undefined){
+					params += `ipˇbtˇdata-user-idˇ${id}`;
+				}
+				//http://localhost:8081/manage/reservation/form?mode=U&id=2&params=
+				var url = `/manage/reservation/form`+params;
+				//location.href = url;
+				window.open(url, '_blank');
+			}
+		</script>
+		<style>
+			.checkpoint{border-bottom: unset !important;}
+		</style>
+	</div>
+</body>
+</html>

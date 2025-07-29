@@ -1,0 +1,577 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+	<div th:fragment="product-tab-basic(strClass, strDataId)" th:class="${strClass}" th:id="${strDataId}">
+		<div class="title-div">
+			<h3>기본정보*</h3>
+			<div class="info-toggle basic">
+				<button class="arrow down" type="button" th:style="|background-image:url('@{/images/icons/arrow_down.svg}')|"></button>
+<!--							<button class="arrow-up" type="button" th:style="|background-image:url('@{/images/icons/arrow_up.svg}')|"></button>-->
+			</div>
+		</div>
+		<div class="basic-info">
+			<form id="basic-info-add-form" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="productStatus" value="">
+				<input type="hidden" name="productDescription" value="">
+				<div class="row-div">
+					<div class="quad-div">
+						<h5>상품구분</h5>
+						<select class="form-select" th:name="${#lists.isEmpty(categoryList) ? 'productMenuId' : '' }" th:id="${#lists.isEmpty(categoryList) ? 'product-menu-id' : '' }" readonly>
+							<option th:text="${menuName}" th:value="${menuId}"></option>
+						</select>
+					</div>
+					<div class="quad-div">
+						<h5>분류구분</h5>
+						<th:block th:if="${not #lists.isEmpty(categoryList)}">
+							<select class="form-select" name="productMenuId" id="product-menu-id">
+<!--								<option value="0">선택없음</option>-->
+								<th:block th:each="item : ${categoryList}">
+									<option th:value="${item.menuId}" th:text="${item.menuName}" th:selected="${item.menuId eq productInfo.productMenuId}"></option>
+								</th:block>
+							</select>
+						</th:block>
+						<th:block th:unless="${not #lists.isEmpty(categoryList)}">
+							<select class="form-select" name="productMenuId" id="product-category-id" disabled>
+								<option readonly="readonly" th:text="|하위 분류 없음|"></option>
+							</select>
+						</th:block>
+					</div>
+					<div class="quad-div">
+						<h5>카테고리</h5>
+						<select class="form-select" name="productCategoryId" id="product-subcategory">
+						</select>
+					</div>
+					<div class="quad-div">
+						<h5>공개여부</h5>
+						<input type="checkbox" name="productUseYn" value="Y" id="isDisplay" class="toggle" checked hidden>
+						<div class="switch-box">
+							<label for="isDisplay" class="toggleSwitch">
+								<span class="toggleButton"></span>
+							</label>
+							<ul class="status">
+								<li class="no-checked">비공개</li>
+								<li class="active checked">공개</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="row-div">
+					<div class="tri-div-double">
+						<h5>상품명*</h5>
+						<input class="form-control" type="text" id="product-title" name="productTitle" th:value="${productInfo.productTitle}">
+					</div>
+					<div class="quad-div">
+						<h5>인기상품</h5>
+						<input type="checkbox" name="isPopular" value="Y" id="isPopular" class="toggle" th:checked="${productInfo.isPopular ne null ? productInfo.isPopular : true}" hidden>
+						<div class="switch-box">
+							<label for="isPopular" class="toggleSwitch">
+								<span class="toggleButton"></span>
+							</label>
+							<ul class="status">
+								<th:block th:if="${productInfo.productUseYn eq null}">
+								<li class="no-checked">미사용</li>
+								<li class="active checked">사용</li>
+								</th:block>
+								<th:block th:unless="${productInfo.productUseYn eq null}">
+									<th:block th:if="${productInfo.productUseYn eq 'N'}">
+										<li class="no-checked active">비공개</li>
+										<li class="checked">공개</li>
+									</th:block>
+									<th:block th:unless="${productInfo.productUseYn eq 'N'}">
+										<li class="no-checked">비공개</li>
+										<li class="checked active">공개</li>
+									</th:block>
+								</th:block>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="row-div">
+					<div class="tri-div-double">
+						<h5>한줄소개</h5>
+						<input class="form-control" id="product-subtitle" name="productSubtitle" type="text" th:value="${productInfo.productSubtitle}" style="margin-left: 10px;">
+					</div>
+					<div class="quad-div">
+						<h5>재고정책</h5>
+						<div class="select-box">
+							<select class="form-control form-select tac" name="policyInventory" id="policyInventory" onchange="fnChangeCapacity(this)">
+								<option value="0" th:selected="${productInfo.policyInventory eq null or  productInfo.policyInventory eq '0'}">기본정책</option>
+								<option value="1" th:selected="${productInfo.policyInventory eq '1'}">예약기반</option>
+								<option value="5" th:selected="${productInfo.policyInventory eq '5'}">외부관리</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="row-div">
+					<div class="tri-div-double">
+						<h5>상품사진*</h5>
+						<input type="file" id="upload-product-image" name="upload" multiple="multiple" hidden>
+						<label for="upload-product-image" class="upload-wrapper">
+							<ul class="upload_btn">
+								<li class="icon" th:style="|background-image:url('@{/images/icons/upload_btn.svg}')|"></li>
+								<li class="text">사진등록</li>
+							</ul>
+						</label>
+						<p class="notification-icon">이미지 추천 사이즈 : 500px * 500px</p>
+						<div id="product-images" class="product-images swiper">
+							<div class="product-image-list swiper-wrapper">
+								<div class="product-image-item swiper-slide" th:if="!${#arrays.isEmpty(productImageList)}" th:each="image : ${productImageList}">
+									<input type="hidden" name="images" th:value="${image.imageId}">
+									<img th:src="|/upload/product/${image.uploadFilename}|" class="product-image-preview"  onclick="changeThumbnailImage(this)">
+									<button type="button" class="product-image-delete-button" th:onclick="deleteThumbnailImage(this, [[${image.imageId}]]);">X</button>
+								</div>
+							</div>
+							<ul class="product-image-pagination">
+								<li class="swiper-button-prev"></li>
+								<li class="swiper-button-next"></li>
+							</ul>
+						</div>
+					</div>
+					<div class="quad-div">
+						<input type="hidden" id="product-thumbnail" name="productThumbnail" th:value="${productInfo.productThumbnail}">
+						<div id="product-thumbnail-view" class="product-thumbnail-view">
+							 <img th:src="${productInfo.productThumbnail}" alt="">
+						</div>
+					</div>
+				</div>
+				<div class="row-div">
+					<h5 class="showDate">노출기간</h5>
+					<div class="picky quad-div">
+						<input name="productShowStartDate" id="display-start-date" type="text" class="form-control with-button" placeholder="20XX-XX-XX"
+							   th:value="${#strings.substring(productInfo.productShowStartDate,0,10)}">
+						<button type="button" class="input-button" onclick="setDefaultSalesPeriod()"><div class="calendar" th:style="|background-image:url('@{/images/icons/calendar.svg}')|"></div></button>
+						<span>~</span>
+					</div>
+					<div class="picky quad-div">
+						<input name="productShowEndDate" id="display-end-date" type="text" class="form-control with-button" placeholder="20XX-XX-XX"
+							   th:value="${#strings.substring(productInfo.productShowEndDate,0,10)}">
+						<button type="button" class="input-button" onclick="setNullSalesEndDate()"><div class="calendar" th:style="|background-image:url('@{/images/icons/calendar.svg}')|"></div></button>
+					</div>
+					<div class="quad-div">
+						<p class="notification-icon">홈페이지에 상품이 노출되는 기간입니다. (미설정시 상시노출)</p>
+					</div>
+				</div>
+				<div class="row-div">
+					<h5 class="sellDate">판매기간</h5>
+					<div class="picky quad-div">
+						<input name="productReservStartDate" type="text" class="form-control with-button" id="sales-start-date" required placeholder="20XX-XX-XX"
+							   th:value="${#strings.substring(productInfo.productReservStartDate,0,10)}">
+						<button type="button" class="input-button" onclick="setDefaultSalesPeriod()">
+							<div class="calendar" th:style="|background-image:url('@{/images/icons/calendar.svg}')|"></div>
+						</button>
+						<span>~</span>
+					</div>
+					<div class="picky quad-div">
+						<input name="productReservEndDate" type="text" class="form-control with-button" id="sales-end-date" required placeholder="20XX-XX-XX"
+							   th:value="${#strings.substring(productInfo.productReservEndDate,0,10)}">
+						<button type="button" class="input-button" onclick="setNullSalesEndDate()">
+							<div class="calendar" th:style="|background-image:url('@{/images/icons/calendar.svg}')|"></div>
+						</button>
+					</div>
+					<div class="quad-div">
+						<p class="notification-icon">상품이 판매되는 기간입니다(결제기간) (미설정시 상시판매)</p>
+					</div>
+				</div>
+				<div class="row-div">
+					<div class="dotted"></div>
+				</div>
+				<div class="row-div">
+					<div class="full-div text-area">
+						<h5>상품요약</h5>
+						<textarea name="productNotice" id="product-notice" class="form-control" type="text" placeholder="ex) 제주 동부 핫플레이스 총집합! 체험과 힐링을 한번에, 제주 맞춤 2박3일 여행 패키지!"
+								  th:text="${productInfo.productNotice}"></textarea>
+					</div>
+				</div>
+				<div class="row-div">
+					<div class="full-div hashtag">
+						<h5>태그</h5>
+						<input name="productTag" id="product-tag" class="form-control" type="text" placeholder="ex) #제주도, #체험관광, #자연관광" th:value="${productInfo.productTag}">
+					</div>
+					<p class="notification-icon">콤마(,)로 구분해주세요</p>
+				</div>
+
+				<div class="row-div">
+					<div class="full-div include-info">
+						<h5>포함내역</h5>
+						<input name="productIncludeItem" id="product-include-item" class="form-control" type="text" placeholder="ex) 입장료,버스요금,숙박비"
+							   th:value="${productInfo.productIncludeItem}">
+					</div>
+				</div>
+				<div class="row-div">
+					<div class="full-div exclude-info">
+						<h5>불포함내역</h5>
+						<input name="productExcludeItem" id="product-exclude-item" class="form-control" type="text" placeholder="ex) 여행자보험,개인경비,전일정 식사비"
+							   th:value="${productInfo.productExcludeItem}">
+					</div>
+				</div>
+				<div class="row-div" hidden>
+					<div class="dotted"></div>
+				</div>
+				<div class="row-div productOption" hidden>
+					<div class="quad-div"th:if="${menu.menuSubType eq 'single'}">
+						<h5 th:text="${menu.menuSubType eq 'experience' ? '' : '도수'}">옵션1(도수)</h5>
+						<input class="form-control" type="text" id="productOption1" name="productOption1"
+							   th:value="${productInfo.productOption1}">
+					</div>
+					<div class="quad-div">
+						<h5 th:text="${menu.menuSubType eq 'experience' ? '소요시간' : '용량'}">옵션2(용량)</h5>
+						<input class="form-control" type="text" id="productOption2" name="productOption2"
+							   th:value="${productInfo.productOption2}">
+					</div>
+					<div class="quad-div" th:if="${menu.menuSubType eq 'experience'}")>
+						<h5>유형</h5>
+						<select class="form-control" type="text" id="productOption3" name="productOption3">
+							<option value="normal"  th:selected="${productInfo.productOption3 eq 'normal'}">상설</option>
+							<option value="special" th:selected="${productInfo.productOption3 eq 'special'}">특별</option>
+						</select>
+					</div>
+				</div>
+				<ul class="buttons">
+					<li class="cancel"><button type="button" onclick="resetBasicInfo()">취소하기</button></li>
+					<li class="save"><button type="button" onclick="saveBasicInfo(this)">저장하기</button></li>
+				</ul>
+			</form>
+		</div>
+		<script th:inline="javascript">
+			$(document).ready(function(event){
+				thumbnailImages();
+				initializeDatepicker();
+
+				$('#product-menu-id').on('change', function () {
+					initSubProductCategory();
+				});
+
+				if( $("#product-menu-id option:selected") ){
+					initSubProductCategory();
+				}
+				$(".picky").on("change",validationDatePeriod);
+				$('#ui-datepicker-div').hide();
+			});
+
+			thumbnailImages = function(event){
+				$('#upload-product-image').on("change",function(event){
+					$.ajax({
+						url: '/manage/product/upload-product-images',
+						type : "POST",
+						enctype : 'multipart/form-data',
+						data : new FormData($('#basic-info-add-form')[0]),
+						contentType : false,
+						processData : false,
+						beforeSend:function(xhr){
+							xhr.setRequestHeader(
+								[[${_csrf.headerName}]], [[${_csrf.token}]]
+							);
+						},
+						success : function(data) {
+							if (typeof data.result != "undefined" && data.result == "error") {
+								alert(data.error);
+								return;
+							} else {
+								for(var i=0; i<data.list.length; i++){
+									var row = '<div class="product-image-item swiper-slide" onclick="changeThumbnailImage(this)">';
+									row += '<input type="hidden" name="images" value="'+data.list[i].imageId+'">';
+									row += '<img src="/upload/product/' + data.list[i].uploadFilename + '" class="product-image-preview" />';
+									row += '<button type="button" class="product-image-delete-button" onclick="deleteThumbnailImage(this, \''+data.list[i].imageId+'\');">X</button>';
+									row += '</div>';
+									$('#product-images').find('.product-image-list').append(row);
+								}
+								$('#product-images').show();
+
+								$('#product-thumbnail').val($('#product-images').find('.product-image-preview').eq(0).attr('src'));
+								$('#product-thumbnail-view').html('<img src="'+$('#product-images').find('.product-image-preview').eq(0).attr('src')+'" class="product-image-preview thumbnail" />');
+							}
+
+							initializeImageSwiper();
+						}
+					})
+				});
+			}
+
+			initializeImageSwiper = function(){
+				const swiper = new Swiper('.swiper', {
+					direction: 'horizontal',
+					speed: 400,
+					slidesPerView: Math.floor($('#product-images').width()/200),
+					spaceBetween: 10,
+
+					// Navigation arrows
+					navigation: {
+						nextEl: '.swiper-button-next',
+						prevEl: '.swiper-button-prev',
+					},
+				});
+			}
+
+			changeThumbnailImage = function(item){
+				let img = item.querySelector("img");
+				let src = img.getAttribute("src");
+				$('#product-thumbnail').val(src);
+				$('#product-thumbnail-view').html('<img src="'+src+'" class="product-image-preview thumbnail" />');
+			}
+
+			deleteThumbnailImage = function(item, id){
+				$('#product-thumbnail-view').empty();
+				$(item).parent().remove();
+
+				$.ajax({
+					url: '/manage/product/delete-product-images',
+					type : "DELETE",
+					data : {
+						[[${_csrf.parameterName}]]: [[${_csrf.token}]],
+						'product_tour_id' : 0,
+						'image_id': id,
+					},
+					success : function(data) {
+						if (typeof data.result != "undefined" && data.result == "error") {
+							alert(data.error);
+							return;
+						} else {
+							let thumbnail = $('#product-images').find('.product-image-preview').eq(0);
+							initializeImageSwiper();
+							if($('#product-images').find('.product-image-preview').length > 0){
+								$('#product-thumbnail').val($(thumbnail).attr('src'));
+								$('#product-thumbnail-view').html('<img src="'+$(thumbnail).attr('src')+'" class="product-image-preview thumbnail" />');
+							}else{
+								$('#product-thumbnail').val('');
+								$('#product-thumbnail-view').html('');
+							}
+						}
+					},
+					error : function(xhr, code, errorMsg) { },
+					beforeSend : function() { },
+					complete : function() { }
+				});
+			}
+
+			initializeDatepicker = function(){
+				console.log("initialized datepicker")
+				const datepickerOption = {
+					dateFormat:"yy-mm-dd",
+					prevText: '이전 달',
+					nextText: '다음 달',
+					monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+					monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+					dayNames: ['일', '월', '화', '수', '목', '금', '토'],
+					dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+					dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+					showMonthAfterYear: true,
+					yearSuffix: '년',
+				}
+
+				$('#sales-start-date, #sales-end-date').datepicker(datepickerOption);
+				$('#display-start-date, #display-end-date').datepicker(datepickerOption);
+			};
+
+			setDefaultSalesPeriod = function(){
+				$('#sales-start-date').val('');
+				$('#sales-end-date').val('');
+				$('#display-start-date').val('');
+				$('#display-end-date').val('');
+				initializeDatepicker();
+				$('.picker').show();
+			};
+
+			setNullSalesEndDate = function(){
+				$('#sales-end-date').val('');
+			}
+/*
+	initSubProductCategory = function () {
+		let selectCategoryId = $("#product-menu-id").val();
+
+		$.ajax({
+			url:"/manage/product/getProductCategory",
+			data:{"productMenuId":selectCategoryId, "ueeYn":'Y', "deleteYn":'N'},
+			type:"GET",
+			beforeSend:function(xhr){
+				xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+			},
+			success:function(res){
+				if(res.result=="success"){
+					var html = `<option value='0'>미선택</option>`;
+					if(res.categories.length > 0){
+						for(var i in res.categories){
+							var item = res.categories[i];
+
+							html += `<option value='${item.productCategoryId}'>${item.categoryTitle}</option>`;
+						}
+						$("#product-subcategory").attr('disabled',false).attr('readonly',false);
+					} else {
+						html = `<option>하위 카테고리 없음</option>`;
+
+						$("#product-subcategory").attr('disabled',true).attr('readonly',true);
+					}
+					$("#product-subcategory").html(html);
+				}
+			},
+			error:function(data){}
+		});
+	}
+*/
+			initSubProductCategory = function () {
+				let selectCategoryId = $("#product-menu-id option:selected").val();
+
+				if(selectCategoryId !== '0'){
+					$.ajax({
+						url:"/manage/product/getProductCategory",
+						data:{"productMenuId":selectCategoryId, "useYn":'Y', "deleteYn":'N'},
+						type:"GET",
+						beforeSend:function(xhr){
+							xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+						},
+						success:function(res){
+							if(res.result=="success"){
+								var html;
+								html = `<option value='0'>미선택</option>`;
+								if(res.categories.length > 0){
+									for(var i in res.categories){
+										var item = res.categories[i];
+
+										html += `<option value='${item.productCategoryId}'>${item.categoryTitle}</option>`;
+									}
+									$("#product-subcategory").attr('disabled',false).attr('readonly',false);
+								} else {
+									html = `<option value="0">하위 카테고리 없음</option>`;
+
+									$("#product-subcategory").attr('disabled',true).attr('readonly',true);
+								}
+								$("#product-subcategory").html(html);
+							}
+						},
+						error:function(data){}
+					});
+				} else {
+					$("#product-subcategory").html(`<option>하위 카테고리 없음</option>`);
+					$("#product-subcategory").attr('disabled',true).attr('readonly',true);
+				}
+			}
+
+			validationDatePeriod = function(event){
+				let target = event.target.closest("input");
+				let type = target.getAttribute("id");
+
+				if(type =="display-end-date"){
+					// display-start-date value가 있을때 해당 값과 비교하여 값이 적으면 alert()
+					let endDate = new Date(document.querySelector("#display-end-date").value);
+					let startDate = new Date(document.querySelector("#display-start-date").value);
+					if(startDate > endDate){
+						alert("날짜를 확인해주세요");
+						document.querySelector("#display-start-date").value="";
+					}
+				}else if(type=="display-start-date"){
+					let endDate = new Date(document.querySelector("#display-end-date").value);
+					let startDate = new Date(document.querySelector("#display-start-date").value);
+					if(startDate > endDate){
+						alert("날짜를 확인해주세요");
+						document.querySelector("#display-end-date").value="";
+					}
+				}else if(type=="sales-start-date"){
+					let endDate = new Date(document.querySelector("#sales-end-date").value);
+					let startDate = new Date(document.querySelector("#sales-start-date").value);
+					if(startDate > endDate){
+						alert("날짜를 확인해주세요");
+						document.querySelector("#sales-end-date").value="";
+					}
+				} else if(type =="sales-end-date"){
+					let endDate = new Date(document.querySelector("#sales-end-date").value);
+					let startDate = new Date(document.querySelector("#sales-start-date").value);
+					if(startDate > endDate){
+						alert("날짜를 확인해주세요");
+						document.querySelector("#sales-start-date").value="";
+					}
+				}
+			}
+
+			resetBasicInfo = function(){
+				if(confirm("취소하시겠습니까?")){
+					$("#product-title").val("");
+					$("#upload-product-image").val("");
+					$("#product-thumbnail").val("");
+					$("#product-thumbnail-view").html("");
+					$(".product-image-list").html("");
+					$("#display-start-date").val("");
+					$("#display-end-date").val("");
+					$("#sales-start-date").val("");
+					$("#sales-end-date").val("");
+					$("#product-notice").val("");
+					$("#product-tag").val("");
+					$("#product-include-item").val("");
+					$("#product-exclude-item").val("");
+				}
+			}
+
+			saveBasicInfo = function(e){
+				//console.log(currentInfoToggle);
+				if(productBasicInputValidation() && confirm("해당 정보를 저장하시겠습니까?") ){
+					$("#basic-info-add-form input[name='productStatus']").val("R-basic-info")
+
+					let data = formSerialize($(`#basic-info-add-form`)[0]);
+					let type="productInfo";
+					//var sendData = JSON.stringify(`{"${type}" : ${data}}`);
+
+					var url  = ([[${mode}]] == 'I' ? '/manage/product/saveProduct' : '/manage/product/modifyProduct');
+
+					$.ajax({
+						url : url
+						, data : `{"${type}" : ${data}}`
+						, type : 'POST'
+						, dataType:"json"
+						, contentType:"application/json;utf-8"
+						//, enctype: 'multipart/form-data'
+						//, contentType : false
+						//, processData : false
+						, beforeSend : function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						}
+						, success : function(res) {
+							if ( res.result === "success" ) {
+								let id = res.id
+								if ( id !== undefined ) {
+									$("#product-tour-id").val(id); // setting product-tour-id
+								}
+								$("#basic-info").trigger("click");
+								document.getElementById('basic-info').value = 'Y';
+								// product-info
+								// $(".product-tour-id").val(id)
+								$("#product-info-add-form > input[name='productTourId']").val(id);
+
+								fnNextWrapper( e );
+							} else {
+								alert(rese.message)
+							}
+
+						}
+						, error:function(){
+
+						}
+					});
+				}
+			}
+
+			productBasicInputValidation = function(infoType){
+				let result=false;
+				// 상품명, 상품 사진, 상품 대표 사진
+				// $("#product-title"),$("#product-thumbnail"), $(".product-image-list");
+				if($("#product-title").val() == undefined || $("#product-title").val() ==''){
+					alert("상품명을 입력해주세요");
+					$("#product-title").focus();
+					result=false;
+				}else if($("#product-thumbnail").val() == undefined || $("#product-thumbnail").val() ==''){
+					alert("상품 대표이미지를 선택해주세요");
+					$(".upload-wrapper").focus();
+					result=false;
+				}else if($(".product-image-list").children().length <1){
+					alert("이미지를 등록해주세요");
+					$(".upload-wrapper").focus();
+					result=false;
+				}else{
+					result=true;
+				}
+
+				return result;
+
+			}
+
+		</script>
+	</div>
+</body>
+</html>

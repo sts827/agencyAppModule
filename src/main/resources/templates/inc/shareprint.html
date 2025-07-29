@@ -1,0 +1,149 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="ko">
+<nav th:fragment="shareprint-bar">
+    <style>
+		.detail_icon{display: flex;justify-content: flex-end;position:relative;}
+		.view_info_share_print{display: flex;flex-wrap: nowrap;align-content: center;align-items: center;}
+		.view_info_share_area{width: 222px;height: 45px; display: none; align-items: center;border-radius:22.5px;background: #EEE;justify-content: space-evenly;position: absolute;right: 30px;top:-10px;opacity:0;}
+		.view_info_share_area li{ cursor: pointer;}
+		.view_info_share_area li img{border-radius:50px;}
+		.share-link-btn{width: 63.584px;height: 30.026px;border-radius: 50px;background: #565656;color: #FFF;font-size: 14px;font-style: normal;font-weight: 500;line-height: 16px;display: flex;align-items: center;justify-content: center;
+		}
+    </style>
+
+	<ul class="detail_icon">
+		<ul class="view_info_share_area" style="">
+			<li role="button" onclick="shareLink('KAKAO', '')"><img src="/images/icon/sns/share-icon-kakao.svg" alt=""></li>
+	        <li role="button" onclick="shareLink('NAVER', '')"><img src="/images/icon/sns/share-icon-blog.svg" alt=""></li>
+	        <li role="button" onclick="shareLink('FACEBOOK', '')"><img src="/images/icon/sns/share-icon-facebook.svg" alt=""></li>
+	        <li role="button" onclick="shareLink('BAND', '')"><img src="/images/icon/sns/share-icon-band.svg" alt=""></li>
+	        <li role="button" onclick="shareLink('LINK', '')" class="share-link-btn">URL 복사</li>
+		</ul>
+	    <li role="button" class="detail_icon_share">
+	        <img src="/images/icon/sns/view_info_share.svg">
+	    </li>
+<!--
+	    <li role="button" class="detail_icon_print" onclick="window.print()">
+	        <img src="/images/joyfulTour/icon/detail_icon_print.png" >
+	    </li>
+-->
+	</ul>
+
+    <script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+    <script th:inline="javascript">
+        $(document).ready(function(){
+
+			$('.detail_icon_share').on('click', function(){
+
+				if(!$('.detail_icon_share').hasClass('active')){
+					$('.detail_icon_share').addClass('active');
+				} else {
+					$('.detail_icon_share').removeClass('active');
+				}
+
+				if($('.view_info_share_area').css('display') === 'none'){
+					$('.view_info_share_area')
+						.css('display','flex')
+						.animate({'opacity': 1}, 500);
+				} else {
+					$('.view_info_share_area')
+						.animate({'opacity': 0}, 500, function(){
+							$(this).css('display','none');
+						});
+				}
+			});
+			$('.view_info_print').on('click', function(){
+				//printProduct();
+			});
+		});
+
+        function shareLink(type, title){
+            if (!Kakao.isInitialized()) {
+                Kakao.init('da0594ebc7c97d64272662ca8b6266ad');
+            };
+            switch (type){
+                case 'KAKAO':
+                	var _url = location.href;
+                	var _title = $('.detail_title').text();
+                	var _desc = $('.detail_desc').text();
+                	var imgurl = location.origin + $('.detail_list_img img').eq(0).attr('src');
+
+                	console.log(imgurl);
+
+                    Kakao.Share.sendDefault({
+                        objectType: 'feed',
+                        content: {
+                            title: _title,
+                            description: _desc,
+                            imageUrl: imgurl,
+                            imageWidth:200,
+                            imageHeight:200,
+                            link: { mobileWebUrl: _url, webUrl:_url }
+                        },
+                        buttons: [
+                            {
+                                title: '웹으로 이동',
+                                link: { mobileWebUrl: _url,
+                                        webUrl: _url, },
+                            },
+                            {
+                                title: '앱으로 이동',
+                                link: { mobileWebUrl: _url,
+                                        webUrl: _url, },
+                            },
+                        ]
+                    });
+                    break;
+                case 'FACEBOOK':
+                    let shareTitle = encodeURIComponent("백록주가");
+                    let shareURL = encodeURIComponent(window.location.href);
+                    // let shareURL = "http://www.facebook.com/sharer.php?u=" + location.href;
+
+                    window.open("https://www.facebook.com/sharer.php?u="+shareURL);
+
+                    break;
+                case 'LINK':
+                    let clipboard = location.href;
+                    const element = document.createElement('textarea');
+                    element.value = clipboard;
+                    element.setAttribute('readonly', '');
+                    document.body.appendChild(element);
+                    element.select();
+                    let returnValue = document.execCommand('copy');
+                    document.body.removeChild(element);
+                    if (!returnValue) {
+                        throw new Error('URL 복사 실패하였습니다.');
+                    }else{
+                        alert('URL을 복사했습니다.');
+                    }
+                    break;
+                case 'NAVER':
+                    let naverTitle = "HarimTour";
+                    let naverUrl = location.href;
+                    window.open("https://share.naver.com/web/shareView?url=" + naverUrl + "&title=" + naverTitle);
+                    break;
+                case 'BAND':
+                    let url = location.href;
+                    let body = "HarimTour"
+                    window.open("http://band.us/plugin/share?body="+body+"&route"+url);
+                    break;
+            }
+
+        }
+        handleShareBox = function(){
+            $(".share-box").toggle()
+        }
+        $(".view_info_share").on("click",handleShareBox);
+
+        function fnShowShareBtnList() {
+            if ( $("#middle-bar-share-icon-list").css('display') !== 'flex' ) {
+                $("#middle-bar-share-icon-list").css('display', 'flex');
+                $(".middle-bar-share-btn-box img").attr('src', '/HarimTour/icon/social-share-btn-green.svg');
+            }
+            else {
+                $("#middle-bar-share-icon-list").css('display', 'none');
+                $(".middle-bar-share-btn-box img").attr('src', '/HarimTour/icon/social-share-btn.svg');
+            }
+        }
+    </script>
+</nav>
+</html>

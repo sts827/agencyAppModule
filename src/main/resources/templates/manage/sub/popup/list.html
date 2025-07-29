@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">팝업관리</h1>
+        </div>
+        <div class="manage-tab-header">
+            <ul class="tab-list">
+                <li class="tab-item" th:classappend="${p == null} or ${p != null and p.type == 'layer'} ? 'active'" data-id="layer" onclick="location.href='/manage/main/popup/list?type=layer'">공지팝업</li>
+                <li class="tab-item" th:classappend="${p != null and p.type == 'notice-bar'} ? 'active'" data-id="notice-bar" onclick="location.href='/manage/main/popup/list?type=notice-bar'">상단팝업</li>
+            </ul>
+        </div>
+        <div class="manage-content filter">
+            <form id="search-form">
+            <input type="hidden" id="popup-type" name="type" value="layer" th:value="${p != null} ? ${p.type} : 'layer'" />
+            <div class="row">
+                <div class="form-inline col-md-2">
+                    <label class="col-3">상태</label>
+                    <select class="col-9 form-control" name="useYn">
+                        <option value="ALL" th:selected="${p != null} and ${#strings.equals(p.useYn, 'ALL')}">전체</option>
+                        <option value="Y" th:selected="${p != null} and ${#strings.equals(p.useYn, 'Y')}">노출</option>
+                        <option value="N" th:selected="${p != null} and ${#strings.equals(p.useYn, 'N')}">숨김</option>
+                    </select>
+                </div>
+                <div class="form-inline col-md-5">
+                    <label class="col-2">팝업명</label>
+                    <input type="text" id="titleLike" name="searchKey" class="col-10 form-control" placeholder="팝업명 입력" maxlength="50" th:value="${p != null} ? ${p.searchKey}" />
+                </div>
+                <div class="col-md-1 clearfix">
+                    <div class="btn-group float-right">
+                        <button type="button" class="btn btn-primary" onclick="fnSearchNotice();"><i class="fa fa-search"></i> 검색</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        <div class="manage-control middle">
+            <button type="button" class="btn btn-primary" onclick="fnWritePopup()">신규등록</button>
+            <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modal-popup-sort">순서변경</button>
+        </div>
+        <div class="manage-content table">
+            <table id="datatable" class="table table-hover manage-table">
+                <thead>
+                    <tr>
+                        <th>순서</th>
+                        <th>썸네일</th>
+                        <th>팝업명</th>
+                        <th>등록일</th>
+                        <th>노출기간</th>
+                        <th>노출여부</th>
+                        <th>수정/삭제</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:if="${popupList == null or #arrays.isEmpty(popupList)}">
+                        <tr class="empty-row">
+                            <td colspan="7">등록된 팝업이 없습니다.</td>
+                        </tr>
+                    </th:block>
+                    <th:block th:unless="${popupList == null or #arrays.isEmpty(popupList)}">
+                        <tr th:each="item, idx : ${popupList}">
+                            <td class="no" th:text="${((paging.currentPageNumber-1)*5)+idx.count}">순서</td>
+                            <td class="thumbnail" th:classappend="${#strings.equals(item.noticeType, 'notice-bar')} ? 'bar'">
+                                <th:block th:if="${#strings.equals(item.noticeType, 'layer')}">
+                                    <th:block th:if="${#strings.equals(item.contentType, 'image')}">
+                                        <img class="thumbnail-img" th:src="@{/upload/{url}(url=${item.imageUrlPc})}" />
+                                    </th:block>
+                                    <th:block th:if="${#strings.equals(item.contentType, 'text')}">
+                                        <div class="thumbnail-img" th:utext="${item.noticeText}" style="padding:0.25rem;"></div>
+                                    </th:block>
+                                </th:block>
+                                <th:block th:if="${#strings.equals(item.noticeType, 'notice-bar')}">
+                                <div class="bar-pc" th:if="!${#strings.isEmpty(item.imageUrlPc)}" th:styleappend="!${#strings.isEmpty(item.imageBackgroundPc)} ? |background-color: ${item.imageBackgroundPc}|">
+                                    <img class="thumbnail-img bar" th:src="@{/upload/{url}(url=${item.imageUrlPc})}" />
+                                </div>
+                                <div class="bar-mobile" th:if="!${#strings.isEmpty(item.imageUrlPc)}" th:styleappend="!${#strings.isEmpty(item.imageBackgroundMobile)} ? |background-color: ${item.imageBackgroundMobile}|">
+                                    <img class="thumbnail-img bar" th:src="@{/upload/{url}(url=${item.imageUrlMobile})}" th:if="!${#strings.isEmpty(item.imageUrlMobile)}" />
+                                </div>
+                                </th:block>
+                            </td>
+                            <td class="name" th:text="${item.titleText}">팝업명</td>
+                            <td class="date" th:text="${item.createDate}">등록일</td>
+                            <td class="period">
+                                <th:block th:if="${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                    상시노출
+                                </th:block>
+                                <th:block th:unless="${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                    <th:block th:if="!${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                        <span th:text="|${item.startDate} ~|"></span>
+                                    </th:block>
+                                    <th:block th:if="${#strings.isEmpty(item.startDate)} and !${#strings.isEmpty(item.expireDate)}">
+                                        <span th:text="|~ ${item.expireDate}|"></span>
+                                    </th:block>
+                                    <th:block th:if="!${#strings.isEmpty(item.startDate)} and !${#strings.isEmpty(item.expireDate)}">
+                                        <span th:utext="|${item.startDate} <br /> ~ ${item.expireDate}|"></span>
+                                    </th:block>
+                                </th:block>
+                            </td>
+                            <td class="control">
+                                <button type="button" class="btn btn-visible" th:classappend="${#strings.equals(item.visibleYnPc, 'Y')} ? 'active':'inactive'" th:attr="data-visible=${item.visibleYnPc}" th:onclick="fnNoticePopupViewStatusToggle(this, [[${item.id}]], [[${item.timeKey}]], 'PC')">PC</button>
+                                <button type="button" class="btn btn-visible" th:classappend="${#strings.equals(item.visibleYnMobile, 'Y')} ? 'active':'inactive'" th:attr="data-visible=${item.visibleYnMobile}" th:onclick="fnNoticePopupViewStatusToggle(this, [[${item.id}]], [[${item.timeKey}]], 'Mobile')">Mobile</button>
+                            </td>
+                            <td class="control">
+                                <button type="button" class="btn btn-control btn-gray" th:onclick="fnModifyNoticePopup([[${item.id}]], [[${item.timeKey}]])">수정</button>
+                                <button type="button" class="btn btn-control btn-dark" th:onclick="fnDeleteNoticePopup([[${item.id}]], [[${item.timeKey}]])">삭제</button>
+                            </td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+        <div class="manage-pagination">
+            <div th:replace="~{/manage/inc/manage-pagination :: paging-page}" ></div>
+        </div>
+    </section>
+    <div class="modal fade manage-modal" id="modal-popup-sort" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="popup-sort" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-banner-item-title">팝업 순서 변경</h5>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="popup-sort-form">
+                        <ul class="popup-sort-list">
+                            <li class="sort-item" th:each="item : ${popupList}">
+                                <input type="hidden" name="ids" th:value="${item.id}" />
+                                <div class="guide"></div>
+                                <div class="content">
+                                    <div class="preview">
+                                        <th:block th:if="${#strings.equals(item.contentType, 'image')}">
+                                            <img class="thumbnail-img" th:src="@{/upload/{url}(url=${item.imageUrlPc})}" />
+                                        </th:block>
+                                        <th:block th:if="${#strings.equals(item.contentType, 'text')}">
+                                            <div class="thumbnail-img" th:utext="${item.noticeText}"></div>
+                                        </th:block>
+                                    </div>
+                                    <div class="popup-name">
+                                        <span th:text="${item.titleText}"></span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" onclick="fnUpdateNoticePopupOrder()">저장</button>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    fnSearchNotice = function(){
+        document.getElementById('search-form').submit();
+    }
+
+    fnWritePopup = function(){
+        location.href='/manage/main/popup/add?type='+document.getElementById('popup-type').value;
+    }
+
+    fnModifyNoticePopup = function(id, timeKey){
+        location.href=`/manage/main/popup/modify?type=${document.getElementById('popup-type').value}&id=${id}&timeKey=${timeKey}`;
+    }
+
+    fnNoticePopupViewStatusToggle = function(item, id, timeKey, type){
+        if($(item).hasClass('active')){
+            $(item).removeClass('active').addClass('inactive');
+            $(item).attr('data-visible', 'N');
+        }else{
+            $(item).removeClass('inactive').addClass('active');
+            $(item).attr('data-visible', 'Y');
+        }
+        let status = $(item).attr('data-visible');
+        $.ajax({
+            url : "/manage/main/popup/status",
+            type : "PUT",
+            data :  `id=${id}&timeKey=${timeKey}&type=${type}&status=${status}`,
+            dataType : "json",
+            success : function(data){
+                if( data.result !== "success" ){
+                    alert('오류가 발생했습니다.');
+                    console.log(data);
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        })
+    }
+
+    fnDeleteNoticePopup = function(id, timeKey){
+        if(confirm('삭제하면 되돌릴 수 없습니다.')){
+            $.ajax({
+                url : "/manage/main/popup/delete",
+                type : "DELETE",
+                data :  `id=${id}&timeKey=${timeKey}`,
+                dataType : "json",
+                success : function(data){
+                    if( data.result === "success" ){
+                        alert('삭제완료');
+                        location.reload();
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            });
+        }
+    }
+
+    fnUpdateNoticePopupOrder = function(){
+        $.ajax({
+            url : "/manage/main/popup/orderly",
+            type : "PUT",
+            data :  $('#popup-sort-form').serialize(),
+            dataType : "json",
+            success : function(data){
+                if( data.result === "success" ){
+                    alert(data.message);
+                    location.reload();
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    $(document).ready(function(){
+        const modalPopupSort = document.getElementById('modal-popup-sort');
+        modalPopupSort.addEventListener('show.bs.modal', event => {
+
+        });
+        modalPopupSort.addEventListener('hide.bs.modal', event => {
+
+        });
+
+        $('.popup-sort-list').sortable({
+            items: $('.sort-item')
+        })
+    });
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

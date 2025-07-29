@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#{여행사}</title>
+    <head th:replace="~{inc/common-header :: include}" />
+    <link rel="stylesheet" type="text/css" href="/css/user/user.css" th:href="@{/css/user/user.css}" />
+    <script type="text/javascript" th:inline="javascript">
+        fnFindUser = function(){
+            let form = $('#user-form');
+            formValidCheck($('#user-name'), 'input', 'is-invalid', null);
+            formValidCheck($('#user-mobile'), 'input', 'is-invalid', 'mobile');
+
+            if($(form).find('.is-invalid').length > 0){
+                alert('사용자정보를 정확히 입력해주세요.');
+                return;
+            }
+
+            $.ajax({
+                url: '/user/find-id',
+                type : "POST",
+                data : $(form).serialize(),
+                success : function(data) {
+                    if (typeof data.result != "undefined" && data.result == "error") {
+                        alert(data.error);
+                        return;
+                    } else {
+                        if( data.result === "success" ){
+                            $('.find-input').hide();
+                            if(data.list.length > 0){
+                                let rows = '찾으시는 아이디는 ';
+                                    for(let i=0; i<data.list.length; i++){
+                                        rows += `<span class="user-email">${data.list[i].userEmail}</span>`;
+                                    }
+                                    rows += ' 입니다.';
+                                $('.find-result').find('.result-text').empty().append(rows);
+                                $('.exist-user').show();
+                            }else{
+                                $('.find-result').find('.result-text').html('해당 정보로 가입된 아이디가 없습니다.');
+                                $('.none-user').show();
+                            }
+                            $('.find-result').show();
+                        }else{
+                            alert(data.message);
+                        }
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            });
+        }
+    </script>
+</head>
+<body>
+<header th:replace="~{inc/header :: header-nav}" />
+<section class="wrap">
+    <div class="contents">
+        <div class="login-title">
+            <span class="title-text">아이디 찾기</span>
+        </div>
+        <form id="user-form" method="post">
+            <div class="join-data">
+                <div class="find-input">
+                    <p class="plaintext">
+                        회원가입시 등록했던 정보를 입력해주세요.
+                    </p>
+                    <div class="input-item">
+                        <input type="text" class="join-input" name="user_name" id="user-name" placeholder="이름" />
+                    </div>
+                    <div class="input-item">
+                        <input type="text" class="join-input" name="user_mobile" id="user-mobile" placeholder="연락처" />
+                    </div>
+                    <div class="join-submit">
+                        <button class="join-button find-id" type="button" onclick="fnFindUser()">아이디 찾기</button>
+                    </div>
+                </div>
+                <div class="find-result">
+                    <p class="result-text">
+                        해당 정보로 가입된 아이디가 없습니다.
+                    </p>
+                    <div class="join-inline-link">
+                        <a class="join-link exist-user" href="/user/login">로그인으로</a>
+                        <a class="join-link none-user" href="/user/join">회원가입</a>
+                        <a class="join-link" href="/">메인으로</a>
+                        <a class="join-link exist-user" href="/user/find-password">비밀번호찾기</a>
+                        <a class="join-link none-user" href="/user/find-id">아이디찾기</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<footer th:replace="~{inc/footer :: footer}" />
+</body>
+</html>

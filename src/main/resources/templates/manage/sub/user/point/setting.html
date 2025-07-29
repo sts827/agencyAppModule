@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">포인트 설정</h1>
+        </div>
+        <div class="manage-content filter mb-4">
+            <form id="search-form">
+            <div class="row">
+                <div class="form-inline col-md-4">
+                    <label class="col-3">사용기간</label>
+                    <input type="text" name="startDate" class="col-4 form-control datepicker" readonly="readonly"
+                           th:attr="${p != null and p.startDate != null} ? data-default=${p.startDate}"
+                           th:value="${p != null and p.startDate != null} ? ${p.startDate}" />
+                    ~
+                    <input type="text" name="endDate" class="col-4 form-control datepicker" readonly="readonly"
+                           th:attr="${p != null and p.endDate != null} ? data-default=${p.endDate}"
+                           th:value="${p != null and p.endDate != null} ? ${p.endDate}" />
+                </div>
+                <div class="col-md-1 clearfix">
+                    <div class="btn-group float-right">
+                        <button type="button" class="btn btn-primary" onclick="fnSearch();"><i class="fa fa-search"></i> 검색</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        <div class="manage-content table">
+            <table id="datatable" class="table table-hover manage-table">
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>발생 포인트</th>
+                        <th>발생 유효기간</th>
+                        <th>사용기간</th>
+                        <th>사용여부</th>
+                        <th>수정/삭제</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:if="${pointSetList == null or #arrays.isEmpty(pointSetList)}">
+                        <tr class="empty-row">
+                            <td colspan="6">포인트 내역이 없습니다.</td>
+                        </tr>
+                    </th:block>
+                    <th:block th:unless="${pointSetList == null or #arrays.isEmpty(pointSetList)}">
+                        <tr th:each="item, idx : ${pointSetList}">
+                            <td class="name" th:text="${item.accruedReason}"></td>
+                            <td class="date" th:text="${#numbers.formatInteger(item.accruedPoint, 1, 'COMMA')}"></td>
+                            <td class="date" th:text="${#strings.isEmpty(item.expiredDay)} ? '무기한':${#strings.replace(item.expiredDay, 'd', '일').replace('m', '개월').replace('y', '년')}"></td>
+                            <td class="period">
+                                <th:block th:if="${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                    상시사용
+                                </th:block>
+                                <th:block th:unless="${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                    <th:block th:if="!${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                        <span th:text="|${item.startDate} ~|"></span>
+                                    </th:block>
+                                    <th:block th:if="${#strings.isEmpty(item.startDate)} and !${#strings.isEmpty(item.expireDate)}">
+                                        <span th:text="|~ ${item.expireDate}|"></span>
+                                    </th:block>
+                                    <th:block th:if="!${#strings.isEmpty(item.startDate)} and !${#strings.isEmpty(item.expireDate)}">
+                                        <span th:utext="|${item.startDate} <br /> ~ ${item.expireDate}|"></span>
+                                    </th:block>
+                                </th:block>
+                            </td>
+                            <td class="date" th:text="${item.useYn}"></td>
+                            <td class="control">
+                                <button class="btn btn-danger"
+                                    th:onclick="|fnModifyPointSetting(${item.id})|">수정</button>
+                            </td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+        <div class="manage-pagination">
+            <div th:replace="~{/manage/inc/manage-pagination :: paging-page}" ></div>
+        </div>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    fnSearch = function(){
+        document.getElementById('search-form').submit();
+    }
+
+    fnModifyPointSetting = function(id){
+        location.href = `/manage/point/setting/${id}`;
+    }
+
+    $(document).ready(function(){
+        $('.datepicker').daterangepicker({
+            autoUpdateInput: true,
+            singleDatePicker:true,
+            showDropdowns: true,
+            showCustomRangeLabel:false,
+            drops:"auto",
+            locale: {
+                format: 'YYYY-MM-DD',
+                applyLabel: "적용",
+                cancelLabel: "취소",
+                daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                separator:separator
+            }
+        }, function(start, end, label){});
+        for(let i=0; i<$('.datepicker').length; i++){
+            if($('.datepicker').eq(i).attr('data-default') === undefined){
+                $('.datepicker').eq(i).val('')
+            }
+        }
+    });
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

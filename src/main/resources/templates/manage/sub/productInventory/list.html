@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <!-- Preloader -->
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+
+	  <!-- Navbar -->
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <!-- /.navbar -->
+
+	  <!-- Main Sidebar Container -->
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0">재고 관리</h1>
+	    </div>
+	    <!-- /.content-header -->
+
+	    <!-- Main content -->
+	    <section class="content">
+	      <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+<!--
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0 search-body">
+							<div class="row">
+								<div class="form-inline col-md-3">
+									<label class="col-5"></label>
+		                            <select id="boardId" class="form-control col-6">
+										<option value="">전체</option>
+<th:block th:each="list : ${listBoard}" >
+										<option th:value="${list.id}"  th:text="${list.title}"></option>
+</th:block>
+		                            </select>
+								</div>
+								<div class="form-inline col-md-3">
+	                             	<label class="col-3">제목</label>
+	                             	<input type="text" id="titleLike" class="form-control col-8" placeholder="제목 입력" maxlength="30">
+								</div>
+								<div class="form-inline col-md-4">
+	                             	<label class="col-3">내용</label>
+	                             	<input type="text" id="contLike" class="form-control col-8" placeholder="내용 입력" maxlength="30">
+								</div>
+								<div class="col-md-2 clearfix">
+									<div class="btn-group float-right">
+										<button type="button" class="btn btn-primary" id="searchBtn"><i class="fa fa-search"></i> 검색</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+*/-->
+				</div>
+			</div>
+
+
+			<div class="row mb-10">
+				<div class="col-md-12">
+					<div class="float-left">
+<!--			            <button class="tab-btn active" data-id="all" th:onclick="fnSetcategoryId()">전체</button>-->
+		<th:block th:each="item : ${listProduct}">
+			            <button class="tab-btn" th:text="${item.productTitle}"  th:data-id="${item.productSerial}" th:onclick="fnSetcategoryId([[${item.productSerial}]])" >항목</button>
+		</th:block>
+			        </div>
+			        <div class="float-right">
+						<button type="button" id="btnAdd" class="btn btn-primary pull-right disabled" onclick="fnModalAdd()">재고등록</button>
+					</div>
+				</div>
+	        </div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0">
+							<div class="row">
+								<div class="col-md-2">
+									<label>전체 입고개수</label>
+									<div class="tac" id="summaryStore">0</div>
+								</div>
+								<div class="col-md-2">
+									<label>전체 출고개수</label>
+									<div class="tac" id="summaryRelease">0</div>
+								</div>
+								<div class="col-md-2">
+									<label>재고개수</label>
+									<div class="tac" id="summaryInventory">0</div>
+								</div>
+							</div>
+
+							<table id="datatable" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+	      </div>
+	    </section>
+	    <!-- /.content -->
+	  </div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+<!-- popup window -->
+	<!-- popup window -->
+	<div class="modal fade func-inventory-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 id="func-inventory-modal-title" class="menu-title"></h4>
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form id="funcInventoryForm" name="funcInventoryForm" class="form-horizontal form-label-left">
+						<input type="hidden" id="mode" name="mode" value="I" />
+						<input type="hidden" id="productSerial" name="productSerial" />
+
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12 req">상품 이름 </label>
+							<div class="col-md-12 col-sm-12 col-xs-12" id="productTitle">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-6">
+								<label class="control-label col-md-3 col-sm-3 col-xs-12 req">입고수량 </label>
+								<div class="col-md-12 col-sm-12 col-xs-12">
+									<input type="number" id="storeCount" name="storeCount" min="0" max="9999" value="0" class="form-control col-md-12 col-xs-6" placeholder="입고수량 입력">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<label class="control-label col-md-3 col-sm-3 col-xs-12 req">출고수량 </label>
+								<div class="col-md-12 col-sm-12 col-xs-12">
+									<input type="number" id="releaseCount" name="releaseCount" min="0" max="9999" value="0" class="form-control col-md-12 col-xs-6" placeholder="출고수량 입력">
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label col-md-3 col-sm-3 col-xs-12">비고</label>
+							<div class="col-md-12 col-sm-12 col-xs-12">
+								<textarea class="form-control" rows="3" id="note" name="note" placeholder="비고 입력"></textarea>
+							</div>
+						</div>
+					</div>
+				</form>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" onclick="fnInventorySave()" id="popupSave">저장</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashboard.js"></script>
+	-->
+
+	<script type="text/javascript" th:inline="javascript">
+	var datatable;
+	var redraw = false;
+
+	$(document).ready(function() {
+		initDatatable();
+	});
+
+	initDatatable = function(){
+		//$('#bbsId').trigger('change');
+		datatable = $("#datatable").DataTable({
+			"searching" : false
+			,"sDom": '<"top"i>rtf<"bottom"lp><"clear">'//
+			,"paging": true
+			,"bPaginate": true
+			,"responsive": true
+			,"language": lang_kor
+			,"ordering": false
+			,"bLengthChange" : false
+			,"bInfo":false
+			,"deferLoading":0
+			,"ajax" : {
+				"url" : "/manage/product/inventory-list"
+				,"method" : "post"
+				, "beforeSend": function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				}
+				,"data" : function(d) {
+					d.productSerial = $(`.tab-btn.active`).data('id');
+				}
+			},"processing": true
+			,"serverSide": true
+			,"order" :
+				[ [0, 'desc'] ]
+			,"createdRow": function(row, data) {
+				  if ( data.deleteYn === "Y" ) {
+					  $(row).css('background-color', '#DC3545');
+				  }
+				  else if ( data.useYn === "N" ) {
+					  $(row).css('background-color', '#D9D9D9');
+				  }
+			  }
+			,"initComplete": function(settings, json) {
+    			//fnInitBootstrapToggle();
+  			},"drawCallback": function( settings ) {
+				//fnInitBootstrapToggle();
+				var response = settings.json;
+				console.log(response);
+
+        		if(response !== undefined){
+	        		if(response.summary !== undefined && response.summary !== null){
+						var sum = response.summary;
+						$('#summaryStore').text(sum.storeCount);
+						$('#summaryRelease').text(sum.releaseCount);
+						$('#summaryInventory').text(sum.inventoryCount);
+					} else {
+						$('#summaryStore').text('-');
+						$('#summaryRelease').text('-');
+						$('#summaryInventory').text('-');
+					}
+				} else {
+					$('#summaryStore').text('-');
+					$('#summaryRelease').text('-');
+					$('#summaryInventory').text('-');
+				}
+
+		    },
+		    rowCallback: function(row, data) {
+//		      $('td:eq(0)', row).html(data[0] + '/' + $('tfoot th:eq(3)').text())
+		    }
+			,"columns": [
+				{ "name" : "id", "title" : "재고관리 고유번호", "data" : "id", "className" : "dt-head-center dt-body-left","visible":false},
+				{ "name" : "productSerial", "title" : "상품고유번호", "data" : "productSerial", "className" : "dt-head-center dt-body-left","visible":false},
+				{ "name" : "lastUpdateDate", "title" : "최종수정일시", "data" : "lastUpdateDate", "className" : "dt-head-center dt-body-center","width":"10%"},
+				{ "name" : "storeCount", "title" : "입고 개수", "data" : "storeCount", "className" : "dt-head-center dt-body-right","width":"5%"},
+				{ "name" : "releaseCount", "title" : "출고 개수", "data" : "releaseCount", "className" : "dt-head-center dt-body-right","width":"5%"},
+				{ "name" : "note", "title" : "비고", "data" : "note", "className" : "dt-head-center dt-body-left",},
+				{ "name" : "createId", "title" : "작성자", "data" : "createId", "className" : "dt-head-center dt-body-center","width":"100px","visible":false},
+				{ "name" : "userName", "title" : "작성자", "data" : "userName", "className" : "dt-head-center dt-body-center","width":"100px"},
+				{ "name" : "func_btns", "title":"기능",
+					"data" :
+						function (row, type, set, meta) {
+
+							var html = "";
+							html += `<div class="form-inline justify-content-center">`;
+							html += `<button type='button' class='btn btn-default' data-toggle='tooltip' title='수정' onclick='fnInventoryEdit(${meta.row})'>보기</button>&nbsp;`;
+							html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제'  onclick='goDelete(\""+row["id"]+"\")'>삭제</button>";
+/*
+							if ( row["deleteYn"] === 'Y' ) {
+								  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='복구'  onclick='goRestore(\""+row["id"]+"\")' style='color:#fff;background-color:#007bff;border-color:#007bff;box-shadow:none'>복구</button>";
+							} else  {
+							}
+*/
+							html += `</div>`;
+							return html;
+						},
+				   "className": "dt-head-center dt-body-center", "orderable" : false,"width":"120px"},
+			]
+		});
+	}
+
+	select = function(){
+		datatable.ajax.reload();
+	}
+
+	$("#searchBtn").click(function() {
+		select();
+	});
+
+	$("#resetBtn").click(function() {
+		searchReset();
+		//datatable.column( 4 ).visible(true);
+		datatable.ajax.reload();
+	});
+
+	goDelete = function(id){
+		if(confirm("삭제하시겠습니까?")){
+			$.ajax({
+				url : '/manage/product/inventory-delete',
+				type : "POST",
+				data : {"id" : id},
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				},
+				success : function(res){
+					if("success" == res.result){
+						alert("삭제되었습니다.");
+						select();
+					}else{
+						alert(res.message)
+					}
+				}
+			})
+		}
+	}
+	fnInitBootstrapToggle = function(){
+		setTimeout(function(){
+			$('.content input[data-toggle="toggle"]')
+				.bootstrapToggle()
+				.change(function(e){
+					selector = '';
+					id='';
+					yn = 'Y';
+					type = this.name;
+
+					$.each(this.attributes, function() {
+			         	if(this.name =='data-id'){
+							id = this.value;
+							selector = `input[name=${type}][data-id=${id}]`;
+
+							if(!$(selector).prop('checked')){yn = 'N';}
+							switch(type){
+								case 'useYn': fnUseYnUpdate(id, yn); break;
+								case 'deleteYn':break;
+							}
+						}
+			        });
+
+			        if(type = 'useYn'){
+				        if(yn==='N'){
+							$(this).closest('tr').css('background-color','#E6E6E6');
+						} else {
+							$(this).closest('tr').css('background-color','unset');
+						}
+					}
+				});
+		},50);
+	}
+
+		fnSetcategoryId =function(id){
+			$('.tab-btn').removeClass('active');
+
+			if(id !== undefined){
+				$('#categoryId').val(id);
+				$(`.tab-btn[data-id='${id}']`).addClass('active');
+				if($('#btnAdd').hasClass('disabled'))
+					$('#btnAdd').removeClass('disabled');
+			}else{
+				$('#categoryId').val('');
+				$(`.tab-btn[data-id='all']`).addClass('active');
+			}
+
+			//$("#searchBtn").trigger('click');
+			datatable.ajax.reload();
+		}
+
+		fnModalAdd = function(upperId, depth){
+			if($('#btnAdd').hasClass('disabled')){
+				alert('등록 대상 상품을 선택하여주십시오.');
+				return;
+			}
+
+			$('#funcInventoryForm')[0].reset();
+			$('#func-inventory-modal-title').text( "재고 등록" );
+			$('#productTitle').text( $(`.tab-btn.active`).text() );
+			$('#productSerial').val( $(`.tab-btn.active`).data('id') );
+			$('#mode','#funcInventoryForm').val( 'I' );
+			$('.func-inventory-modal').modal("show");
+		}
+
+		fnInventoryEdit = function(rowNo){
+			console.log(rowNo);
+
+			$('#funcInventoryForm')[0].reset();
+			$('#func-inventory-modal-title').text( "재고 수정" );
+			$('#productTitle').text( $(`.tab-btn.active`).text() );
+			$('#productSerial').val( $(`.tab-btn.active`).data('id') );
+			$('#mode','#funcInventoryForm').val( 'U' );
+
+			var _data = datatable.row(rowNo).data();
+
+			$('#storeCount').val( _data.storeCount );
+			$('#releaseCount').val( _data.releaseCount );
+			$('#note').text(_data.note);
+
+			$('.func-inventory-modal').modal("show");
+		}
+
+		fnInventorySave = function(){
+			$('.is-invalid').removeClass('is-invalid');
+
+			var dubplicate;
+
+			if($('#storeCount').val() == 0 || $('#releseCount').val() == 0){
+				alert(`'입고수량' 혹은 '출고수량'이 모두 0개 입니다.`);
+				return;
+			} else {
+				if(checkForm('funcInventoryForm') && confirm("저장하시겠습니까?")) {
+					var _data = $('#funcInventoryForm').serialize();
+
+					$.ajax({
+						url : '/manage/product/inventory-save',
+						type : "POST",
+						data : _data,
+						dataType : "json",
+						beforeSend: function (xhr) {
+							xhr.setRequestHeader( [[${_csrf.headerName}]], [[${_csrf.token}]] );
+						},
+						success : function(res) {
+							if ("success" == res.result) {
+								$('.func-inventory-modal').modal("hide");
+								select();
+								alert("처리 되었습니다");
+							}else {
+								alert(res.message);
+							}
+						}
+					});
+				}
+			}
+		}
+	</script>
+	<style>
+		input[type='number']{text-align: right;}
+	</style>
+
+	</body>
+</html>

@@ -1,0 +1,45 @@
+@charset "UTF-8";
+
+.way-table{font-family: 'Pretendard';font-size: 0.938rem;}
+
+.way-table thead th{border-top: 2px solid #333333;background-color:#EDEEF3; }
+/*.way-table tbody th,.way-table tbody td{background-color:#FFF;}*/
+.way-table tbody th,.way-table tbody td{vertical-align: middle;}
+.way-table tbody tr:last-child th,
+.way-table tbody tr:last-child td{border-bottom: 2px solid #333333;}
+.way-table img:default {width: 100px;height: 100px;max-width: 100%;}
+.way-table img.fit_w100 {max-width: 100%;}
+
+.table-menu{
+	width: 100%;
+	border: 1px solid #dee2e6;
+	margin-bottom: 1rem;
+    background-color: #EDEEF3;
+}
+
+.table-menu th, .table-menu td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+.table-menu thead th {
+    vertical-align: middle;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 1rem;
+}
+
+.table-menu th, .table-menu td {
+    /*border: 1px solid #dee2e6;*/
+    border-top: 2px solid #333333;
+}
+
+.table-menu thead th, .table-menu thead td {
+    border-bottom-width: 2px;
+}
+
+@media screen and (max-width:1000px) {
+	.way-table th, .way-table td {
+		font-size: 0.8rem;
+	}
+}

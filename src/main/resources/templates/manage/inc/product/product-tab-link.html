@@ -1,0 +1,311 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+	<div th:fragment="product-tab-link(strClass, strDataId)" th:class="${strClass}" th:id="${strDataId}">
+		<div class="title-div">
+			<h3>연결정보</h3>
+			<div class="info-toggle schedule">
+				<button class="arrow-down" type="button" th:style="|background-image:url('@{/images/icons/arrow_down.svg}')|"></button>
+			</div>
+		</div>
+		<div class="schedule-info">
+			<div class="row-div">
+				<div class="detail-link-tab-box">
+					<button type="button" class="tab-btn"
+							th:each="list,index : ${productTourLinkList}"
+							style="display: block;"
+							th:data-id="${ index.index }"
+							>정보</button>
+					<button type="button" class="btn btn-primary" onclick="fnAddLinkInfo(this)">정보 추가</button>
+				</div>
+				<div id="detail-schedule-link-box-list">
+					 <div class="detail-link-content-box" style="display: none;">
+						<ul class="link-list">
+<th:block  th:if="!${#arrays.isEmpty(productTourLinkList)}">
+							<li class="detail-link-content-inner-box" th:each="list,index : ${productTourLinkList}" th:data-id="${ index.index }" th:data-stored="${list.linkId ne null}">
+								<div id="detail-link-content-box-list">
+									<div class="detail-link-item-box">
+										<input type="hidden" name="linkId" th:value="${list.linkId}" >
+										<input type="hidden" name="linkProductSerial" th:value="${list.linkProductSerial}" >
+										<input type="hidden" name="linkPlaceId" th:value="${list.linkPlaceId}" >
+										<div class="detail-schedule-third-line">
+											<div style="display: flex;">
+												<div class="connect-place-box">
+													<label class="connect-place-box-label">연결 장소
+														<input type="text" class="connect-place-box-input" placeholder="연결 장소" readonly th:value="${list.tsTitle}"></label>
+												</div>
+												<button type="button" class="choose-place-btn" th:onclick="showConnectPlaceOrProductModal(this, 'place')">장소 선택</button>
+											</div>
+
+											<div style="display: flex;">
+												<div class="connect-place-box">
+													<label class="connect-place-box-label">연결 상품
+														<input type="text" class="connect-product-box-input" placeholder="연결 상품" readonly  th:value="${list.productTitle}"></label>
+												</div>
+												<button type="button" class="choose-place-btn" th:onclick="showConnectPlaceOrProductModal(this, 'product')">상품 선택</button>
+											</div>
+										</div>
+										<div class="detail-schedule-first-line">
+											<div class="detail-schedule-name-box">
+												<label class="detail-schedule-name-label">
+													일정내용*
+													<input type="text" name="linkTitle" class="detail-schedule-name-input"  placeholder="일정명을 입력해주세요." th:value="${list.linkTitle}">
+												</label>
+											</div>
+											<div class="detail-schedule-address-box">
+												<label class="detail-schedule-address-label">
+													주소
+													<input type="text" name="linkAddress" class="detail-schedule-address-input" placeholder="주소" readonly th:value="${list.linkAddress}">
+												</label>
+											</div>
+										</div>
+										<div class="detail-schedule-second-line">
+											<label class="detail-schedule-title-label">
+												일정설명
+												<input type="text" name="linkNote" class="detail-schedule-title-input" placeholder="일정내용을 입력해주세요." th:value="${list.linkNote}">
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="delete-schedule-btn">
+									<button type="button" onclick="deleteDetailScheduleItem(this, ${num})">
+										<img src="/images/icon/x-black-box-15x15.svg" style="width: 15px; height: 15px;" alt="">
+									</button>
+								</div>
+								<input type="hidden" name="schedule_item_order">
+							</li>
+</th:block>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<ul class="buttons">
+				<li class="cancel"><button type="button" onclick="resetLinkInfo()">취소하기</button></li>
+				<li class="save"><button type="button"  onclick="saveProductLinkInfo()">저장하기</button></li>
+			</ul>
+		</div>
+
+		<script th:inline="javascript">
+			$(document).ready(function(){
+				$('.detail-link-tab-box .tab-btn').on('click',function(e){
+					fnLinkTabBtn(e);
+				})
+
+				$('.detail-link-tab-box .tab-btn:eq(0)').click();
+			});
+
+			fnLinkTabBtn = function(e){
+				//console.log(e);
+				//console.log( $('.detail-link-tab-box .tab-btn').index( tgt ) );
+
+				var tgt = $(e.target);
+				var dataId = $(tgt).data('id')
+
+				if( !$(tgt).hasClass('active') ){
+					$(tgt).siblings().removeClass('active')
+					$(tgt).addClass('active');
+
+					$(`.detail-link-content-inner-box`).hide();
+					$(`.detail-link-content-inner-box[data-id=${dataId}]`).show();
+				}
+			}
+
+			fnAddLinkInfo = function(target){
+				var id = $(".link-list li").length;
+
+				var htmlBtn = `<button type="button" class="tab-btn" style="display: block;" data-id=${id}>정보</button>`;
+				var htmlLi;
+				htmlLi =  `<li class="detail-link-content-inner-box" id="detail-link-content-inner-box-${id}" data-id=${id} style="display: none;">`;
+				htmlLi += `<div id="detail-link-content-box-list">`;
+				htmlLi += `<div class="detail-schedule-item-box">`;
+				htmlLi += `<input type="hidden" name="linkId" >`;
+				htmlLi += `<input type="hidden" name="linkProductSerial" >`;
+				htmlLi += `<input type="hidden" name="linkPlaceId" >`;
+
+				htmlLi += `<div class="detail-schedule-third-line">`;
+
+				htmlLi += `<div style="display: flex;">`;
+				htmlLi += `<div class="connect-place-box"><label class="connect-place-box-label">연결 장소<input type="text" class="connect-place-box-input" placeholder="연결 장소"></label></div>`;
+				htmlLi += `<button type="button" class="choose-place-btn" onclick="showConnectPlaceOrProductModal(this, 'product')">장소 선택</button></div>`;
+
+				htmlLi += `<div style="display: flex;">`;
+				htmlLi += `<div class="connect-place-box"><label class="connect-place-box-label">연결 상품<input type="text" class="connect-product-box-input" placeholder="연결 상품" readonly></label></div>`;
+				htmlLi += `<button type="button" class="choose-place-btn" onclick="showConnectPlaceOrProductModal(this, 'product')">상품 선택</button></div>`;
+
+			    htmlLi += `</div>`;
+
+				htmlLi += `<div class="detail-schedule-first-line">`;
+				htmlLi += `<div class="detail-schedule-name-box">`;
+				htmlLi += `<label class="detail-schedule-name-label">일정내용*<input type="text" name="linkTitle" class="detail-schedule-name-input"  placeholder="일정명을 입력해주세요."></label>`;
+				htmlLi += `</div>`;
+				htmlLi += `<div class="detail-schedule-address-box"><label class="detail-schedule-address-label">주소`;
+				htmlLi += `<input type="text" name="linkAddress" class="detail-schedule-address-input" placeholder="주소"></label>`;
+				htmlLi += `</div>`;
+				htmlLi += `</div>`;
+				htmlLi += `<div class="detail-schedule-second-line">`;
+				htmlLi += `<label class="detail-schedule-title-label">일정설명<input type="text" name="linkNote" class="detail-schedule-title-input" placeholder="일정내용을 입력해주세요."></label>`;
+				htmlLi += `</div>`; //detail-schedule-second-line
+				htmlLi += `</div>`; //detail-schedule-item-box
+
+				htmlLi += `</div>`; //detail-link-content-box-list
+				htmlLi += `<div class="delete-schedule-btn">`;
+				htmlLi += `<button type="button" onclick="deleteDetailLinkItem(this, ${id})"><img src="/images/icon/x-black-box-15x15.svg" style="width: 15px; height: 15px;" alt=""></button>`;
+				htmlLi += `</div>`; //delete-schedule-btn
+				htmlLi +=  `</li>`;
+
+				$(target).before( htmlBtn );
+				$(".link-list").append( htmlLi );
+
+				if( $('.detail-link-content-box').css('display')=='none' ){
+					$('.detail-link-content-box').css('display', 'block');
+					setTimeout(function(){
+						$('.detail-link-tab-box .tab-btn:eq(0)').click();
+					},100);
+				}
+
+				$('.detail-link-tab-box .tab-btn').off('click').on('click',function(e){
+					fnLinkTabBtn(e);
+				})
+			}
+
+			function deleteDetailLinkItem(obj, num) {
+				if ( confirm("삭제하시겠습니까?") ) {
+					const item = $(obj).closest('li.detail-link-content-inner-box');
+					var id = item.data('id');
+					var btn = $(`.detail-link-tab-box .tab-btn[data-id=${id}]`);
+
+					btn.remove();
+					item.remove();
+				}
+			}
+
+			resetLinkInfo = function(){
+				// TODO..주영님
+			}
+			function saveProductLinkInfo() {
+				let chkCountId = 0;
+				let chkCountTitle = 0;
+
+				$('.link-list li').each(function(i,e){
+					if( !($(`input[name='linkProductSerial']`, e).val().length >= 1 || $(`input[name='linkPlaceId']`, e).val().length >=1)  ){
+						chkCountId ++;
+					}
+
+					if( !($(`input[name='linkTitle']`, e).val().length >= 1)  ){
+						chkCountTitle ++;
+					}
+				});
+
+				if( chkCountId != 0 ){
+					alert( `'연결 장소' 혹은 '연결 상품'중 양자 택 1을 필수입니다.`  );
+				} else if( chkCountTitle != 0 ){
+					alert( `'일정내용'을 필수입니다.`  );
+				} else if(chkCountId == 0 && chkCountTitle == 0 && confirm("저장 하시겠습니까?")){
+					let productTourLinkList = [];
+					const ajaxJson = {
+						"productTourLinkList" : [],
+					} ;
+
+					$('.link-list li').each(function(i,e){
+						var status = 'n';
+
+						if( $(e).data('stored') ){
+							if($(e).data('status') == 'update'){
+								status = 'u';
+							} else if($(e).data('status') == 'delete') {
+								status = 'd';
+							}
+						}
+
+						productTourLinkList.push({
+							"linkId" : 			$(`input[name='linkId']`, e).val()
+							, "linkProductSerial" : 	$(`input[name='linkProductSerial']`, e).val()
+							, "linkPlaceId" : 		$(`input[name='linkPlaceId']`, e).val()
+							, "linkTitle" : 		$(`input[name='linkTitle']`, e).val()
+							, "linkAddress" : 		$(`input[name='linkAddress']`, e).val()
+							, "linkNote" : 			$(`input[name='linkNote']`, e).val()
+							, "statusType" : 		status
+						});
+					});
+
+					ajaxJson.productTourLinkList = productTourLinkList;
+
+
+					$.ajax({
+						url : '/manage/product/save-link-product'
+						, type : 'POST'
+						, contentType : 'application/json'
+						, data : JSON.stringify(ajaxJson)
+						, beforeSend : function (xhr) {
+							xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+						}
+						, success : function(data) {
+							if ( data.result === 'success' ) {
+								alert(data.message);
+								setCookie("tabIndex", tabIndex);
+								location.replace(`/manage/product/${[[${typeCode}]]}/modify/${data.productTourId}`)
+							}
+						}
+					});
+
+				}
+			}
+
+		function showConnectPlaceOrProductModal(e, type) {
+			detailSchedulePlaceParents = e.closest('.detail-link-content-inner-box')
+
+			switch(type){
+				case 'place':
+					$('.schedule-add-modal-top-text','.connect-place-select-modal-box').text('연결 장소 선택');
+					$('#search-form .place').show();
+					$('#search-form .product').hide();
+
+					$('input,select','#search-form .place').prop('disabled',false);
+					$('input,select','#search-form .product').prop('disabled',true);
+
+					searchTourPlace();
+				break;
+				case 'product':
+					$('.schedule-add-modal-top-text','.connect-place-select-modal-box').text('연결 상품 선택');
+					$('#search-form .place').hide();
+					$('#search-form .product').show();
+
+					$('input,select','#search-form .place').prop('disabled',true);
+					$('input,select','#search-form .product').prop('disabled',false);
+					searchTourProduct();
+				break;
+			}
+
+			$('.connect-place-select-modal-box .place-choose-btn').attr('onclick',`selectOverrideConnectPlaceOrProduct()`);
+			$('.connect-place-select-modal-box').css('display', "flex");
+		}
+
+		function selectOverrideConnectPlaceOrProduct( ) {
+			const parentsDiv = detailSchedulePlaceParents;
+			const selectedPlace = document.querySelector('.place-item-box.active');
+
+			if( $("input[name='productSerial']", '.place-item-box.active').length != 0  ){
+				$(`input[name='linkPlaceId']`, parentsDiv).val('');
+				$(`input.connect-place-box-input`, parentsDiv).val( '' );
+
+				$(`input[name='linkProductSerial']`, parentsDiv).val( $("input[name='productSerial']", '.place-item-box.active').val() );
+				$(`input.connect-product-box-input`, parentsDiv).val( $(".product-item-name", '.place-item-box.active').text() );
+			} else {
+				$(`input[name='linkProductSerial']`, parentsDiv).val( '' );
+				$(`input.connect-product-box-input`, parentsDiv).val( '' );
+
+				$(`input[name='linkPlaceId']`, parentsDiv).val( $("input#place-item-id", '.place-item-box.active').val() );
+				$(`input.connect-place-box-input`, parentsDiv).val( $(".place-item-name", '.place-item-box.active').text() );
+			}
+
+			$(parentsDiv).data('status','update');
+
+			closeConnectPlaceModal();
+			detailSchedulePlaceParents = "";
+		}
+
+		</script>
+
+    </div>
+</body>
+</html>

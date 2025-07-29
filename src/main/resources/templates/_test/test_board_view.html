@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${company != null} ? ${company.siteName}">#{여행사} </title>
+    <head th:replace="~{inc/common-header :: include}" />
+    <head th:replace="~{inc/header :: header-script}" />
+    <head th:replace="~{inc/board :: board-script}" />
+</head>
+<body>
+<section class="wrap">
+	<div th:replace="~{/inc/board :: board-view}" ></div>
+</section>
+<footer th:replace="~{inc/footer :: footer}" />
+</body>
+</html>

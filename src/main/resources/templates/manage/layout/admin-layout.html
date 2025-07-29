@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block th:replace="./manage/inc/manage-common-include :: main-include"></head>
+</head>
+    <body>
+        <nav th:replace="./manage/inc/manage-sidebar-include :: sidebar-menu-v0"></nav>
+        <header th:replace="./manage/inc/manage-header :: header"></header>
+        <main layout:fragment ="content"></main>
+        <div th:replace="./manage/inc/manage-floating :: floating"></div>
+    </body>
+</html>

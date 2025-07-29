@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <!-- Preloader -->
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+
+	  <!-- Navbar -->
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <!-- /.navbar -->
+
+	  <!-- Main Sidebar Container -->
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0" > 상담이력</h1>
+	    </div>
+	    <!-- /.content-header -->
+
+	    <!-- Main content -->
+	    <section class="content">
+	      <div class="container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0 search-body">
+							<div class="row form-inline">
+
+								<div class="form-inline col-4 p-0">
+									<div class="form-inline col-4">
+					                    <select id="dateType" name="dateType" class="form-control col-md-12">
+											<option value="" >일자선택</option>
+											<option value="req">상담일자</option>
+											<option value="res">응대일자</option>
+					                	</select>
+									</div>
+									<div class="form-inline col-8 p-0">
+		                             	<label class="col-2 p-0">기간</label>
+										<input type="text" id="dateRange" name="dateRange" class="form-control col-md-10 p-0 date-range-picker tac">
+									</div>
+								</div>
+								<div class="form-inline col-md-4 p-0">
+									<div class="form-inline col-md-6">
+		                             	<label class="col-5">상담유형</label>
+					                    <select id="requestCategory" name="requestCategory" class="form-control col-md-7">
+											<option value="" >상담유형</option>
+											<option value="0">상담일자</option>
+											<option value="1">응대일자</option>
+					                	</select>
+									</div>
+									<div class="form-inline col-md-6">
+		                             	<label class="col-4">응대자</label>
+										<input type="text" id="responseName" name="responseName" class="form-control col-md-8" placeholder="미입력시 전체.">
+									</div>
+								</div>
+								<div class="form-inline col-3">
+									<input type="text" id="searchKey" name="searchKey" class="form-control col-md-12" placeholder="고객명, 연락처를 입력해주세요">
+								</div>
+								<div class="col-md-1 clearfix">
+									<div class="btn-group float-right">
+										<button type="button" class="btn btn-primary" id="searchBtn"><i class="fa fa-search"></i> 검색</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row form-group">
+				<div class="col-md-12">
+					<div class="float-right">
+						<button type="button" class="btn btn-primary pull-right" onclick="goInsert()">등록하기</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+					<div class="manage-content mb-10">
+						<div class="container-fluid p-0">
+							<table id="datatable" class="table way-table table-bordered table-hover" style="width:100%; table-layout:fixed;"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+	      </div>
+	    </section>
+	    <!-- /.content -->
+	  </div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashinquiry demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashinquiry.js"></script>
+	-->
+
+	<script type="text/javascript" th:inline="javascript">
+		var datatable;
+		$(document).ready(function() {
+			initDatatable();
+		});
+
+		initDatatable = function(){
+			var baseColumns = [
+				{ "name" : "id", "title" : "", "data" : "id", "className" : "dt-head-center dt-body-left","visible":false},
+				{ "name" : "requestDate", "title" : "상담일자", "data" : "requestDate", "className" : "dt-head-center dt-body-center"},
+				{ "name" : "requestCategory", "title" : "요청유형", "data" :
+					function (row, type, set) {
+						var html= "";
+						var strclass = row["requestCategory"];
+						var strText = "";
+
+						switch(row["requestCategory"]){
+							case "product":     strText="상품문의"; break;
+							case "payment":     strText="결제문의"; break;
+							case "reservation": strText="예약문의"; break;
+							case "cancel":      strText="취소문의"; break;
+							default :           strText="미요청"; break;
+						}
+
+						html = `<span class="box-label ${strclass}">${strText}</span>`;
+
+						return html;
+					},
+					"className" : "dt-head-center dt-body-center" , width:'80px'},
+				{ "name" : "requestName", "title" : "상담고객명", "data" : "requestName", "className" : "dt-head-center dt-body-center"},
+				{ "name" : "requestTel", "title" : "상담고객 연락처", "data" : "requestTel", "className" : "dt-head-center dt-body-center"},
+				{ "name" : "responseName", "title" : "상담사명", "data" : "responseName", "className" : "dt-head-center dt-body-center"},
+				{ "name" : "responseDate", "title" : "응대일자", "data" : "responseDate", "className" : "dt-head-center dt-body-center"},
+				{ "name" : "func_btns", "title":"기능",
+					"data" :
+						function (row, type, set) {
+							var html = "";
+							html += `<div class="form-inline justify-content-center">`;
+							html += "<button type='button' class='btn btn-default' data-toggle='tooltip' title='수정' onclick='goView(\""+row["id"]+"\")'>세부</button>&nbsp;";
+							if ( row["deleteYn"] === 'Y' ) {
+								  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='복구'  onclick='goRestore(\""+row["id"]+"\")' style='color:#fff;background-color:#007bff;border-color:#007bff;box-shadow:none'>복구</button>";
+							} else  {
+								  html += "<button type='button' class='btn btn-black' data-toggle='tooltip' title='삭제'  onclick='goDelete(\""+row["id"]+"\")'>삭제</button>";
+							}
+							html += `</div>`;
+							return html;
+						},
+				   "className": "dt-head-center dt-body-center", "orderable" : false, "width":"160px"},
+			];
+
+			datatable = $("#datatable").DataTable({
+				"searching" : false
+				,"paging": true
+				,"bPaginate": true
+				,"responsive": true
+				,"language": lang_kor
+				,"ordering": false
+				,"bLengthChange" : false
+				,"bInfo":false
+				,"ajax" : {
+					"url" : "/manage/user/counsel-list"
+					,"method" : "post"
+					, "beforeSend": function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					}
+					,"data" : function(d) {
+
+						if( $('#dateType option:selected').index() > 0 ){
+							d.dateType = $('#dateType option:selected').val();
+
+							var dateRange = $('#dateRange').val().split(separator);
+
+							d.dateFrom = dateRange[0];
+							d.dateTo   = dateRange[1];
+
+						}
+						if( $('#requestCategory option:selected').index() > 0 ){
+							d.requestCategory = $('#requestCategory option:selected').val();
+						}
+
+						if ($('#responseName').val().trim() != "") d.responseName       = $('#responseName').val().trim();
+						if ($('#searchKey').val().trim() != "") d.searchKey = $('#searchKey').val().trim();
+					}
+				},"processing": true
+				,"serverSide": true
+				,"order" :
+					[ [0, 'desc'] ]
+				,"createdRow": function(row, data) {
+					  if ( data.deleteYn === "Y" ) {
+						  $(row).css('background-color', '#DC3545');
+					  } else if ( data.secretYn === "Y" ) {
+						  $(row).css('background-color', '#e9e9e9');
+					  }
+				  }
+				,"initComplete": function(settings, json) {
+	    			//fnInitBootstrapToggle();
+	  			}
+				,"columns": baseColumns
+			});
+		};
+
+		$("#searchBtn").click(function() {
+			if( datatable !== undefined)
+				datatable.ajax.reload();
+		});
+
+		goView = function(id){
+			location.href = `/manage/user/counsel/view?id=${id}&params=`+getParams();
+		}
+
+		goInsert = function(id){
+			location.href = `/manage/user/counsel/form?params=`+getParams();
+		}
+
+		goDelete = function(id){
+			if(confirm("삭제하시겠습니까?")){
+				$.ajax({
+					url : '/manage/user/counsel-delete',
+					type : "POST",
+					data : {"id" : id},
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					},
+					success : function(res){
+						if("success" == res.result){
+							alert("삭제처리 되었습니다.");
+							datatable.ajax.reload();
+						}else{
+							alert(res.message)
+						}
+					}
+				})
+			}
+		}
+
+		goResotre = function(id){
+				$.ajax({
+					url : '/manage/user/counsel-restore',
+					type : "POST",
+					data : {"id" : id},
+					dataType : "json",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+					},
+					success : function(res){
+						if("success" == res.result){
+							datatable.ajax.reload();
+							alert("복구처리 되었습니다.");
+						}else{
+							alert(res.message)
+						}
+					}
+				})
+		}
+	</script>
+	<style>
+		.way-table .box-label{display: inline-block;min-width: 90%;color: #FFF;border: 1px solid #999999;border-radius: 5px;background-color: #999999;text-align: center;}
+
+		.way-table .box-label.product     {background-color: #d8530e;border-color: #d8530e;}
+		.way-table .box-label.cancel      {background-color: #f30b0b;border-color: #f30b0b;}
+		.way-table .box-label.payment     {background-color: #309115;border-color: #309115;}
+		.way-table .box-label.reservation {background-color: #feff00;border-color: #feff00;}
+	</style>
+
+	</body>
+</html>

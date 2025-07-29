@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <!-- Content Wrapper. Contains page content -->
+	  <div class="content-wrapper">
+	    <!-- Content Header (Page header) -->
+	    <div class="content-header">
+			<h1 class="m-0" th:data-reservationYn="${reservationYn}"><th:block th:text="|${reservationYn eq 'N' ? '문의' : '예약'} ${mode eq 'I' ? '등록' : '수정'}|"> </th:block></h1>
+	    </div>
+		<div class="manage-content mb-10">
+			<h3 class="title">기본 및 고객정보</h3>
+			<div class="container-fluid p-0">
+				<div class="row form-group ">
+					<label class="col-md-2" for="createDate">제목</label>
+					<span class="col-md-2" th:text="${inquiry.title}"></span>
+					<label class="col-md-2" for="createDate">문의종류</label>
+					<span class="col-md-2" th:text="${inquiry.categoryName}"></span>
+					<label class="col-md-2" for="createDate">문의일시</label>
+					<span class="col-md-2" th:text="${inquiry.createDate}"></span>
+				</div>
+				<div th:if="${ inquiry.createId ne null and #strings.isEmpty(inquiry.createId) }">
+					<div class="row form-group ">
+						<label class="col-md-2" for="createDate">회원이름</label>
+						<span class="col-md-2" th:text="${!#strings.isEmpty(inquiry.customerName) ? inquiry.customerName : inquiry.userName }"></span>
+						<label class="col-md-2" for="createDate">회원ID</label>
+						<span class="col-md-2" th:text="${inquiry.createId}"></span>
+						<label class="col-md-2" for="createDate">연락처</label>
+						<span class="col-md-2" th:text="${!#strings.isEmpty(inquiry.customerPhone) ? inquiry.customerPhone : inquiry.userMobile }"></span>
+					</div>
+				</div>
+
+				<div th:if="${ inquiry.createId eq null and #strings.isEmpty(inquiry.createId) }">
+					<div class="row form-group ">
+						<label class="col-md-2" for="createDate">회원이름</label>
+						<span class="col-md-2" th:text="${inquiry.customerName}"></span>
+						<label class="col-md-2" for="createDate">연락처</label>
+						<span class="col-md-2"  th:text="${!#lists.isEmpty(inquiry.customerPhone) ? inquiry.customerPhone : '연락처없음.'}"></span>
+						<label class="col-md-2" for="createDate">이메일</label>
+						<span class="col-md-2"  th:text="${!#lists.isEmpty(inquiry.customerEmail) ? inquiry.customerEmail : '이메일없음.' }"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="manage-content mb-10">
+			<h3 class="title">상품정보 </h3>
+			<div class="row" th:if="${product ne null}">
+				<div class="col-md-6">
+					<div class="row form-group">
+						<label id="product-title" class="col-md-8" th:text="${product.productTitle}"></label>
+						<a  class="btn btn-black col-md-3" th:href="@{/product{url}/{product}(url=${product.menuUrl}, product=${product.productSerial})}" target="_blank" >상품정보보기</a>
+					</div>
+					<div class="">
+						<div class="col-md-12">
+							<img th:src="${product.productThumbnail}" th:alt="${product.productTitle}">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container-fluid p-0">
+				<div class="row form-group ">
+					<label class="col-md-2" for="secretYn">첨부파일</label>
+					<div>
+						<th:block th:each="list : ${fileList}" >
+							<a style="display:block;" th:href="|/download-file?fileName=${list.uploadFilename}|" download>[[${list.originFilename}]]</a>
+						</th:block>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div th:if="!${#strings.isEmpty( inquiry.travelScheduleJson )}">
+						<label class="col-md-12">여행 일자</label>
+						<div id="json_travel_schedule" class="row jsonForm">
+							<div>
+								<span class="col-1">출발일시</span>
+								<span class="col-2" id="travelFromDt" name="travelFromDt"></span>
+								<span class="col-2" id="travelFromTm" name="travelFromTm"></span>
+								<span class="col-1">~</span>
+							</div>
+							<div id="travelTo" style="display:none;">
+								<span class="col-1">복귀일시</span>
+								<span class="col-2" id="travelToDt" name="travelToDt"></span>
+								<span class="col-2" id="travelToTm" name="travelToTm"></span>
+							</div>
+						</div>
+					</div>
+
+					<div th:if="!${#strings.isEmpty(optionPriceListFix)}">
+						<label class="col-md-12">선택 옵션정보</label>
+						<div id="people_box">
+							<div class="row col-md-12" th:each="optionFix, index : ${optionPriceListFix}" th:data-idx="${index.count}">
+								<span class="col-md-4" th:text="${optionFix.optionName}" th:price-id="${optionFix.priceId}" ></span>
+								<span class="col-md-3 tal" th:text="${optionFix.priceNormal}"></span>
+								<span class="col-md-2 tac" th:id="|price${index.count}_count|" ></span>
+								<span class="col-md-3 tar" th:id="|price${index.count}_amount|"></span>
+							</div>
+							<div id="price-summary"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<form id="saveForm" name="saveForm" enctype="multipart/form-data">
+			<div class="manage-content mb-10">
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+				<input type="hidden" name="params" id="params" />
+				<input type="hidden" name="mode" id="mode" th:value="${mode}" />
+				<input type="hidden" name="reservationYn" id="reservationYn" th:value="${reservationYn}" />
+				<input type="hidden" name="id" id="id" th:value="${inquiry.id}" />
+				<input type="hidden" name="contentsIid" id="contentsIid" th:value="${inquiry.id}" />
+
+				<h3 class="title">문의답변 </h3>
+				<div class="mb-20">
+					<label class="control-label col-md-2 req" for="content">문의내용</label>
+					<div class="col-md-12">
+						<textarea class="form-control col-md-12 ckeditor" rows="10" id="content" name="content" th:text="${inquiry.content}"></textarea>
+					</div>
+				</div>
+				<div class="mb-20">
+					<label class="control-label col-md-2 req" for="content">답변내용</label>
+					<div class="col-md-12">
+						<textarea class="form-control col-md-12 ckeditor" rows="10" id="comment" name="comment" th:text="${inquiry.comment}"></textarea>
+					</div>
+				</div>
+				<div class="row mb-20" th:if="${reservationYn eq 'N'}">
+					<div class="col-md-6">
+						<label class="" for="secretYn">비밀글</label>
+						<div class="">
+							<input type="checkbox" id="secretYn" name="secretYn" data-toggle="toggle" data-onstyle="success" data-on="비밀" data-off="노출" data-width="100%" th:checked="${inquiry.secretYn eq 'Y'} ? 'checked'">
+						</div>
+					</div>
+					<div class="col-md-6">
+	                	<label class="control-label col-md-6" for="company-name">처리 상태</label>
+						<select id="applyCode" name="applyCode" class="form-control col-md-6">
+						</select>
+					</div>
+				</div>
+<!--/*
+				<div class="row mb-20" th:if="${reservationYn eq 'N'}">
+					<div class="col-md-6">
+						<label class="" for="secretYn">예약전환</label>
+						<div class="">
+							<input type="checkbox" id="reservationYn" name="reservationYn" data-toggle="toggle" data-onstyle="success" data-on="전환" data-off="비전환" data-width="100%" >
+						</div>
+					</div>
+					<div class="col-md-3" >
+						<label class="control-label col-md-12" for="company-name">예약종류</label>
+	                    <select id="categoryId" name="categoryId" class="form-control col-md-12" disabled>
+							<option value="">선택</option>
+<th:block th:each="list : ${listCategoryReservation}" >
+							<option th:value="${list.id}"  th:text="${list.title}"
+									th:selected="${inquiry.categoryId eq list.id} ? 'selected'"></option>
+</th:block>
+                		</select>
+                	</div>
+				</div>
+				<div class="row mb-20" th:if="${reservationYn eq 'Y'}">
+					<div class="col-md-3" >
+	                	<label class="control-label col-md-12" for="company-name">예약 상태</label>
+						<select id="reservationCode" name="reservationCode" class="form-control col-md-12">
+						</select>
+					</div>
+					<div class="col-md-3" >
+	                	<label class="control-label col-md-12" for="company-name">취소 상태</label>
+						<select id="cancelCode" name="cancelCode" class="form-control col-md-12">
+						</select>
+					</div>
+				</div>
+*/-->
+			</div>
+		</form>
+
+		<div class="col-md-12 clearfix">
+			<div class="text-center">
+				<button type="button" class="btn btn-black"   onclick="preList()">취소하기</button>
+				<button type="button" class="btn btn-primary" onclick="save()">저장하기</button>
+				<button type="button" class="btn btn-danger"  th:onclick="goDelete([[${inquiry.id}]])" th:if="${mode eq 'U'}">삭제하기</button>
+				<button type="button" class="btn btn-info"
+					th:onclick="|fnTransferreservation(${inquiry.id}, 'Y')|"
+					th:if="${category.reservationSwitchYn eq 'Y' and inquiry.applyCode eq '2'}">예약전환</button>
+
+			</div>
+		</div>
+	    <!-- /.content -->
+	</div>
+	  <!-- /.content-wrapper -->
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+	  <!-- Control Sidebar -->
+	  <aside class="control-sidebar control-sidebar-dark">
+	    <!-- Control sidebar content goes here -->
+	  </aside>
+	  <!-- /.control-sidebar -->
+	</div>
+	<!-- ./wrapper -->
+	<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+	<script>
+	  $.widget.bridge('uibutton', $.ui.button)
+	</script>
+	<!-- AdminLTE App -->
+	<script src="/js/manage/adminlte.js"></script>
+	<!-- AdminLTE for demo purposes
+	<script src="/js/manage/demo.js"></script>
+	<!-- AdminLTE dashboard demo (This is only for demo purposes)
+	<script src="/js/manage/pages/dashboard.js"></script>
+	-->.
+	<script type="text/javascript" th:inline="javascript">
+	var attchFileSize;
+	let editor, editorComment;
+	var reservation = [[${reservationYn}]] === 'Y' ? true : false;
+
+	$(document).ready(function() {
+		fnMakeCkeditor($('#content')[0],  true).then(
+			makedEditor => {
+				editor = makedEditor;
+			});
+
+		fnMakeCkeditor($('#comment')[0],  false).then(
+			makedEditor => {
+				editorComment = makedEditor;
+			});
+		$('#applyCode').html(       loadMakeUpHtmlSelect('statusType', '[(${inquiry.applyCode})]', 'applyCode', 'applyCode','class',false ) );
+		$('#reservationCode').html( loadMakeUpHtmlSelect('reservationType', '[(${inquiry.reservationCode})]', 'reservationCode', 'reservationCode','class',false ) );
+		$('#cancelCode').html(      loadMakeUpHtmlSelect('cancelType', '[(${inquiry.cancelCode})]', 'cancelCode', 'cancelCode','class',false ) );
+/*
+		console.log("-----------");
+		console.log([[${inquiry.applyCode}]]);
+		console.log([[${inquiry.travelScheduleJson}]])
+		console.log([[${inquiry.priceOptionJson}]])
+*/
+		fnInitProductPriceOpton( [[${inquiry.travelScheduleJson}]] );
+		fnInitProductPriceOpton( [[${inquiry.priceOptionJson}]] );
+
+		$("#travelToDt, #travelToTm").each(function(i,e){
+			if( $(this).text() != '' ){
+				$(this).parent().show();
+			}
+		});
+
+		$('input#reservationYn[data-toggle="toggle"]')
+			.bootstrapToggle()
+			.change(function(e){
+				if( $(this).is(':checked') ){
+					$('#applyCode').attr('disabled',true);
+					$('#categoryId').attr('disabled',false);
+				} else {
+					$('#applyCode').attr('disabled',false);
+					$('#categoryId').attr('disabled',true);
+				}
+			});
+
+	});
+
+	fnInitProductPriceOpton = function( json ){
+	    //console.log( i, $(e).attr('id'), $(e).val() );
+		if(json !== undefined && json.length > 0 ){
+	    	var _data = JSON.parse( json );
+			var id   = _data['id'];
+			var data = _data['data'];
+
+			$.each( data, function( key, value ){
+			    //console.log( 'key:' + key + ' / ' + 'value:' + value );
+			    $(`#${key}`,`#${id}`).text(value);
+			});
+		}
+		//$('#divProductPriceOption').html();
+	}
+
+	function save() {
+		var form = document.saveForm;
+		var nowac = "";
+		$("#comment").text(editorComment.getData());
+
+		if($.trim(form.comment.value) == "") {
+			alert("답변내용을 입력해 주세요.");
+			form.comment.focus();
+		} else if($('input#reservationYn[data-toggle="toggle"]').is(':checked') && $.trim(form.categoryId.value) == "") {
+			alert("예약종류 선택해 주세요.");
+			form.categoryId.focus();
+		} else if(!$('input#reservationYn[data-toggle="toggle"]').is(':checked') &&  $.trim(form.applyCode.value) == "") {
+			alert("처리상태을 입력해 주세요.");
+			form.applyCode.focus();
+		} else  {
+// 			var contents = eval("CKEDITOR.instances.bbsNttCm.getData()");
+// 			$("#bbsNttCm").val(contents);
+			var url = "/manage/inquiry/contents-save";
+
+			if($("#mode").val() == 'R'){
+				nowac = "저장";
+			}else if($("#mode").val() == 'I'){
+				nowac = "등록";
+			}
+			if(confirm(nowac+"하시겠습니까?")) {
+				var formData = new FormData($('#saveForm')[0]);
+
+				 $('input[data-toggle="toggle"]').each(function(i,e){
+				    formData.set( $(e).attr('name'), $(e).is(':checked') ? 'Y' : 'N');
+				});
+				if($('input#reservationYn[data-toggle="toggle"]').is(':checked')){
+					formData.set( 'applyCode', 3);
+					formData.set( 'reservationCode', 0);
+				}
+				$.ajax({
+		            url: url,
+		            type : 'POST',
+		            enctype: 'multipart/form-data',
+					contentType : false,
+					processData : false,
+		            data : formData,
+		            dataType: 'JSON',
+		            success : function(data) {
+		                if (typeof data.result != "undefined" && data.result == "error") {
+		                    alert(data.message);
+		                    return;
+		                } else {
+		                    alert(data.message);
+		                    preList();
+		                }
+		            },
+		            error : function(xhr, code, errorMsg) { },
+		            beforeSend : function() { },
+		            complete : function() { }
+		        });
+			}
+		}
+	}
+
+	function preList(){
+		location.href = `/manage/inquiry/${reservation ? 'reservation' : 'inquiry'}?params=`+getParams();
+	}
+
+	function goreservation(id){
+		location.href = `/manage/inquiry/form?mode=U&id=${id}&params=`+getParams();
+	}
+
+	goDelete = function(id){
+		if( confirm('삭제처리 하시겠습니까?') ){
+			$.ajax({
+	            url: '/manage/inquiry/contents-delete',
+	            type : 'POST',
+	            data : { 'id':id},
+	            //dataType: 'JSON',
+	            success : function(data) {
+	                if (typeof data.result != "undefined" && data.result == "error") {
+	                    alert(data.message);
+	                    preList();
+	                    return;
+	                } else {
+	                    alert(data.message);
+	                }
+	            },
+	            error : function(xhr, code, errorMsg) { },
+	            beforeSend : function(xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+	            complete : function() { }
+	        });
+        }
+	}
+
+	fnTransferreservation = function(id, resovationYn){
+		if( confirm('예약전환 하시겠습니까?') ){
+			$.ajax({
+	            url: '/manage/inquiry/contents-save',
+	            type : 'POST',
+	            data : { 'mode':'U', 'id':id, 'reservationYn':'Y' },
+	            //dataType: 'JSON',
+	            success : function(data) {
+	                if (typeof data.result != "undefined" && data.result == "error") {
+	                    alert(data.message);
+	                    return;
+	                } else {
+	                    alert(data.message);
+						goreservation(id);
+	                }
+	            },
+	            error : function(xhr, code, errorMsg) { },
+	            beforeSend : function(xhr) { xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]); },
+	            complete : function() { }
+	        });
+        }
+	}
+	</script>
+	<style>
+	    #attach-file-list .filebox img {
+		    width: 70%;
+		    height: auto;
+		}
+
+		.ck-editor__editable { height: 200px; }
+
+		.board_photo{position: relative;width: 150px;height: 150px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 5px;}
+		.board_photo img{width: 100%; height: 100%;}
+		.board_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+
+		.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+		.board_btn.thumnail {top: 5px;left: 5px;}
+		.board_btn.thumnail.check {background-color: greenyellow;}
+		.board_btn.delete {top: 5px;right: 5px;}
+		.control-label {justify-content: unset !important;}
+	</style>
+	</body>
+</html>

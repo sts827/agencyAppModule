@@ -1,0 +1,1973 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.ManageMapper">
+	<!--################################### manageMenu ###################################-->
+		<select id="selectOneManageMenu" parameterType="HashMap" resultType="ManageMenu">
+        SELECT menu_id, upper_menu_id, menu_type, menu_name, menu_url, menu_icon, menu_sort, menu_desc, menu_permission, create_id, create_date, last_update_id, last_update_date, delete_yn, use_yn
+          FROM manage_menu a
+          join (SELECT @rownum:= 0) rnum
+         <where>
+         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	and upper_menu_id=#{upperMenuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	and menu_type=#{menuType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	and menu_name=#{menuName}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	and menu_url=#{menuUrl}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuIcon)" >	and menu_icon=#{menuIcon}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	and menu_sort=#{menuSort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	and menu_desc=#{menuDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+			and delete_yn='N'
+         </where>
+	</select>
+
+	<select id="selectManageMenuByUrl" parameterType="String" resultType="MenuUser">
+		SELECT menu_id,
+		       upper_menu_id,
+		       menu_name,
+		       menu_acronym,
+		       menu_url,
+		       menu_type,
+		       menu_sub_type,
+		       menu_sort,
+		       menu_desc,
+		       navbar_yn,
+		       use_yn,
+		       create_date
+		FROM menu_user
+		WHERE menu_url=#{value}
+	</select>
+
+	<select id="selectManageSubMenuListById" parameterType="int" resultType="MenuUser">
+		SELECT menu_id,
+			   upper_menu_id,
+			   menu_name,
+			   menu_url,
+			   menu_type,
+			   menu_sort,
+			   menu_desc,
+			   navbar_yn,
+			   use_yn,
+			   create_date,
+			   (select count(*) from menu_user b where b.upper_menu_id = a.upper_menu_id) subMenuCount
+		FROM menu_user a
+		WHERE delete_yn='N' AND upper_menu_id = #{value}
+	</select>
+
+	<select id="selectListManageMenu" parameterType="HashMap" resultType="ManageMenu">
+		SELECT *
+		  FROM(
+	        SELECT @rownum:=@rownum+1 AS rownum,
+	        	   menu_id, upper_menu_id, menu_type, menu_name, menu_url, menu_icon, menu_sort, menu_desc, menu_permission, create_id, create_date, last_update_id, last_update_date, delete_yn, use_yn
+	          FROM manage_menu a
+	          join (SELECT @rownum:= 0) rnum
+	         <where>
+	         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+	         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	and menu_type=#{menuType}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	and upper_menu_id=#{upperMenuId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	and menu_name=#{menuName}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	and menu_url=#{menuUrl}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuIcon)" >	and menu_icon=#{menuIcon}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	and menu_sort=#{menuSort}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	and menu_desc=#{menuDesc}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+				and delete_yn='N'
+	         </where>
+
+	         <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+		    	ORDER BY
+		        <choose>
+		            <when test="sort=='menuId'" >	menu_id	</when>
+					<when test="sort=='upperMenuId'" >	upper_menu_id	</when>
+					<when test="sort=='menuName'" >	menu_name	</when>
+					<when test="sort=='menuUrl'" >	menu_url	</when>
+					<when test="sort=='menuIcon'" >	menu_icon	</when>
+					<when test="sort=='menuSort'" >	menu_sort	</when>
+					<when test="sort=='menuDesc'" >	menu_desc	</when>
+					<when test="sort=='createId'" >	create_id	</when>
+					<when test="sort=='createDate'" >	create_date	</when>
+					<when test="sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="sort=='deleteYn'" >	delete_yn	</when>
+					<when test="sort=='useYn'" >	use_yn	</when>
+		            <otherwise>rownum</otherwise>
+		        </choose>
+		        <choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+		    	ORDER BY <foreach item="item" index="index" collection="listSort" separator=",">
+		    	<choose>
+		            <when test="item.sort=='menuId'" >	menu_id	</when>
+					<when test="item.sort=='upperMenuId'" >	upper_menu_id	</when>
+					<when test="item.sort=='menuName'" >	menu_name	</when>
+					<when test="item.sort=='menuUrl'" >		menu_url	</when>
+					<when test="item.sort=='menuIcon'" >	menu_icon	</when>
+					<when test="item.sort=='menuSort'" >	menu_sort	</when>
+					<when test="item.sort=='menuDesc'" >	menu_desc	</when>
+					<when test="item.sort=='createId'" >	create_id	</when>
+					<when test="item.sort=='createDate'" >	create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="item.sort=='deleteYn'" >	delete_yn	</when>
+					<when test="item.sort=='useYn'" >	use_yn	</when>
+		        </choose>
+		    	<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+
+			) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	 <select id="selectCountManageMenu" parameterType="HashMap" resultType="Integer">
+        SELECT count(menu_id) FROM manage_menu
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	and menu_type=#{menuType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	and upper_menu_id=#{upperMenuId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	and menu_name=#{menuName}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	and menu_url=#{menuUrl}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuIcon)" >	and menu_icon=#{menuIcon}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	and menu_sort=#{menuSort}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	and menu_desc=#{menuDesc}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	and use_yn=#{useYn}	</if>
+         </where>
+    </select>
+
+	<insert id="insertManageMenu" parameterType="ManageMenu" useGeneratedKeys="true" keyProperty="menuId">
+        INSERT INTO manage_menu(
+        		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	menu_type,	</if>
+        		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	upper_menu_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	menu_name,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	menu_url,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuIcon)" >	menu_icon,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	menu_sort,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	menu_desc,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuPermission)" >	menu_permission, </if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	delete_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id,	</if>
+                create_date)
+        VALUES (
+        		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	#{menuType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	#{upperMenuId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	#{menuName},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	#{menuUrl},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuIcon)" >	#{menuIcon},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	#{menuSort},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	#{menuDesc},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuPermission)" >	#{menuPermission}, </if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	#{useYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	#{createId},	</if>
+                now()
+                )
+    </insert>
+
+    <update id="updateManageMenu" parameterType="ManageMenu">
+        UPDATE manage_menu
+        <set>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuType)" >	menu_type=#{menuType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperMenuId)" >	upper_menu_id=#{upperMenuId},	</if>
+<!-- 			<if test="upperMenuId == null" >	upper_menu_id=null,	</if> -->
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuName)" >	menu_name=#{menuName},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)" >	menu_url=#{menuUrl},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuIcon)" >	menu_icon=#{menuIcon},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuSort)" >	menu_sort=#{menuSort},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuDesc)" >	menu_desc=#{menuDesc},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuPermission)" >	menu_permission=#{menuPermission}, </if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	delete_yn=#{deleteYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+		</where>
+    </update>
+
+    <update id="deleteManageMenu" parameterType="ManageMenu">
+        UPDATE manage_menu
+        <set>
+			delete_yn='Y',last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)" >	and menu_id=#{menuId}	</if>
+		</where>
+    </update>
+	<!--################################### Statistic ###################################-->
+	<select id="selectListStatisticDate" parameterType="HashMap" resultType="HashMap">
+        select
+        <choose>
+        	<when test="chartType == 'dateRange'">time, </when>
+        	<when test="chartType == 'weekRange'">WEEKDAY(STR_TO_DATE( time, '%Y-%m-%d')) week, </when>
+        </choose>
+         <choose>
+        	<when test="chartType == 'weekRange'">case WEEKDAY(STR_TO_DATE( time, '%Y-%m-%d')) when 0 then '월' when 1 then '화' when 2 then '수' when 3 then '목' when 4 then '금' when 5 then '토' else '일' end  weekname, </when>
+        </choose>
+
+        count(session_id) cnt
+		  from (
+			select session_id, SUBSTRING(min(request_time),1,10) time
+			  from user_web_log
+			 group by session_id) a
+		<where>
+			<if test="@kr.wayplus.hp.common.util.MybatisUtil@isNotEmpty(startDate) and @kr.wayplus.hp.common.util.MybatisUtil@isNotEmpty(endDate)">time between #{startDate} and #{endDate}</if>
+		</where>
+		group by
+		<choose>
+        	<when test="chartType == 'dateRange'">time </when>
+        	<when test="chartType == 'weekRange'">week </when>
+        </choose>
+
+		<choose>
+        	<when test="chartType == 'dateRange'">order by time desc </when>
+        </choose>
+    </select>
+
+    <select id="selectListStatisticInfo" parameterType="HashMap" resultType="HashMap">
+	 select sum(day_cnt) to_sum_cnt
+	 		, round(avg(day_cnt),1) to_avg_cnt
+	 		, max(case when time = date(now()) then day_cnt else 0 end) to_day_count
+	 		, max(case when time = date(adddate(now(), interval -1 day)) then day_cnt else 0 end) to_yuesterday_count
+	   from(
+		 select time
+		 		,count(session_id) day_cnt
+		  from (
+			select session_id, SUBSTRING(min(request_time),1,10) time
+			  from user_web_log
+			 group by session_id) a
+		 group by time
+		 order by time desc ) a
+    </select>
+
+	<!--################################### Product ###################################-->
+	<!--  상품 개수	-->
+	<select id="selectProductListCount" parameterType="HashMap" resultType="int">
+		SELECT COUNT(*)
+		FROM product_tour pt
+		LEFT JOIN menu_user mu on mu.menu_id = pt.product_menu_id
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and product_title like concat('%',#{titleLike},'%')</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(isNotMe)">AND (product_serial != #{isNotMe})</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">AND (mu.upper_menu_id = #{menuId} or mu.menu_id=#{menuId})</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)">AND mu.menu_url = #{menuUrl}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productTourId)">AND pt.product_tour_id = #{productTourId}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productMenuId)">AND pt.product_menu_id=#{productMenuId}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productCategoryId)">AND pt.product_category_id=#{productCategoryId}</if>
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productStatus) and !"ALL".equals(productStatus)'>AND product_status LIKE CONCAT(#{productStatus},'%')</if>
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productUseYn)'>AND pt.product_use_yn = #{productUseYn}</if>
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(regacyYn)'>AND pt.regacy_yn = #{regacyYn}</if>
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)'>AND pt.delete_yn = #{deleteYn}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+				<if test="searchType.equals('title')">
+					AND pt.product_title LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+				<if test="searchType.equals('tag')">
+					AND pt.product_tag LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+			</if>
+			<if test='"popular".equals(productType)'>AND pt.isPopular = 'Y'</if>
+		</where>
+	</select>
+	<!--상품 목록-->
+	<select id="selectProductList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductInfo">
+		SELECT *,
+		(SELECT menu_name FROM menu_user WHERE menu_id = product_menu_id) categoryTitle,
+		(SELECT category_title FROM product_common_category WHERE product_menu_id = pt.product_menu_id AND product_category_id = pt.product_category_id) subCategoryTitle
+		FROM product_tour pt
+		LEFT JOIN menu_user mu on mu.menu_id = pt.product_menu_id
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and product_title like concat('%',#{titleLike},'%')</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(isNotMe)">AND (product_serial != #{isNotMe})</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">AND (mu.upper_menu_id = #{menuId} or mu.menu_id=#{menuId})</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuUrl)">AND mu.menu_url = #{menuUrl}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productTourId)">AND pt.product_tour_id = #{productTourId}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productMenuId)">AND pt.product_menu_id = #{productMenuId}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productCategoryId)">AND pt.product_category_id=#{productCategoryId}</if>
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productStatus) and !"ALL".equals(productStatus)'>AND pt.product_status LIKE CONCAT(#{productStatus},'%')</if>
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productUseYn)'>AND pt.product_use_yn = #{productUseYn}</if>
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(regacyYn)'>AND pt.regacy_yn = #{regacyYn}</if>
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)'>AND pt.delete_yn = #{deleteYn}</if>
+
+			<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(exceptList)'>AND pt.product_serial not in
+				<foreach item="item" index="index" collection="exceptList" separator="," open="(" close=")">#{item}</foreach>
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+				<if test="searchType.equals('title')">
+					AND pt.product_title LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+				<if test="searchType.equals('tag')">
+					AND pt.product_tag LIKE CONCAT('%', #{searchKey}, '%')
+				</if>
+			</if>
+			<if test='"popular".equals(productType)'>AND pt.isPopular = 'Y'</if>
+		</where>
+		<choose>
+			<when test='"Y".equals(orderYn)'>ORDER BY pt.product_sort_order ASC</when>
+			<otherwise>ORDER BY pt.product_tour_id DESC</otherwise>
+		</choose>
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+			LIMIT #{itemStartPosition}, #{pagePerSize}
+		</if>
+	</select>
+
+	<!--템플릿 상품 정보 이미지 등록-->
+	<insert id="insertProductAttachFile" parameterType="ProductAttachFile">
+		INSERT INTO product_common_template_file
+		(
+		 template_id, upload_path, upload_filename, file_extension
+		 , file_size, file_mimetype, origin_filename
+		)
+		VALUES
+		(
+		 #{contentId}, #{contentType}, #{uploadPath}, #{uploadFilename}, #{fileExtension}
+		 , #{fileSize}, #{fileMimetype}, #{originFilename}
+		)
+	</insert>
+
+	<insert id="insertTemplateEditorFile" parameterType="ProductTemplateFile" useGeneratedKeys="true" keyProperty="fileId">
+		INSERT INTO product_common_template_file
+		(
+		 template_id, upload_path, upload_filename, file_extension
+		, file_size, file_mimetype, origin_filename,create_id,create_date)
+		VALUES
+		       (
+			   #{templateId}, #{uploadPath}, #{uploadFilename}, #{fileExtension}
+			   , #{fileSize}, #{fileMimetype}, #{originFilename}, #{createId}, now()
+			   )
+	</insert>
+
+	<!--템플릿 등록-->
+	<insert id="insertProductTemplate" parameterType="ProductTemplate" useGeneratedKeys="true" keyProperty="templateId">
+		INSERT INTO product_common_template
+			(
+				product_tour_id, title, subtitle, template_html, create_id, create_date
+			)
+		VALUES
+			(
+				#{productTourId}, #{title}, #{subtitle}, #{templateHtml}, #{createId}, NOW()
+			)
+	</insert>
+
+	<update id="updateProductTemplate" parameterType="ProductTemplate">
+		UPDATE product_common_template
+		SET template_html =#{templateHtml}
+		WHERE product_tour_id=#{productTourId}
+	</update>
+
+	<update id="updateProductDescription" parameterType="ProductInfo">
+		UPDATE product_tour
+		SET
+			product_description = #{productDescription},
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productDescriptionType)" >	product_description_type=#{productDescriptionType},	</if>
+			last_update_id = #{createId},
+			last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<!--템플릿 리스트 TODO : 상품등록기능 완성시 조건문 걸어야함-->
+	<select id="selectProductTemplateList" resultType="ProductTemplate">
+		SELECT pf.template_id,pf.product_tour_id,pf.title,pf.subtitle,pf.template_type, pf.template_html,pf.template_thumbnail,pf.create_id,pf.create_date,
+			   pf.last_update_id,pf.last_update_date
+		FROM product_common_template AS pf
+				 LEFT JOIN product_common_template_file AS paf on paf.template_id = pf.template_id
+		WHERE pf.delete_yn = 'N' AND pf.template_type='SAMPLE'
+	</select>
+
+	<select id="selectProductTemplateById" parameterType="HashMap" resultType="ProductTemplate">
+		SELECT
+			template_id,product_tour_id,title,subtitle,template_html,template_thumbnail,create_id,
+			create_date
+		FROM product_common_template
+		WHERE product_tour_id =#{productTourId}
+		ORDER BY template_id
+		LIMIT 1
+	</select>
+
+	<select id="selectSampleTemplateById" parameterType="Integer" resultType="ProductTemplate">
+		SELECT template_id,product_tour_id,title,subtitle,template_html,template_thumbnail,create_id,
+		       create_date
+		FROM product_common_template
+		WHERE template_id=#{value}
+	</select>
+
+	<!--템플릿 삭제-->
+	<update id="deleteTemplate" parameterType="map">
+		UPDATE product_common_template
+		SET delete_yn = 'Y'
+			, delete_date = NOW()
+		WHERE template_id = #{templateId}
+	</update>
+
+	<!--상품 가격 옵션 리스트-->
+	<select id="selectPriceOptionList" parameterType="map">
+		SELECT *
+		FROM product_common_price_option
+		WHERE option_type = #{option_type} AND use_yn = 'Y'
+		ORDER BY option_sequence ASC
+	</select>
+
+	<!--상품 가격 옵션 리스트-->
+	<select id="selectListPriceOption" parameterType="HashMap" resultType="ProductPriceOption">
+		with
+		 list(product_tour_id,price_option_id,option_name,gubn,price_set_date, product_price) as (
+		 select product_tour_id,price_option_id,option_name,gubn,price_set_date, ifnull(pd_product_price, pf_product_price) product_price
+		   from (
+			select
+			    po.product_tour_id,
+				po.price_option_id,
+				po.option_name,
+				ifnull(pd.gubn, pf.gubn) gubn,
+				ifnull(pd.price_set_date, pf.price_set_date) price_set_date,
+				(CASE WHEN pd.price_sale != 0 THEN pd.price_sale ELSE pd.price_normal END ) AS pd_product_price,
+				(CASE WHEN pf.price_sale != 0 THEN pf.price_sale ELSE pf.price_normal END ) AS pf_product_price
+			  from product_tour_price_option po
+			  left join (SELECT price_option_id, 'day' gubn, price_set_date, price_set_type, price_sale, price_normal FROM product_tour_price_set) pd on po.price_option_id = pd.price_option_id
+			  left join (SELECT price_option_id, 'fix' gubn, '' price_set_date, price_sale, price_normal  FROM product_tour_price_fix_set) pf on po.price_option_id = pf.price_option_id ) a )
+		  ,cklist(product_tour_id,price_option_id,option_name,gubn,price_set_date,product_price,target) as (
+			select *
+			  from (
+				select DISTINCT product_tour_id,price_option_id,option_name,gubn, price_set_date, product_price
+				       , case when gubn = 'day' and price_set_date = #{travelDate} then 'day'
+				              when gubn = 'fix' then 'fix' end target
+				  from list
+				 where product_tour_id in(#{productTourId})) a
+			 where target is not null )
+		  ,daycheck(isDay) as (
+		  select case when count(target) > 0 and target ='day' then true else false end isDay
+		    from cklist
+		    group by target)
+		  select *
+		    from cklist, daycheck dk
+		   where gubn = ifnull(case when dk.isday then 'day' end, 'fix')
+		   order by price_option_id
+	</select>
+
+	<!--상품 판매 기본가격 정보 저장-->
+	<insert id="insertProductPriceOption" parameterType="kr.co.wayplus.travel.model.ProductPriceOption$BasicPriceList" useGeneratedKeys="true" keyProperty="priceOptionId">
+		INSERT INTO product_tour_price_option
+			set
+				price_option_id=#{priceOptionId},
+				product_tour_id=#{productTourId},
+				option_group_code=#{optionGroupCode},
+				option_sequence=#{optionSequence},
+				option_name=#{optionName},
+				option_desc=#{optionDesc},
+				max_quantity=#{maxQuantity},
+				<if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(maxCapacity)'>max_capacity=#{maxCapacity},</if>
+				use_yn='Y',
+				create_id=#{createId},
+				create_date=NOW()
+		ON DUPLICATE KEY UPDATE
+			price_option_id = VALUES(price_option_id)
+			, product_tour_id = VALUES(product_tour_id)
+			, option_sequence = IFNULL(VALUES(option_sequence), option_sequence)
+			, option_group_code = VALUES(option_group_code)
+		    , option_name = VALUES(option_name)
+		    , option_desc = VALUES(option_desc)
+		    , max_quantity = VALUES(max_quantity)
+		    <if test='@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(maxCapacity)'>, max_capacity = VALUES(max_capacity)</if>
+			, last_update_id = VALUES(create_id)
+			, last_update_date = NOW()
+	</insert>
+
+	<!--상품 동일금액 정보 저장-->
+	<insert id="insertProductBasicPriceSet" parameterType="kr.co.wayplus.travel.model.ProductPriceOption$BasicPriceList" useGeneratedKeys="true" keyProperty="priceId">
+		INSERT INTO product_tour_price_set
+			set
+				price_id=#{priceId},
+				price_option_id=#{priceOptionId},
+				price_sequence=#{priceSequence},
+				price_set_type=#{priceSetType},
+				price_set_date=#{priceSetDate},
+				price_sale=#{priceSale},
+				price_normal=#{priceNormal},
+				alone_yn=#{aloneYn},
+				create_id=#{createId},
+				create_date=NOW()
+		ON DUPLICATE KEY UPDATE
+			price_id = VALUES(price_id)
+			  , price_option_id = VALUES(price_option_id)
+			  , price_sequence = VALUES(price_sequence)
+			  , price_set_type = VALUES(price_set_type)
+			  , price_set_date = VALUES(price_set_date)
+			  , price_sale = VALUES(price_sale)
+			  , price_normal = VALUES(price_normal)
+			  , alone_yn = VALUES(alone_yn)
+			  , last_update_id = VALUES(create_id)
+			  , last_update_date = NOW()
+			  , delete_yn = 'N'
+			  , use_yn = 'Y'
+	</insert>
+
+	<!--상품 가격정보 저장-->
+	<insert id="insertProductPriceSet" parameterType="kr.co.wayplus.travel.model.ProductPriceOption$DayList" useGeneratedKeys="true" keyProperty="priceId">
+		INSERT INTO product_tour_price_set
+			set
+				price_id=#{priceId},
+				price_option_id=#{priceOptionId},
+				price_sequence=#{priceSequence},
+				price_set_type=#{priceSetType},
+				price_set_date=#{priceSetDate},
+				price_sale=#{priceSale},
+				price_normal=#{priceNormal},
+				alone_yn=#{aloneYn},
+				option_group_code=#{optionGroupCode},
+				create_id=#{createId},
+				create_date=NOW(),
+				delete_yn=#{deleteYn}
+		ON DUPLICATE KEY UPDATE
+			price_id = VALUES(price_id)
+		  , price_option_id = VALUES(price_option_id)
+		  , option_group_code = VALUES(option_group_code)
+		  , price_sequence = VALUES(price_sequence)
+		  , price_set_type = VALUES(price_set_type)
+		  , price_set_date = VALUES(price_set_date)
+		  , price_sale = VALUES(price_sale)
+		  , price_normal = VALUES(price_normal)
+		  , alone_yn = VALUES(alone_yn)
+		  , last_update_id = VALUES(create_id)
+		  , last_update_date = NOW()
+		  , use_yn = 'Y'
+		  , delete_yn = VALUES(delete_yn)
+	</insert>
+
+	<!--상품 가격 정보가 속한 그룹의 마지막 번호-->
+	<select id="selectPriceSequenceNum" parameterType="ProductPriceOption" resultType="int">
+		SELECT IFNULL( MAX(price_sequence), 0 )
+		FROM product_tour_price_set
+	</select>
+
+	<!--저장된 상품 가격 정보 리스트(최저값만)-->
+	<select id="selectAddedPriceSetMinimumList" parameterType="ProductPriceOption" resultType="ProductPriceOption">
+	SELECT
+		price_sequence,
+		price_set_date,
+		MIN(CASE WHEN price_sale != 0 THEN price_sale ELSE price_normal END ) AS product_price
+	FROM product_tour_price_set
+	WHERE use_yn = 'Y' AND delete_yn != 'Y'
+	<if test="priceIdList != null">
+		AND price_id IN
+		<foreach item="item" index="index" collection="priceIdList" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</if>
+	<if test="optionGroupCode != null and optionGroupCode != ''">
+		AND option_group_code = #{optionGroupCode}
+	</if>
+	GROUP BY price_sequence, price_set_date
+	</select>
+	<!--특정 상품에 속한 고정가격 리스트-->
+	<select id="selectListProductFixPrice" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption$FixPriceList">
+		SELECT
+		    *
+		FROM product_tour_price_fix_set AS pFitx
+			LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pFitx.price_option_id
+		WHERE pOption.product_tour_id = #{productTourId} AND pOption.use_yn = 'Y'
+			AND pOption.delete_yn = 'N' AND pOption.option_sequence = 0 AND pOption.option_group_code IS NOT NULL
+	</select>
+	<!--특정 상품에 속한 고정가격 리스트 (가격최저값)-->
+	<select id="selectOneProductFixPriceList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption$FixPriceList">
+		SELECT
+		    MIN(CASE WHEN price_sale != 0 THEN price_sale ELSE price_normal END ) AS product_price
+		FROM product_tour_price_fix_set AS pFitx
+			LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pFitx.price_option_id
+		WHERE pOption.product_tour_id = #{productTourId} AND pOption.use_yn = 'Y'
+			AND pOption.delete_yn = 'N' AND pOption.option_sequence = 0 AND pOption.option_group_code IS NOT NULL
+	</select>
+	<!--특정 상품에 속한 요일별가격 리스트-->
+	<select id="selectListProductDayPrice" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption$DayList">
+		SELECT
+		    *
+		FROM product_tour_price_set AS pPrice
+			LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pPrice.price_option_id
+		WHERE pOption.product_tour_id = #{productTourId} AND pOption.use_yn = 'Y'
+			AND pOption.delete_yn = 'N' AND pOption.option_group_code IS NOT NULL
+	</select>
+	<!--특정 상품에 속한 요일별가격 리스트 (가격최저값)-->
+	<select id="selectOneProductDayPriceList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption$DayList">
+		SELECT
+		    MIN(CASE WHEN price_sale != 0 THEN price_sale ELSE price_normal END ) AS product_price
+		FROM product_tour_price_set AS pPrice
+			LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pPrice.price_option_id
+		WHERE pOption.product_tour_id = #{productTourId} AND pOption.use_yn = 'Y'
+			AND pOption.delete_yn = 'N' AND pOption.option_group_code IS NOT NULL
+	</select>
+
+	<!--특정 상품 기본가격 정보 리스트-->
+	<select id="selectBasicPriceList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption">
+		SELECT *
+		FROM product_tour_price_option
+		WHERE product_tour_id = #{productTourId} AND delete_yn = 'N'
+	</select>
+
+	<!--저장된 상품 기본가격 정보 리스트-->
+	<select id="selectAddedBasicPriceList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption">
+		SELECT ptpo.price_option_id,
+			ptpo.option_name,
+			ptpo.max_quantity,
+			ptps.price_id,
+		CASE WHEN price_sale != 0 THEN price_sale ELSE price_normal END AS product_price
+		FROM product_tour_price_option ptpo
+		LEFT JOIN product_tour_price_set ptps on ptps.price_option_id = ptpo.price_option_id
+		WHERE ptpo.price_option_id IN
+		<foreach item="item" index="index" collection="priceOptionId" open="(" separator="," close=")">
+			#{item.priceOptionId}
+		</foreach>
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(priceSetType)" >
+			AND ptps.price_set_type != 'byDayPrice'
+		</if>
+	    AND ptps.use_yn = 'Y' AND ptpo.delete_yn = 'N'
+		GROUP BY ptpo.price_option_id
+		ORDER BY ptpo.option_sequence ASC
+	</select>
+
+	<!--저장된 상품 가격 정보 리스트-->
+	<select id="selectAddedPriceSetList" parameterType="map" resultType="ProductPriceOption">
+		SELECT ptps.price_option_id, price_id, price_sequence, price_set_type, price_set_date, max_quantity
+		, price_sale, price_normal, alone_yn, ptpo.option_name
+		FROM product_tour_price_set ptps
+		LEFT JOIN product_tour_price_option ptpo on ptpo.price_option_id = ptps.price_option_id
+		WHERE price_sequence = #{priceSequence}
+		  <choose>
+			<when test='"N".equals(useYn)'>
+				AND ptps.use_yn = 'N'
+			</when>
+			<otherwise>
+				AND ptps.use_yn = 'Y'
+			</otherwise>
+		  </choose>
+	</select>
+
+	<!--특정 상품의 고정가격정보 (복사용)-->
+	<select id="selectDayPriceOptionForCopy" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption$DayList">
+		SELECT *
+		FROM product_tour_price_set
+		WHERE price_option_id = #{priceOptionId} AND delete_yn = 'N'
+	</select>
+
+	<!--특정 상품일정 삭제-->
+	<delete id="deleteProductPriceSet" parameterType="kr.co.wayplus.travel.model.ProductPriceOption">
+		UPDATE product_tour_price_set
+		SET delete_yn = 'Y', use_yn = 'N', delete_id = #{createId}, delete_date = NOW()
+		WHERE price_sequence = #{priceSequence}
+	</delete>
+
+	<!--일정 수정시 상품판매 기본가격 정보 생성-->
+	<insert id="insertPriceBasicOption" parameterType="kr.co.wayplus.travel.model.ProductPriceOption$BasicPriceList" useGeneratedKeys="true" keyProperty="priceOptionId">
+		INSERT INTO product_tour_price_option
+			(
+				product_tour_id, option_sequence, option_name, option_desc, max_quantity, create_id, use_yn, create_date
+			)
+		VALUES
+			(
+				#{productTourId}, #{optionSequence}, #{optionName}, #{optionDesc}, #{maxQuantity}, #{createId}, 'Y', NOW()
+			)
+	</insert>
+
+	<!--일정 삭제-->
+	<update id="deletePriceSet" parameterType="map">
+		UPDATE product_tour_price_set
+		SET use_yn = 'N'
+		  , delete_yn = 'Y'
+		  , delete_id = #{createId}
+		  , delete_date = NOW()
+		WHERE price_sequence = #{priceSequence}
+	</update>
+
+	<!--일정 기본옵션 삭제-->
+	<update id="deleteBasicPriceOption" parameterType="map">
+		UPDATE product_tour_price_option
+		SET use_yn = 'N'
+		, delete_yn = 'Y'
+		, delete_id = #{createId}
+		, delete_date = NOW()
+		WHERE price_option_id IN
+		<foreach item="item" index="index" collection="basicPriceOptionIdList" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!--일정수정 때 기본옵션 삭제 했을시-->
+	<update id="deleteCalendarBasicPriceOption" parameterType="map">
+		UPDATE product_tour_price_option
+		SET use_yn = 'N'
+		, delete_yn = 'Y'
+		, delete_id = #{createId}
+		, delete_date = NOW()
+		WHERE price_option_id IN
+		<foreach item="item" index="index" collection="deleteBasicPriceOptionList" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!--툭종 상품의 기본가격 옵션 리스트-->
+	<select id="selectOneProductPriceOptionList" parameterType="map" resultType="ProductPriceOption">
+		SELECT DISTINCT pFix.price_option_id
+		FROM product_tour_price_fix_set AS pFix
+		LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pFix.price_option_id
+		WHERE pOption.product_tour_id = #{productTourId}
+	</select>
+
+	<!--툭종 상품의 요일별가격 옵션 리스트-->
+	<select id="selectOneProductDayPriceOptionList" parameterType="map" resultType="ProductPriceOption">
+		SELECT DISTINCT pSet.price_option_id
+		FROM product_tour_price_set AS pSet
+		LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pSet.price_option_id
+		WHERE pOption.product_tour_id = #{productTourId}
+	</select>
+
+	<!--################################### Info ###################################-->
+
+	<insert id="insertProductInfo" parameterType="kr.co.wayplus.travel.model.ProductInfo" useGeneratedKeys="true" keyProperty="productTourId">
+		INSERT INTO product_tour set
+			product_tour_id=#{productTourId},
+			product_menu_id=#{productMenuId},
+			product_category_id=#{productCategoryId},
+			product_title=#{productTitle},
+			product_subtitle=#{productSubtitle},
+			product_tag=#{productTag},
+			product_description=#{productDescription},
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productDescriptionType)" >	product_description_type=#{productDescriptionType},	</if>
+			product_show_start_date=#{productShowStartDate},
+			product_show_end_date=#{productShowEndDate},
+			product_reserv_start_date=#{productReservStartDate},
+			product_reserv_end_date=#{productReservEndDate},
+			product_tour_start_date=#{productTourStartDate},
+			product_tour_end_date=#{productTourEndDate},
+			product_thumbnail=#{productThumbnail},
+			product_images=#{productImages},
+			product_include_item=#{productIncludeItem},
+			product_exclude_item=#{productExcludeItem},
+			product_option_item=#{productOptionItem},
+			product_notice=#{productNotice},
+			product_stipulation=#{productStipulation},
+			product_regulation=#{productRegulation},
+			product_use_yn=#{productUseYn},
+			product_view_count=#{productViewCount},
+			product_favorite_count=#{productFavoriteCount},
+			product_sort_order=#{productSortOrder},
+			product_status=#{productStatus},
+			isPopular=#{isPopular},
+			product_serial=#{productSerial},
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyInventory)" >	policy_inventory=#{policyInventory},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(regacyYn)" >	regacy_yn=IFNULL(#{regacyYn}, 'N'),	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption1)" >	product_option1=#{productOption1},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption2)" >	product_option2=#{productOption2},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption3)" >	product_option3=#{productOption3},	</if>
+			create_id=#{createId},
+			create_date=now(),
+			product_label=#{productLabel},
+			product_status=#{productStatus},
+			product_segments=#{productSegments},
+			product_address=#{productAddress},
+			product_link=#{productLink}
+		ON DUPLICATE KEY UPDATE
+			product_tour_id = VALUES(product_tour_id), 
+			product_menu_id = VALUES(product_menu_id), 
+			product_category_id = VALUES(product_category_id),
+			product_title = VALUES(product_title),
+			product_subtitle = VALUES(product_subtitle),
+			product_tag = VALUES(product_tag),
+			product_description = VALUES(product_description),
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productDescriptionType)" >	product_description_type=VALUES(product_description_type),	</if>
+			product_show_start_date = VALUES(product_show_start_date),
+			product_show_end_date = VALUES(product_show_end_date),
+			product_reserv_start_date = VALUES(product_reserv_start_date),
+			product_reserv_end_date = VALUES(product_reserv_end_date),
+			product_tour_start_date = VALUES(product_tour_start_date),
+			product_tour_end_date = VALUES(product_tour_end_date),
+			product_thumbnail = VALUES(product_thumbnail),
+			product_images = VALUES(product_images),
+			product_include_item = VALUES(product_include_item),
+			product_exclude_item = VALUES(product_exclude_item),
+			product_option_item = VALUES(product_option_item),
+			product_notice = VALUES(product_notice),
+			product_stipulation = VALUES(product_stipulation),
+			product_regulation = VALUES(product_regulation),
+			product_use_yn = VALUES(product_use_yn),
+			product_view_count = VALUES(product_view_count),
+			product_favorite_count = VALUES(product_favorite_count),
+			product_sort_order = VALUES(product_sort_order),
+			product_status = VALUES(product_status),
+			isPopular = VALUES(isPopular),
+			product_serial = VALUES(product_serial),
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyInventory)" >	policy_inventory=VALUES(product_serial),	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(regacyYn)" >	regacy_yn=VALUES(regacy_yn),	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption1)" >	product_option1=VALUES(productOption1),	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption2)" >	product_option2=VALUES(productOption2),	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption3)" >	product_option3=VALUES(productOption3),	</if>
+			product_label=VALUES(product_label),
+			product_segments=VALUES(product_segments),
+			product_address=VALUES(product_address),
+			product_link=VALUES(product_link),
+			last_update_id = #{createId},
+			last_update_date = NOW()
+	</insert>
+
+	<update id="updateProductInfo" parameterType="kr.co.wayplus.travel.model.ProductInfo">
+		UPDATE product_tour
+		SET product_status = #{productStatus}
+		   	, product_menu_id = #{productMenuId}
+		   	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productCategoryId)" >	,product_category_id=#{productCategoryId}</if>
+		  	, product_title = #{productTitle}
+		  	, product_subtitle = #{productSubtitle}
+		  	, product_tag = #{productTag}
+		  	, product_label = #{productLabel}
+		  	, product_show_start_date = #{productShowStartDate}
+			, product_show_end_date = #{productShowEndDate}
+			, product_reserv_start_date = #{productReservStartDate}
+			, product_reserv_end_date = #{productReservEndDate}
+		  	, product_thumbnail = #{productThumbnail}
+			, product_include_item = #{productIncludeItem}
+			, product_exclude_item = #{productExcludeItem}
+			, product_option_item = #{productOptionItem}
+			, product_notice = #{productNotice}
+			, product_stipulation = #{productStipulation}
+			, product_regulation = #{productRegulation}
+			, product_use_yn = #{productUseYn}
+			, product_images = #{productImages}
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyInventory)" >	policy_inventory=VALUES(product_serial),	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption1)" >	product_option1=VALUES(productOption1),	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption2)" >	product_option2=VALUES(productOption2),	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption3)" >	product_option2=VALUES(productOption3),	</if>
+		    <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSegments)">,product_segments=#{productSegments}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productAddress)">,product_address=#{productAddress}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productLink)">,product_link=#{productLink}</if>
+
+			, last_update_id = #{createId}
+			, last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<update id="deleteProductInfo" parameterType="kr.co.wayplus.travel.model.ProductInfo">
+		UPDATE product_tour
+		SET product_use_yn = 'N'
+		  , delete_yn = 'Y'
+		  , delete_id = #{createId}
+		  , delete_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<!--상품옵션 가장 마지막 순서의 값-->
+	<select id="selectOptionLastOrderNum" resultType="int">
+		SELECT ifnull(MAX(option_sequence),0)
+		FROM product_common_price_option
+		WHERE use_yn = 'Y'
+		ORDER BY option_sequence DESC
+	</select>
+
+	<!--상품카테고리 등록-->
+	<insert id="insertProductCommonCategory" parameterType="kr.co.wayplus.travel.model.ProductCategory">
+		INSERT INTO product_common_category
+		<set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productMenuId)" >	product_menu_id=#{productMenuId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryTitle)" >	category_title=#{categoryTitle},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryNote)" >	category_note=#{categoryNote},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(subcategory)" >	subcategory=#{subcategory},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)" >	sort_order=#{sortOrder},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id=#{createId},	</if>
+			create_date=NOW()
+		</set>
+	</insert>
+
+	<!--상품카테고리 삭제-->
+	<update id="updateProductCommonCategory" parameterType="kr.co.wayplus.travel.model.ProductCategory">
+		update product_common_category
+		<set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryTitle)" >	category_title=#{categoryTitle},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(categoryNote)" >	category_note=#{categoryNote},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(subcategory)" >	subcategory=#{subcategory},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)" >	sort_order=#{sortOrder},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id,</if>
+			last_update_date=NOW()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productCategoryId)" >	and product_category_id=#{productCategoryId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productMenuId)" >	and product_menu_id=#{productMenuId}	</if>
+		</where>
+	</update>
+	<!--상품카테고리 삭제-->
+	<update id="deleteProductCommonCategory" parameterType="kr.co.wayplus.travel.model.ProductCategory">
+		UPDATE product_common_category
+		<set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >delete_id = #{deleteId},</if>
+			delete_yn='Y',
+			delete_date=NOW()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productCategoryId)" >	and product_category_id=#{productCategoryId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productMenuId)" >	and product_menu_id=#{productMenuId}	</if>
+		</where>
+	</update>
+
+	<!--상품카테고리 삭제-->
+	<update id="resotreProductCommonCategory" parameterType="kr.co.wayplus.travel.model.ProductCategory">
+		UPDATE product_common_category
+		<set>
+			delete_yn='N',
+			delete_id = null,
+			delete_date=null,
+			last_update_date=NOW()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productCategoryId)" >	and product_category_id=#{productCategoryId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productMenuId)" >	and product_menu_id=#{productMenuId}	</if>
+		</where>
+	</update>
+
+	<!--상품옵션 등록-->
+	<insert id="insertProductOption" parameterType="kr.co.wayplus.travel.model.ProductPriceOption">
+		INSERT INTO product_common_price_option
+			(
+				option_type, option_name, option_sequence, option_desc, create_id, use_yn, create_date
+			)
+		VALUES
+			(
+				#{optionType}, #{optionName}, #{optionOrder}, #{optionDesc}, #{createId}, 'Y', NOW()
+			)
+	</insert>
+
+	<!--상품옵션 수정-->
+	<update id="updateProductOption" parameterType="kr.co.wayplus.travel.model.ProductPriceOption">
+		UPDATE product_common_price_option
+		SET option_type = #{optionType}, option_name = #{optionName}, option_desc = #{optionDesc}
+		  , last_update_id = #{createId}, last_update_date = NOW()
+		WHERE option_setting_id = #{optionSettingId}
+	</update>
+
+	<!--상품옵션 삭제-->
+	<update id="deleteProductOption" parameterType="kr.co.wayplus.travel.model.ProductPriceOption">
+		UPDATE product_common_price_option
+		SET delete_yn = 'Y', use_yn = 'N', last_update_id = #{createId}, last_update_date = NOW()
+		WHERE option_setting_id = #{optionSettingId}
+	</update>
+
+	<!--상품옵션 목록-->
+	<select id="selectProductOptionList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption">
+	SELECT *
+	FROM (
+		SELECT @rownum:=@rownum+1 AS rownum, option_setting_id, option_type, option_sequence, option_name, option_desc
+		FROM product_common_price_option
+		join (SELECT @rownum:= 0) rnum
+		WHERE use_yn = 'Y' AND delete_yn = 'N'
+		<choose>
+			<when test="'tour'.equals(optionType)" >
+				AND option_type != 'rentcar'
+			</when>
+			<when test="'rentcar'.equals(optionType)" >
+				AND option_type = 'rentcar'
+			</when>
+		</choose>
+		<choose>
+			<when test="orderType == 'orderChange'">
+				ORDER BY option_sequence ASC
+			</when>
+			<when test="orderType != 'orderChange'">
+				ORDER BY option_type, option_sequence ASC
+			</when>
+		</choose> ) a
+	</select>
+
+	<!--상품옵션 목록 카운트-->
+	<select id="selectProductOptionListCount" resultType="int">
+		SELECT COUNT(*)
+		FROM product_common_price_option
+		WHERE use_yn = 'Y' AND delete_yn = 'N'
+		<choose>
+			<when test="'tour'.equals(optionType)" >
+				AND option_type != 'rentcar'
+			</when>
+			<when test="'rentcar'.equals(optionType)" >
+				AND option_type = 'rentcar'
+			</when>
+		</choose>
+		<choose>
+			<when test="orderType == 'orderChange'">
+				ORDER BY option_sequence ASC
+			</when>
+			<when test="orderType != 'orderChange'">
+				ORDER BY option_type, option_sequence ASC
+			</when>
+		</choose>
+	</select>
+
+	<!--특정 상품옵션 목록-->
+	<select id="selectProductOptionItem" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption">
+		SELECT option_setting_id, option_type, option_sequence, option_name, option_desc
+		FROM product_common_price_option
+		WHERE option_setting_id = #{optionSettingId} AND use_yn = 'Y' AND delete_yn = 'N'
+	</select>
+
+	<!--옵션분류 목록-->
+	<select id="selectProductCategoryList" resultType="kr.co.wayplus.travel.model.ProductCategory">
+		SELECT product_category_id, product_menu_id, category_title, category_note,subcategory
+		FROM product_common_category
+		WHERE use_yn = 'Y' AND delete_yn = 'N'
+		ORDER BY create_date ASC
+	</select>
+
+	<select id="selectSubCategoryListByMenuId" parameterType="int" resultType="kr.co.wayplus.travel.model.ProductCategory">
+		SELECT mu.*, pc.*, upper_menu.menu_name AS upper_menu_name
+		  FROM menu_user mu
+		  LEFT JOIN product_common_category pc ON pc.product_menu_id = mu.menu_id
+		  LEFT JOIN menu_user upper_menu ON upper_menu.menu_id = mu.upper_menu_id
+		WHERE pc.product_menu_id = #{menuCategory.menuId}
+		  and pc.delete_yn ='N'
+	</select>
+
+	<select id="selectListProductCategory" parameterType="HashMap" resultType="kr.co.wayplus.travel.model.ProductCategory">
+		SELECT product_category_id, product_menu_id, category_title, category_note, subcategory
+		  FROM product_common_category
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productMenuId)" >and product_menu_id = #{productMenuId}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)" >and use_yn = #{useYn}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >and delete_yn = #{deleteYn}</if>
+		</where>
+		 ORDER BY sort_order ASC
+	</select>
+
+	<select id="selectProductCategoriesById" parameterType="int" resultType="kr.co.wayplus.travel.model.ProductCategory">
+		SELECT pc.product_category_id, pc.product_menu_id, ifnull(product_count,0) product_count, category_title, category_note,subcategory, use_yn, delete_yn
+		  FROM product_common_category pc
+		  left join(
+			 select product_menu_id, product_category_id, count(*) product_count
+			  from product_tour
+			 where delete_yn = 'N'
+			   and product_use_yn ='Y'
+			   and regacy_yn ='N'
+			 group by product_menu_id, product_category_id ) pcc on pc.product_menu_id = pcc.product_menu_id and pc.product_category_id = pcc.product_category_id
+		 WHERE pc.product_menu_id IN(#{value})
+		ORDER BY sort_order ASC
+	</select>
+
+	<!--서브옵션분류 목록-->
+	<select id="selectProductSubCategoryList" resultType="kr.co.wayplus.travel.model.ProductCategory">
+		SELECT menu_id
+		       , upper_menu_id
+			   , menu_name
+		FROM menu_user
+		WHERE use_yn = 'Y' AND delete_yn = 'N' AND upper_menu_id IS NOT NULL
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productCategoryId)" >
+		  AND menu_id = #{productCategoryId}
+		</if>
+	</select>
+
+	<!--상품 기본옵션 순서 변경-->
+	<update id="updateBasicProductOptionOrder" parameterType="kr.co.wayplus.travel.model.ProductPriceOption$BasicPriceList">
+		UPDATE product_common_price_option
+		SET option_sequence = #{optionSequence}, last_update_id = #{createId}, last_update_date = NOW()
+		WHERE option_setting_id = #{optionSettingId}
+	</update>
+
+	<!--상품 순서 변경-->
+	<update id="updateProductOrder" parameterType="kr.co.wayplus.travel.model.ProductInfo">
+		UPDATE product_tour
+		SET product_sort_order = #{productSortOrder}, last_update_id = #{createId}, last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+
+	</update>
+
+	<!--세부일정 생성-->
+	<insert id="insertDetailSchedule" parameterType="kr.co.wayplus.travel.model.ProductDetailSchedule" useGeneratedKeys="true" keyProperty="detailId">
+		INSERT INTO product_tour_detail
+			(
+				detail_id, product_tour_id, detail_sequence, detail_category, detail_title, address
+				, tourspot_id, day_text, attach_image, stay_option, stay_minimum_head_count, stay_maximum_head_count, create_id, create_date
+			)
+		VALUES
+			(
+				#{detailId},  #{productTourId}, #{detailSequence}, #{detailCategory}, #{detailTitle}, #{address}
+				, #{tourspotId}, #{dayText}, #{attachImage}, #{stayOption}, #{stayMinimumHeadCount}, #{stayMaximumHeadCount}, #{createId}, NOW()
+			)
+		ON DUPLICATE KEY UPDATE
+		detail_id = VALUES(detail_id)
+		, product_tour_id = VALUES(product_tour_id)
+		, detail_sequence = VALUES(detail_sequence)
+		, detail_category = VALUES(detail_category)
+		, detail_title = VALUES(detail_title)
+		, address = VALUES(address)
+		, tourspot_id = VALUES(tourspot_id)
+		, day_text = VALUES(day_text)
+		, attach_image = VALUES(attach_image)
+		, stay_option = VALUES(stay_option)
+		, stay_minimum_head_count = VALUES(stay_minimum_head_count)
+		, stay_maximum_head_count = VALUES(stay_maximum_head_count)
+		, last_update_id = VALUES(create_id)
+		, last_update_date = NOW()
+		, delete_yn = 'N'
+	</insert>
+
+	<!--세부일정 삭제-->
+	<update id="deleteDetailSchedule" parameterType="map">
+		UPDATE product_tour_detail
+		SET delete_yn = 'Y', delete_id = #{createId}, delete_date = NOW(), last_update_id = #{createId}, last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<!--세부일정 이미지 생성-->
+	<insert id="insertDetailScheduleAttachFile" parameterType="kr.co.wayplus.travel.model.ProductDetailScheduleImage" useGeneratedKeys="true" keyProperty="detailImageId">
+		INSERT INTO product_tour_detail_images
+		(
+			detail_id, upload_path, upload_filename, origin_filename, file_size, file_mimetype, file_extension, create_id, create_date
+		)
+		VALUES
+		(
+			#{detailId}, #{uploadPath}, #{uploadFilename}, #{originFilename}, #{fileSize}, #{fileMimetype}, #{fileExtension}, #{createId}, NOW()
+		)
+	</insert>
+
+	<!-- 상품 슬라이드 이미지 검색	-->
+	<select id="selectProductImagesByKey" parameterType="HashMap" resultType="kr.co.wayplus.travel.model.ProductTourImages">
+		SELECT image_id, product_tour_id,
+		service_type, upload_path, upload_filename,
+		file_extension, file_size, file_mimetype,
+		origin_filename, create_id, create_date,
+		last_update_id, last_update_date, delete_yn, delete_id, delete_date
+		FROM product_tour_images
+		<where>
+			<if test="imageId != null">
+				AND image_id =#{imageId}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectProductTemplateFileImageByKey" parameterType="HashMap" resultType="kr.co.wayplus.travel.model.ProductTemplateFile">
+		SELECT file_id,template_id,upload_path,upload_filename,file_extension,file_size,
+		       file_mimetype,origin_filename,create_id,create_date
+		FROM
+			product_common_template_file
+		<where>
+			<if test="fileId != null">
+				AND file_id = #{fileId}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectTemplateEditorImageByKey" parameterType="HashMap" resultType="kr.co.wayplus.travel.model.ProductTemplateFile">
+		SELECT file_id,template_id,upload_path,upload_filename,file_extension,
+		       file_size,file_mimetype,origin_filename,create_id,create_date
+		FROM product_common_template_file
+		<where>
+			<if test="fileId != null">
+				AND file_id = #{fileId}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectProductImageLists" parameterType="HashMap" resultType="kr.co.wayplus.travel.model.ProductTourImages">
+		SELECT image_id, product_tour_id,
+			   service_type, upload_path, upload_filename,
+			   file_extension, file_size, file_mimetype,
+			   origin_filename, create_id, create_date,
+			   last_update_id, last_update_date
+		FROM product_tour_images
+		WHERE image_id IN (#{imageId})
+	</select>
+	<!-- 상품 슬라이드 이미지 등록	-->
+	<insert id="insertProductSlideImages" parameterType="kr.co.wayplus.travel.model.ProductTourImages" useGeneratedKeys="true" keyProperty="imageId">
+		INSERT INTO product_tour_images
+		(
+			 product_tour_id,
+			 upload_path,
+			 upload_filename,
+			 file_extension,
+			 file_size,
+			 file_mimetype,
+			 origin_filename,
+			 create_id,
+			 create_date
+		 )
+		VALUES
+			(
+				 #{productTourId},
+				 #{uploadPath},
+				 #{uploadFilename},
+				 #{fileExtension},
+				 #{fileSize},
+				 #{fileMimetype},
+				 #{originFilename},
+				 #{createId},
+				 now()
+			 )
+	</insert>
+
+	<!-- 상품 이미지 제거	-->
+	<delete id="deleteProductImagesByKey" parameterType="HashMap">
+		DELETE FROM product_tour_images
+		WHERE product_tour_id = #{productTourId} AND image_id = #{imageId}
+	</delete>
+
+	<delete id="deleteEditorImageByKey" parameterType="HashMap">
+		DELETE FROM product_common_template_file
+		WHERE template_id=#{templateId} AND file_id=#{fileId}
+	</delete>
+
+	<!--세부일정 이미지 삭제-->
+	<update id="deleteDetailScheduleAttachFile" parameterType="kr.co.wayplus.travel.model.ProductDetailSchedule">
+		UPDATE product_tour_detail_images
+		SET detail_id = 0, delete_yn = 'Y', delete_id = #{createId}, delete_date = NOW(), last_update_id = #{createId}, last_update_date = NOW()
+		WHERE detail_id = #{detailId}
+	</update>
+
+	<!--세부일정과 이미지 매칭-->
+	<update id="updateDetailScheduleImage" parameterType="kr.co.wayplus.travel.model.ProductDetailSchedule">
+		UPDATE product_tour_detail_images
+		SET detail_id = #{detailId}, delete_yn = 'N', last_update_id = #{createId}, last_update_date = NOW()
+		WHERE detail_id = 0 AND detail_image_id IN
+		<foreach item="item" collection="attachImageNums" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<!--세부일정의 일차버튼 리스트-->
+	<select id="selectProductDetailScheduleBtnList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductDetailSchedule">
+		SELECT DISTINCT detail_category
+		FROM product_tour_detail
+		WHERE product_tour_id = #{productTourId} AND detail_category != 'golfOption' AND detail_category != 'stayOption' AND delete_yn = 'N'
+		ORDER BY detail_category, detail_sequence ASC
+	</select>
+
+	<!--세부일정 리스트-->
+	<select id="selectProductDetailScheduleList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductDetailSchedule">
+		SELECT ptd.*
+			   , ptd.attach_image AS image_num_list
+			   , ps.ts_id
+			   , ps.ts_title
+			   , ps.ts_append
+		FROM product_tour_detail AS ptd
+		LEFT JOIN place_spot AS ps on ps.ts_id = ptd.tourspot_id
+		WHERE product_tour_id = #{productTourId} AND delete_yn = 'N' AND detail_category != 'golfOption' AND detail_category != 'stayOption'
+		ORDER BY detail_category, detail_sequence ASC
+	</select>
+
+	<!--세부일정의 이미지 리스트-->
+	<select id="selectProductDetailScheduleImageList" parameterType="kr.co.wayplus.travel.model.ProductDetailSchedule" resultType="kr.co.wayplus.travel.model.ProductDetailSchedule$ImageNumList">
+		SELECT *
+		FROM product_tour_detail_images
+		WHERE detail_id = #{detailId} AND delete_yn = 'N'
+		ORDER BY detail_image_id ASC
+	</select>
+
+	<!--세부일정의 이미지 리스트(복사용)-->
+	<select id="selectProductDetailScheduleImageForCopy" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductDetailScheduleImage">
+		SELECT *
+		FROM product_tour_detail_images
+		WHERE detail_image_id = #{detailImageId} AND delete_yn = 'N'
+		ORDER BY detail_image_id ASC
+	</select>
+
+	<!--골프 옵션정보 리스트-->
+	<select id="selectProductGolfOptionList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductDetailSchedule">
+		SELECT ptd.*
+			 , ptd.attach_image AS image_num_list
+			 , ps.ts_id
+			 , ps.ts_title
+			 , ps.ts_append
+		FROM product_tour_detail AS ptd
+		LEFT JOIN place_spot AS ps on ps.ts_id = ptd.tourspot_id
+		WHERE product_tour_id = #{productTourId} AND delete_yn = 'N' AND detail_category = 'golfOption'
+		ORDER BY detail_category, detail_sequence ASC
+	</select>
+
+	<!--숙소 옵션정보 리스트-->
+	<select id="selectProductStayOptionList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductDetailSchedule">
+		SELECT ptd.*
+			 , ptd.attach_image AS image_num_list
+			 , ps.ts_id
+			 , ps.ts_title
+			 , ps.ts_append
+		FROM product_tour_detail AS ptd
+		LEFT JOIN place_spot AS ps on ps.ts_id = ptd.tourspot_id
+		WHERE product_tour_id = #{productTourId} AND delete_yn = 'N' AND detail_category = 'stayOption'
+		ORDER BY detail_category, detail_sequence ASC
+	</select>
+
+	<!--상품 고정금액 등록-->
+	<insert id="insertFixPriceOption" parameterType="kr.co.wayplus.travel.model.ProductPriceOption$FixPriceList">
+		INSERT INTO product_tour_price_fix_set
+			(
+			 	price_id, price_option_id, price_sale, price_normal, create_id, create_date
+			 )
+		VALUES
+		    (
+				#{priceId}, #{priceOptionId}, #{priceSale}, #{priceNormal}, #{createId}, NOW()
+			)
+		ON DUPLICATE KEY UPDATE
+		price_id = VALUES(price_id)
+		  , price_option_id = VALUES(price_option_id)
+		  , price_sale = VALUES(price_sale)
+		  , price_normal = VALUES(price_normal)
+		  , last_update_id = VALUES(create_id)
+		  , last_update_date = NOW()
+		  , delete_yn = 'N'
+		  , use_yn = 'Y'
+	</insert>
+
+	<!--특정 상품의 기본가격의 그룹코드-->
+	<select id="selectProductGroupCode" parameterType="map" resultType="string">
+		SELECT DISTINCT option_group_code
+		FROM product_tour_price_option
+		WHERE product_tour_id = #{productTourId}
+		  AND option_group_code IS NOT NULL
+		  AND USE_YN = 'Y'
+	</select>
+
+	<!--특정 상품의 고정가격정보-->
+	<select id="selectOneProductFixPriceOption" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption$FixPriceList">
+		SELECT  pOption.price_option_id
+		        , pOption.option_name
+		     	, pOption.max_capacity
+		     	, pOption.max_quantity
+		     	, pFix.price_id
+				, CASE WHEN price_sale != 0 THEN price_sale ELSE price_normal END AS product_price
+		FROM product_tour_price_fix_set AS pFix
+		LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pFix.price_option_id
+		WHERE pOption.product_tour_id = #{productTourId} AND pOption.option_sequence = 0 AND pOption.use_yn = 'Y'
+	</select>
+	<!--특정 상품의 고정가격정보 (복사용)-->
+	<select id="selectFixPriceOptionForCopy" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductPriceOption$FixPriceList">
+		SELECT *
+		FROM product_tour_price_fix_set
+		WHERE price_option_id = #{priceOptionId} AND delete_yn = 'N'
+	</select>
+
+	<!--상품등록완료 되었을때 기본가격정보 use_y처리-->
+	<update id="updateBasicPriceOptionUseYn" parameterType="map">
+		UPDATE product_tour_price_option
+		SET use_yn = 'Y'
+			, delete_yn = 'N'
+			, last_update_id = #{createId}
+			, last_update_date = NOW()
+		WHERE price_option_id IN<foreach item="item" collection="basicPriceId" open="(" separator="," close=")">#{item}</foreach>
+	</update>
+
+	<!--특정 상품정보-->
+	<select id="selectProductInfo" parameterType="map" resultType="ProductInfo">
+	with
+	  fixmin as (
+		SELECT
+		    'fix' gubn,
+		    pOption.product_tour_id,
+		    MIN(CASE WHEN price_sale != 0 THEN price_sale ELSE price_normal END ) AS product_price
+		FROM product_tour_price_fix_set AS pFitx
+			LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pFitx.price_option_id
+		WHERE pOption.use_yn = 'Y'
+			AND pOption.delete_yn = 'N' AND pOption.option_sequence = 0 AND pOption.option_group_code IS NOT NULL
+		 group by pOption.product_tour_id),
+	  daymin as (
+		SELECT
+		    'day' gubn,
+		    pOption.product_tour_id,
+		    MIN(CASE WHEN price_sale != 0 THEN price_sale ELSE price_normal END ) AS product_price
+		FROM product_tour_price_set AS pPrice
+			LEFT JOIN product_tour_price_option AS pOption on pOption.price_option_id = pPrice.price_option_id
+		WHERE  pOption.use_yn = 'Y'
+		  AND pOption.delete_yn = 'N' AND pOption.option_group_code IS NOT NULL
+		 group by pOption.product_tour_id)
+		SELECT pt.*,
+			   mu.upper_menu_id,
+			   case when mu.upper_menu_id is not null then mu2.menu_Url else mu.menu_Url end menu_url,
+			   mp.product_price, mp.gubn
+		FROM product_tour pt
+		LEFT JOIN menu_user mu on mu.menu_id = pt.product_menu_id
+		LEFT JOIN menu_user mu2 on mu2.menu_id = mu.upper_menu_id
+		LEFT JOIN(
+			select product_tour_id, min(product_price) product_price, min(gubn) gubn
+			 from(
+				select * from fixmin
+				union all
+				select * from daymin) a
+			 group by product_tour_id) mp on pt.product_tour_id = mp.product_tour_id
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productTourId)">and pt.product_tour_id = #{productTourId}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productTourId)">and pt.product_serial = #{productSerial}</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial) and productTourId eq null">and pt.product_tour_id in (select max(product_tour_id) max_product_tour_id from product_tour pt where pt.product_serial = #{productSerial})</if>
+		</where>
+	</select>
+
+	<!--특정 상품 이미지 정보-->
+	<select id="selectProductInfoImageList" parameterType="map" resultType="ProductAttachFile">
+		SELECT *
+		FROM product_tour_images
+		WHERE image_id IN
+		<foreach collection="images" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<!--상품 기본정보,상품정보 복사-->
+	<insert id="insertCopyProductInfo" parameterType="kr.co.wayplus.travel.model.ProductInfo" useGeneratedKeys="true" keyProperty="productTourId">
+		INSERT INTO product_tour set
+			product_menu_id=#{productMenuId},
+			product_category_id=#{productCategoryId},
+			product_title=#{productTitle},
+			product_subtitle=#{productSubtitle},
+			product_tag=#{productTag},
+			product_label=#{productLabel},
+			product_segments=#{productSegments},
+			product_address=#{productAddress},
+			product_link=#{productAddress},
+			product_description=#{productDescription},
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productDescriptionType)" >	product_description_type=#{productDescriptionType},	</if>
+			product_show_start_date=#{productShowStartDate},
+			product_show_end_date=#{productShowEndDate},
+			product_reserv_start_date=#{productReservStartDate},
+			product_reserv_end_date=#{productReservEndDate},
+			product_tour_start_date=#{productTourStartDate},
+			product_tour_end_date=#{productTourEndDate},
+			product_thumbnail=#{productThumbnail},
+			product_images=#{productImages},
+			product_include_item=#{productIncludeItem},
+			product_exclude_item=#{productExcludeItem},
+			product_option_item=#{productOptionItem},
+			product_notice=#{productNotice},
+			product_stipulation=#{productStipulation},
+			product_regulation=#{productRegulation},
+			product_use_yn=#{productUseYn},
+			product_view_count=#{productViewCount},
+			product_favorite_count=#{productFavoriteCount},
+			product_sort_order=#{productSortOrder},
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(policyInventory)" >	policy_inventory=#{policyInventory},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption1)" >	product_option1=#{productOption1},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption2)" >	product_option2=#{productOption2},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productOption3)" >	product_option2=#{productOption3},	</if>
+			create_id=#{createId},
+			create_date=#{createDate},
+			last_update_id=#{lastUpdateId},
+			last_update_date=#{lastUpdateDate},
+			delete_yn=#{deleteYn},
+			delete_id=#{deleteId},
+			product_status=#{productStatus},
+			isPopular=#{isPopular},
+			regacy_yn=#{regacyYn},
+			product_serial=#{productSerial},
+			car_fuel_type=#{carFuelType},
+			car_model_year=#{carModelYear},
+			car_capacity=#{carCapacity},
+			car_insurance=#{carInsurance},
+			car_option=#{carOption}
+	</insert>
+	<!--상품 기본정보 이미지 복사-->
+	<insert id="insertCopyProductImages" parameterType="kr.co.wayplus.travel.model.ProductTourImages" useGeneratedKeys="true" keyProperty="imageId">
+		INSERT INTO product_tour_images set
+			product_tour_id=#{productTourId},
+			service_type=#{serviceType},
+			upload_path=#{uploadPath},
+			upload_filename=#{uploadFilename},
+			file_extension=#{fileExtension},
+			file_size=#{fileSize},
+			file_mimetype=#{fileMimetype},
+			origin_filename=#{originFilename},
+			create_id=#{createId},
+			create_date=#{createDate},
+			last_update_id=#{lastUpdateId},
+			last_update_date=#{lastUpdateDate},
+			delete_yn=#{deleteYn},
+			delete_id=#{deleteId},
+			delete_date=#{deleteDate}
+	</insert>
+	<!--복사된 상품 기본정보와 이미지 복사본 매칭-->
+	<update id="updateCopiedProductImage" parameterType="map">
+		UPDATE product_tour
+		SET product_images = #{productImages}
+		WHERE product_tour_id = #{copiedProductTourId}
+	</update>
+	<!--상품 판매 기본가격 정보 복사-->
+	<insert id="insertCopyProductBasicPrice" parameterType="kr.co.wayplus.travel.model.ProductPriceOption" useGeneratedKeys="true" keyProperty="priceOptionId">
+		INSERT INTO product_tour_price_option set
+			product_tour_id=#{productTourId},
+			option_group_code=#{optionGroupCode},
+			option_sequence=#{optionSequence},
+			option_name=#{optionName},
+			option_desc=#{optionDesc},
+			max_quantity=#{maxQuantity},
+			max_capacity=#{maxCapacity},
+			use_yn=#{useYn},
+			create_id=#{createId},
+			create_date=#{createDate},
+			last_update_id=#{lastUpdateId},
+			last_update_date=#{lastUpdateDate},
+			delete_yn=#{deleteYn},
+			delete_id=#{deleteId},
+			delete_date=#{deleteDate}
+	</insert>
+	<!--상품 판매 고정가격 정보복사-->
+	<insert id="insertCopyProductFixPrice" parameterType="kr.co.wayplus.travel.model.ProductPriceOption$FixPriceList">
+		INSERT INTO product_tour_price_fix_set
+		set
+			price_option_id=#{copiedPriceOptionId},
+			price_sale=#{priceSale},
+			price_normal=#{priceNormal},
+			use_yn=#{useYn},
+			create_id=#{createId},
+			create_date=#{createDate},
+			last_update_id=#{lastUpdateId},
+			last_update_date=#{lastUpdateDate},
+			delete_yn=#{deleteYn},
+			delete_id=#{deleteId},
+			delete_date=#{deleteDate}
+	</insert>
+
+	<!--상품 판매 요일별가격 정보 복사-->
+	<insert id="insertCopyProductDayPrice" parameterType="kr.co.wayplus.travel.model.ProductPriceOption$DayList">
+		INSERT INTO product_tour_price_set
+			set
+				price_option_id=#{copiedPriceOptionId},
+				option_group_code=#{optionGroupCode},
+				price_sequence=#{priceSequence},
+				price_set_type=#{priceSetType},
+				price_set_date=#{priceSetDate},
+				price_sale=#{priceSale},
+				price_normal=#{priceNormal},
+				alone_yn=#{aloneYn},
+				use_yn=#{useYn},
+				create_id=#{createId},
+				create_date=#{createDate},
+				last_update_id=#{lastUpdateId},
+				last_update_date=#{lastUpdateDate},
+				delete_yn=#{deleteYn},
+				delete_id=#{deleteId},
+				delete_date=#{deleteDate}
+	</insert>
+	<!--상품 세부일정 복사-->
+	<insert id="insertCopyProductDetailSchedule" parameterType="kr.co.wayplus.travel.model.ProductDetailSchedule" useGeneratedKeys="true" keyProperty="detailId">
+		INSERT INTO product_tour_detail
+		set
+			product_tour_id=#{productTourId},
+			detail_sequence=#{detailSequence},
+			detail_category=#{detailCategory},
+			detail_title=#{detailTitle},
+			detail_note=#{detailNote},
+			address=#{address},
+			tourspot_id=#{tourspotId},
+			day_text=#{dayText},
+			time_text=#{timeText},
+			transport_time=#{transportTime},
+			transport_way=#{transportWay},
+			attach_image=#{attachImage},
+			stay_option=#{stayOption},
+			stay_minimum_head_count=#{stayMinimumHeadCount},
+			stay_maximum_head_count=#{stayMaximumHeadCount},
+			create_id=#{createId},
+			create_date=#{createDate},
+			last_update_id=#{lastUpdateId},
+			last_update_date=#{lastUpdateDate},
+			delete_yn=#{deleteYn},
+			delete_id=#{deleteId},
+			delete_date=#{deleteDate}
+	</insert>
+	<!--상품 세부일정 이미지 복사-->
+	<insert id="insertCopyProductDetailScheduleImage" parameterType="kr.co.wayplus.travel.model.ProductDetailScheduleImage" useGeneratedKeys="true" keyProperty="detailImageId">
+		INSERT INTO product_tour_detail_images
+			set
+				detail_id=#{detailId},
+				upload_path=#{uploadPath},
+				upload_filename=#{uploadFilename},
+				file_extension=#{fileExtension},
+				file_size=#{fileSize},
+				file_mimetype=#{fileMimetype},
+				origin_filename=#{originFilename},
+				create_id=#{createId},
+				create_date=#{createDate},
+				last_update_id=#{lastUpdateId},
+				last_update_date=#{lastUpdateDate},
+				delete_yn=#{deleteYn},
+				delete_id=#{deleteId},
+				delete_date=#{deleteDate}
+	</insert>
+	<!--복사된 상품 세부일정과 이미지 복사본 매칭-->
+	<update id="updateCopiedProductDetailScheduleImage" parameterType="map">
+		UPDATE product_tour_detail
+		SET attach_image = #{attachImages}
+		WHERE detail_id = #{detailId}
+	</update>
+
+	<!--특정 상품 useYn 업데이트-->
+	<update id="updateProductUseYn" parameterType="map">
+		UPDATE product_tour
+		SET product_use_yn = #{useYn}
+			, last_update_id = #{createId}
+			, last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<!--옵션 코드 리스트-->
+	<select id="selectOptionCodeList" parameterType="map" resultType="kr.co.wayplus.travel.model.CodeInfo">
+		SELECT *
+		FROM code_item
+		WHERE use_yn = 'Y'
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(upperCode)">
+			AND ( upper_code = 'product' OR upper_code = 'rentCarOption' )
+		</if>
+		ORDER BY sort ASC
+	</select>
+
+	<!--옵션 코드 카운트-->
+	<select id="selectOptionCodeListCount" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM code_item
+		WHERE use_yn = 'Y'
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">
+			AND upper_code = #{upperCode}
+		</if>
+		ORDER BY sort ASC
+	</select>
+
+	<update id="updateProductRegacyYn" parameterType="map">
+		UPDATE product_tour
+		SET regacy_yn = 'Y', product_use_yn = 'N', delete_yn = 'Y'
+			, last_update_id = #{createId}, last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<select id="selectPriceSetLastSequence" resultType="int">
+		SELECT ifnull(MAX(price_sequence), 0)
+		FROM product_tour_price_set
+	</select>
+
+	<select id="selectProductDetailList" parameterType="map" resultType="kr.co.wayplus.travel.model.ProductDetailSchedule">
+		SELECT ptd.*
+				, pt.product_menu_id
+		FROM product_tour_detail AS ptd
+		LEFT JOIN product_tour AS pt on pt.product_tour_id = ptd.product_tour_id
+		WHERE ptd.product_tour_id = #{productTourId} AND detail_category = #{detailCategory} AND ptd.delete_yn = 'N'
+	</select>
+
+	<update id="updateProductMenuId" parameterType="map">
+		UPDATE product_tour
+		SET product_menu_id = #{productMenuId}, last_update_id = #{createId}, last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<!--차량옵션 리스트-->
+	<select id="selectRentCarOptionList" resultType="kr.co.wayplus.travel.model.RentCarOption">
+		SELECT *
+		FROM product_common_price_option
+		WHERE use_yn = 'Y' AND delete_yn = 'N' AND option_type = 'rentCarOption'
+	</select>
+
+	<!--상품 차량정보 업데이트-->
+	<update id="updateProductRentCarInfo" parameterType="kr.co.wayplus.travel.model.ProductInfo">
+		UPDATE product_tour
+		SET car_fuel_type = #{carFuelType}, car_model_year = #{carModelYear}, car_capacity = #{carCapacity}
+		  , car_insurance = #{carInsurance}, car_option = #{carOption}
+		  , last_update_id = #{createId}, last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<!--상품 시리얼 수정-->
+	<update id="updateProductSerial" parameterType="map">
+		UPDATE product_tour
+		SET product_serial = #{productSerial}, last_update_id = #{createId}, last_update_date = NOW()
+		WHERE product_tour_id = #{productTourId}
+	</update>
+
+	<!--################################### ProductTourLink ###################################-->
+	<select id="selectListProductTourLink" parameterType="HashMap" resultType="ProductTourLink">
+		SELECT *
+		  FROM(
+	        SELECT @rownum:=@rownum+1 AS rownum,
+				   a.*,
+				   ps.ts_title, pt.product_title
+			  FROM product_tour_link a
+			  left join place_spot ps on a.link_place_id = ps.ts_id
+			  left join product_tour pt on a.link_product_serial = pt.product_serial
+			  join (SELECT @rownum:= 0) rnum
+	         <where>
+	         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkId)" >	and a.link_id=#{linkId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	and a.product_serial=#{productSerial}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkSequence)" >	and a.link_sequence=#{linkSequence}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkCategory)" >	and a.link_category=#{linkCategory}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkTitle)" >	and a.link_title=#{linkTitle}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkNote)" >	and a.link_note=#{linkNote}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkAddress)" >	and a.link_address=#{linkAddress}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkProductSerial)" >	and a.link_product_serial=#{linkProductSerial}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkPlaceId)" >	and a.link_place_id=#{linkPlaceId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and a.create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and a.create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and a.last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and a.a.last_update_date=#{lastUpdateDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and a.delete_yn=#{deleteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and a.delete_id=#{deleteId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and a.delete_date=#{deleteDate}	</if>
+	         </where>
+
+	         <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+		    	ORDER BY
+		        <choose>
+		            <when test="sort=='linkId'" >	a.link_id	</when>
+					<when test="sort=='productSerial'" >	a.product_serial	</when>
+					<when test="sort=='linkSequence'" >	a.link_sequence	</when>
+					<when test="sort=='linkCategory'" >	a.link_category	</when>
+					<when test="sort=='linkTitle'" >	a.link_title	</when>
+					<when test="sort=='linkNote'" >	a.link_note	</when>
+					<when test="sort=='linkAddress'" >	a.link_address	</when>
+					<when test="sort=='linkProductSerial'" >	a.link_product_serial	</when>
+					<when test="sort=='linkPlaceId'" >	a.link_place_id	</when>
+					<when test="sort=='createId'" >	a.create_id	</when>
+					<when test="sort=='createDate'" >	a.create_date	</when>
+					<when test="sort=='lastUpdateId'" >	a.last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	a.last_update_date	</when>
+					<when test="sort=='deleteYn'" >	a.delete_yn	</when>
+					<when test="sort=='deleteId'" >	a.delete_id	</when>
+					<when test="sort=='deleteDate'" >	a.delete_date	</when>
+		            <otherwise>rownum</otherwise>
+		        </choose>
+		        <choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+		    	ORDER BY <foreach item="item" index="index" collection="listSort" separator=",">
+		    	<choose>
+					<when test="item.sort=='linkId'" >	link_id	</when>
+					<when test="item.sort=='productSerial'" >	product_serial	</when>
+					<when test="item.sort=='linkSequence'" >	link_sequence	</when>
+					<when test="item.sort=='linkCategory'" >	link_category	</when>
+					<when test="item.sort=='linkTitle'" >	link_title	</when>
+					<when test="item.sort=='linkNote'" >	link_note	</when>
+					<when test="item.sort=='linkAddress'" >	link_address	</when>
+					<when test="item.sort=='linkProductSerial'" >	link_product_serial	</when>
+					<when test="item.sort=='linkPlaceId'" >	link_place_id	</when>
+					<when test="item.sort=='createId'" >	create_id	</when>
+					<when test="item.sort=='createDate'" >	create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="item.sort=='deleteYn'" >	delete_yn	</when>
+					<when test="item.sort=='deleteId'" >	delete_id	</when>
+					<when test="item.sort=='deleteDate'" >	delete_date	</when>
+		        </choose>
+		    	<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+
+			) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+
+	<insert id="insertProductTourLink" parameterType="ProductTourLink">
+        INSERT INTO product_tour_link
+         <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkId)" >	link_id=#{linkId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	product_serial=#{productSerial},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkSequence)" >	link_sequence=#{linkSequence},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkCategory)" >	link_category=#{linkCategory},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkTitle)" >	link_title=#{linkTitle},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkNote)" >	link_note=#{linkNote},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkAddress)" >	link_address=#{linkAddress},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkProductSerial)" >	link_product_serial=#{linkProductSerial},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkPlaceId)" >	link_place_id=#{linkPlaceId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id=#{createId},	</if>
+			create_date=now()
+         </set>
+    </insert>
+
+    <update id="updateProductTourLink" parameterType="ProductTourLink">
+        UPDATE product_tour_link
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	product_serial=#{productSerial},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkSequence)" >	link_sequence=#{linkSequence},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkCategory)" >	link_category=#{linkCategory},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkTitle)" >	link_title=#{linkTitle},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkNote)" >	link_note=#{linkNote},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkAddress)" >	link_address=#{linkAddress},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkProductSerial)" >	link_product_serial=#{linkProductSerial},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkPlaceId)" >	link_place_id=#{linkPlaceId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkId)" >and link_id=#{linkId}	</if>
+		</where>
+    </update>
+
+    <delete id="deleteProductTourLink" parameterType="ProductTourLink">
+        delete from product_tour_link
+        <where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(linkId)" >and link_id=#{linkId}	</if>
+		</where>
+    </delete>
+
+    <!--################################### ProductInventory ###################################-->
+	<select id="selectCountProductInventory" parameterType="HashMap" resultType="Integer">
+        SELECT count(id) FROM product_inventory
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	and product_serial=#{productSerial}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(storeCount)" >	and store_count=#{storeCount}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(releaseCount)" >	and release_count=#{releaseCount}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+         </where>
+    </select>
+
+	<select id="selectListProductInventory" parameterType="HashMap" resultType="ProductInventory">
+		SELECT *
+		  FROM(
+	        SELECT @rownum:=@rownum+1 AS rownum,
+	        	   a.id , a.product_serial , a.store_count , a.release_count , a.note , a.create_id , a.create_date , a.last_update_id , a.delete_yn , a.delete_id , a.delete_date, ifNull(last_update_date, create_date) last_update_date,
+	        	   u.user_name
+	          FROM product_inventory a
+	          left join user u on a.create_id = u.user_email
+	          join (SELECT @rownum:= 0) rnum
+	         <where>
+	         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	and product_serial=#{productSerial}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(storeCount)" >	and store_count=#{storeCount}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(releaseCount)" >	and release_count=#{releaseCount}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+				and delete_yn='N'
+	         </where>
+
+	         <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sort) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)">
+		    	ORDER BY
+		        <choose>
+		            <when test="sort=='menuId'" >	menu_id	</when>
+					<when test="sort=='upperMenuId'" >	upper_menu_id	</when>
+					<when test="sort=='menuName'" >	menu_name	</when>
+					<when test="sort=='menuUrl'" >	menu_url	</when>
+					<when test="sort=='menuIcon'" >	menu_icon	</when>
+					<when test="sort=='menuSort'" >	menu_sort	</when>
+					<when test="sort=='menuDesc'" >	menu_desc	</when>
+					<when test="sort=='createId'" >	create_id	</when>
+					<when test="sort=='createDate'" >	create_date	</when>
+					<when test="sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="sort=='deleteYn'" >	delete_yn	</when>
+					<when test="sort=='useYn'" >	use_yn	</when>
+		            <otherwise>rownum</otherwise>
+		        </choose>
+		        <choose><when test="sortOrder == 'asc'">ASC</when><when test="sortOrder == 'desc'">DESC</when></choose>
+			</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(listSort)">
+		    	ORDER BY <foreach item="item" index="index" collection="listSort" separator=",">
+		    	<choose>
+		            <when test="item.sort=='menuId'" >	menu_id	</when>
+					<when test="item.sort=='upperMenuId'" >	upper_menu_id	</when>
+					<when test="item.sort=='menuName'" >	menu_name	</when>
+					<when test="item.sort=='menuUrl'" >		menu_url	</when>
+					<when test="item.sort=='menuIcon'" >	menu_icon	</when>
+					<when test="item.sort=='menuSort'" >	menu_sort	</when>
+					<when test="item.sort=='menuDesc'" >	menu_desc	</when>
+					<when test="item.sort=='createId'" >	create_id	</when>
+					<when test="item.sort=='createDate'" >	create_date	</when>
+					<when test="item.sort=='lastUpdateId'" >	last_update_id	</when>
+					<when test="item.sort=='lastUpdateDate'" >	last_update_date	</when>
+					<when test="item.sort=='deleteYn'" >	delete_yn	</when>
+					<when test="item.sort=='useYn'" >	use_yn	</when>
+		        </choose>
+		    	<choose><when test="item.sortOrder == 'asc'">ASC</when><when test="item.sortOrder == 'desc'">DESC</when></choose></foreach>
+			</if>
+
+			) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<select id="selectOneProductInventory" parameterType="HashMap" resultType="ProductInventory">
+        SELECT a.id , a.product_serial , a.store_count , a.release_count , a.note , a.create_id , a.create_date , a.last_update_id , a.last_update_date , a.delete_yn , a.delete_id , a.delete_date
+          FROM product_inventory a
+          join (SELECT @rownum:= 0) rnum
+         <where>
+         	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	and product_serial=#{productSerial}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(storeCount)" >	and store_count=#{storeCount}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(releaseCount)" >	and release_count=#{releaseCount}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	and note=#{note}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	and create_id=#{createId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	and create_date=#{createDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	and last_update_id=#{lastUpdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateDate)" >	and last_update_date=#{lastUpdateDate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteYn)" >	and delete_yn=#{deleteYn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteId)" >	and delete_id=#{deleteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(deleteDate)" >	and delete_date=#{deleteDate}	</if>
+			and delete_yn='N'
+         </where>
+	</select>
+
+	<select id="selectSummaryProductInventory" parameterType="HashMap" resultType="ProductInventory">
+	SELECT store_count,
+	       release_count,
+	       (store_count - release_count) inventory_count
+	  FROM(
+        SELECT sum(store_count) store_count,
+               sum(release_count) release_count
+          FROM product_inventory a
+         <where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	and product_serial=#{productSerial}	</if>
+			and delete_yn='N'
+         </where>) a
+	</select>
+
+	<insert id="insertProductInventory" parameterType="ProductInventory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO product_inventory
+        <set>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	id=#{id},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	product_serial=#{productSerial},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(storeCount)" >	store_count=#{storeCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(releaseCount)" >	release_count=#{releaseCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	note=#{note},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id=#{createId},	</if>
+			create_date = now()
+		</set>
+    </insert>
+
+    <update id="updateProductInventory" parameterType="ProductInventory">
+        UPDATE product_inventory
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(productSerial)" >	product_serial=#{productSerial},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(storeCount)" >	store_count=#{storeCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(releaseCount)" >	release_count=#{releaseCount},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(note)" >	note=#{note},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createId)" >	create_id=#{createId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(createDate)" >	create_date=#{createDate},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(lastUpdateId)" >	last_update_id=#{lastUpdateId},	</if>
+			last_update_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >and id=#{id}	</if>
+		</where>
+    </update>
+
+    <update id="deleteProductInventory" parameterType="ProductInventory">
+        UPDATE product_inventory
+        <set>
+			delete_yn='Y',delete_date = now()
+		</set>
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(id)" >	and id=#{id}	</if>
+		</where>
+    </update>
+</mapper>

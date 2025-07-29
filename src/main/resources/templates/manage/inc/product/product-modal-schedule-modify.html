@@ -1,0 +1,650 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+	<!--일정수정 모달-->
+	<div th:fragment="product-modal-schedule-modify(strClass, strDataId)" th:class="${strClass}" th:id="${strDataId}">
+	<!--스크립트에서 처리-->
+    </div>
+    <script th:inline="javascript">
+
+		function showScheduleModifyModal(priceSequence) {
+			$.ajax({
+				url : "/manage/product/load-modify-price-option"
+				, type : "GET"
+				, data : { "priceSequence" : priceSequence }
+				, beforeSend: function (xhr) {
+					xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+					);
+				},
+				success : function(data) {
+					startDate = data.startDate.priceSetDate;
+					endDate = data.endDate.priceSetDate;
+					loadedEndDate = data.endDate.priceSetDate;
+					postJson.priceSequence = priceSequence;
+					priceSequenceValue = priceSequence;
+					addedPriceSetList = data.addedPriceSetList;
+					//본문세팅
+					const scheduleModifyModalBox = document.querySelector('.schedule-modify-modal-box');
+					scheduleModifyModalBox.insertAdjacentHTML('beforeend',
+						`<div class="schedule-add-modal-inner-box" >
+							<div class="schedule-add-modal-top" style="">
+								<p class="schedule-add-modal-top-text">일정수정</p>
+								<button type="button" onclick="closeScheduleModifyModal()"><img src="/images/icon/x-black-17x17.svg" style="width: 17px; height: 17px;" alt=""></button>
+							</div>
+							<div class="schedule-add-modal-scroll-box">
+							<div id="modifyScheduleAddModalScrollInnerBox" class="schedule-add-modal-scroll-inner-box">
+								<div class="schedule-add-modal-price-select-box">
+									<label style="width: 100%; height: 35px">
+										<span class="schedule-p-text">요금방식*</span>
+										<select id="modifyPriceTypeSelect" style="margin-left: 10px">
+											<option value="samePrice">단일금액</option>
+											<option value="periodSamePrice">기간 동일금액</option>
+											<option value="byDayPrice">출발요일별 차등금액</option>
+										</select>
+									</label>
+									<hr class="schedule-hr-15">
+								</div>
+								<div style="padding-right: 17px;">
+									<div class="start-day-box">
+										<p class="schedule-p-text">시작일*</p>
+										<div class="calendar-text" id="startDatePicker">
+										</div>
+									</div>
+									<div class="end-day-box">
+										<p class="schedule-p-text">종료일*</p>
+										<div class="calendar-text" id="endDatePicker">
+										</div>
+									</div>
+									<hr class="schedule-hr">
+									<div style="display:flex;">
+										<p class="schedule-p-text">기본가격*</p>
+										<div>
+											<div id="modifyBasicPriceOptionBox">
+												<!--스크립트에서 처리-->
+											</div>
+											<div class="add-option-btn" onclick="addModifyBasicPriceOption()">
+												<p class="add-option-btn-text">판매항목 추가</p>
+												<img src="/images/icon/+-white-10x10.svg" style="width: 15px; height: 15px;" alt="">
+											</div>
+
+										</div>
+									</div>
+									<hr class="schedule-hr">
+									<div id="modifyByDayPriceOption" class="by-day-price-option-box">
+										<div class="by-day-price-option-item-box">
+											<label class="schedule-option-item-label">
+												<input role="switch" type="checkbox" class="modify-day-checkbox">
+												<span class="schedule-p-text" style="margin-right: 21px;">월요일 출발</span>
+											</label>
+											<div data-modify-div-name="by-day-price-option-item-box-div" class="by-day-price-option-item-box-div">
+												<!--스크립트에서 처리-->
+											</div>
+										</div>
+										<div class="by-day-price-option-item-box">
+											<label class="schedule-option-item-label">
+												<input role="switch" type="checkbox" class="modify-day-checkbox">
+												<span class="schedule-p-text" style="margin-right: 21px;">화요일 출발</span>
+											</label>
+											<div data-modify-div-name="by-day-price-option-item-box-div" class="by-day-price-option-item-box-div">
+												<!--스크립트에서 처리-->
+											</div>
+										</div>
+										<div class="by-day-price-option-item-box">
+											<label class="schedule-option-item-label">
+												<input role="switch" type="checkbox" class="modify-day-checkbox">
+												<span class="schedule-p-text" style="margin-right: 21px;">수요일 출발</span>
+											</label>
+											<div data-modify-div-name="by-day-price-option-item-box-div" class="by-day-price-option-item-box-div">
+												<!--스크립트에서 처리-->
+											</div>
+										</div>
+										<div class="by-day-price-option-item-box">
+											<label class="schedule-option-item-label">
+												<input role="switch" type="checkbox" class="modify-day-checkbox">
+												<span class="schedule-p-text" style="margin-right: 21px;">목요일 출발</span>
+											</label>
+											<div data-modify-div-name="by-day-price-option-item-box-div" class="by-day-price-option-item-box-div">
+												<!--스크립트에서 처리-->
+											</div>
+										</div>
+										<div class="by-day-price-option-item-box">
+											<label class="schedule-option-item-label">
+												<input role="switch" type="checkbox" class="modify-day-checkbox">
+												<span class="schedule-p-text" style="margin-right: 21px;">금요일 출발</span>
+											</label>
+											<div data-modify-div-name="by-day-price-option-item-box-div" class="by-day-price-option-item-box-div">
+												<!--스크립트에서 처리-->
+											</div>
+										</div>
+										<div class="by-day-price-option-item-box">
+											<label class="schedule-option-item-label">
+												<input role="switch" type="checkbox" class="modify-day-checkbox">
+												<span class="schedule-p-text" style="margin-right: 21px;">토요일 출발</span>
+											</label>
+											<div data-modify-div-name="by-day-price-option-item-box-div" class="by-day-price-option-item-box-div">
+												<!--스크립트에서 처리-->
+											</div>
+										</div>
+										<div class="by-day-price-option-item-box">
+											<label class="schedule-option-item-label">
+												<input role="switch" type="checkbox" class="modify-day-checkbox">
+												<span class="schedule-p-text" style="margin-right: 21px;">일요일 출발</span>
+											</label>
+											<div data-modify-div-name="by-day-price-option-item-box-div" class="by-day-price-option-item-box-div">
+												<!--스크립트에서 처리-->
+											</div>
+										</div>
+									</div>
+									<div id="dayModifyItemBox" style="display: none">
+
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="product-add-btn-group">
+							<button type="button" class="product-modify-btn" onclick="modifySchedule()">수정</button>
+							<button type="button" class="product-delete-btn" onclick="deleteSchedule(priceSequenceValue)">삭제</button>
+							<button type="button" class="product-close-btn" onclick="closeScheduleModifyModal()">취소</button>
+						</div>
+						</div>`);
+
+					//본문세팅이 완료되면 select 박스 이벤트 처리
+					let selectType = data.startDate.priceSetType;
+					modifyPriceTypeSelect = document.getElementById('modifyPriceTypeSelect');
+
+					for ( const i of data.addedPriceSetList ) {
+						if ( i.priceSetType === 'byDayPrice' ) {
+							selectType = "byDayPrice";
+							document.getElementById('modifyByDayPriceOption').style.display = 'block';
+							break;
+						}
+					}
+
+					modifyPriceTypeSelect.value = selectType;
+					if (selectType === 'samePrice') {
+						document.getElementById('modifyByDayPriceOption').style.display = 'none';
+						scheduleModifyModalBox.querySelector('.end-day-box').style.display = 'none';
+						postJson.priceSetType = "samePrice";
+					}
+
+					modifyPriceTypeSelect.addEventListener('change', function() {
+						const selectedValue = this.value;
+
+						if (selectedValue === 'samePrice') {
+							document.getElementById('modifyByDayPriceOption').style.display = 'none';
+							scheduleModifyModalBox.querySelector('.end-day-box').style.display = 'none';
+							endDate = startDate;
+							postJson.endDate = startDate;
+							postJson.priceSetType = "samePrice";
+						}
+						else if (selectedValue === 'byDayPrice') {
+							document.getElementById('modifyByDayPriceOption').style.display = 'block';
+							scheduleModifyModalBox.querySelector('.end-day-box').style.display = 'flex';
+							endDate = startDate;
+							endDate = scheduleModifyModalBox.querySelector('#endDatePicker').textContent.trim().replaceAll(". ", "-");
+							postJson.priceSetType = "byDayPrice";
+						}
+						else if (selectedValue === 'periodSamePrice') {
+							document.getElementById('modifyByDayPriceOption').style.display = 'none';
+							scheduleModifyModalBox.querySelector('.end-day-box').style.display = 'flex';
+							endDate = startDate;
+							endDate = scheduleModifyModalBox.querySelector('#endDatePicker').textContent.trim().replaceAll(". ", "-");
+							postJson.priceSetType = "periodSamePrice";
+						}
+					});
+
+					scheduleModifyModalBox.style.display = "flex";
+
+					const checkboxes = document.querySelectorAll(".modify-day-checkbox");
+					checkboxes.forEach((checkbox) => {
+						checkbox.addEventListener('change', modifyCheckDayCheckBox);
+					});
+
+					//datepicker 처리
+					initStartDatePicker();
+					initEndDatePicker();
+
+					//본문세팅이 완료되면 각종 데이터 처리
+					let optionName = "";
+					let maxQuantity = "";
+					let priceOptionId = "";
+					let productPrice = "";
+					let priceId = "";
+
+					const modifyBasicPriceOptionBox = document.getElementById("modifyBasicPriceOptionBox");
+					basicPriceOptionLength = data.addedBasicPriceList.length;
+
+					for (let i = 0; i < basicPriceOptionLength; i++) {
+						optionName = data.addedBasicPriceList[i].optionName;
+						maxQuantity = data.addedBasicPriceList[i].maxQuantity;
+						priceOptionId = data.addedBasicPriceList[i].priceOptionId;
+						productPrice = data.addedBasicPriceList[i].productPrice;
+						priceId = data.addedBasicPriceList[i].priceId;
+						//기본가격 칸에 세팅
+						modifyBasicPriceOptionBox.insertAdjacentHTML("beforeend", `<div style="display:flex;" data-price-option-id="${priceOptionId}">
+																				<div class="price-option-title">
+																					<input data-modify-basic-option-type="name" type="text" class="schedule-p-text" style="width: 100%;" value="${optionName}" placeholder="항목을 입력해주세요." />
+																					<input data-modify-basic-option-type="price" type="text" onkeyup="checkInputNumValidation(event)" class="schedule-price-text" value="${insertSpecialCharReverse(productPrice, 3, ',')}" placeholder="가격을 입력해주세요." />
+																				</div>
+																				<div class="price-option-quantity">
+																					<p class="schedule-p-text">최대수량</p>
+																					<input data-modify-basic-option-type="maxQuantity" type="text" onkeyup="checkInputNumValidation(event)" class="schedule-price-text" value="${maxQuantity}" placeholder="수량입력"/>
+																				</div>
+																				<div class="option-btx-box">
+																					<button type="button" class="delete-option-btn" onclick="deleteModifyBasicPriceOption(this, ${priceOptionId})">
+																						<img src="/images/icon/x-black-box-15x15.svg" style="width: 15px; height: 15px;" alt="">
+																					</button>
+																				</div>
+																				<input type="hidden" data-modify-basic-option-type="priceOptionId" value="${priceOptionId}">
+																				<input type="hidden" data-modify-basic-option-type="priceId" value="${priceId}">
+																			</div>`)
+
+					}
+
+					const byDayPriceOptionItemBoxDiv = document.querySelectorAll('[data-modify-div-name="by-day-price-option-item-box-div"]');
+					for (let i = 0; i < 7; i++) { //일주일
+						for (let l = 0; l < basicPriceOptionLength; l++) {
+							optionName = data.addedBasicPriceList[l].optionName;
+							maxQuantity = data.addedBasicPriceList[l].maxQuantity;
+							priceOptionId = data.addedBasicPriceList[l].priceOptionId;
+							productPrice = data.addedBasicPriceList[l].productPrice;
+							priceId = data.addedBasicPriceList[l].priceId;
+
+							byDayPriceOptionItemBoxDiv[i]
+								.insertAdjacentHTML("beforeend", `<div data-box-name="option-item">
+																	<div class="schedule-option-item-box">
+																		<div class="price-basic-option-title">
+																			<p class="schedule-p-text" data-modify-option-type="name" style="width: 100%;" readonly>${optionName}</p>
+																			<input type="text" class="schedule-price-text" data-modify-option-type="price" onkeyup="checkInputNumValidation(event)" value="${insertSpecialCharReverse(productPrice, 3, ',')}" placeholder="가격을 입력해주세요.">
+																		</div>
+																	</div>
+																	<div style="display: none">
+																		<p class="schedule-p-text">최대수량</p>
+																		<input type="text" class="schedule-price-text" data-modify-option-type="maxQuantity" onkeyup="checkInputNumValidation(event)" value="${maxQuantity}" />
+																	</div>
+																	<input type="hidden" data-modify-option-type="priceOptionId" value="${priceOptionId}">
+																  </div>`)
+
+						}
+					}
+
+					//이미 추가되어 있는 기본가격 삭제용
+					for (let i = 0; i < data.addedPriceSetList.length; i++) {
+						if ( data.addedPriceSetList[i].priceSetType === "byDayPrice" ) {
+							const dateString = data.addedPriceSetList[i].priceSetDate
+							// 입력받은 날짜를 Date 객체로 변환
+							const dateObject = new Date(`${dateString.replace(/-/g, '/')}`);
+							//  입력받은 날짜의 요일을 가져옵니다. (0: 월요일, 1: 화요일, ..., 6: 일요일)
+							const dayOfWeek = dateObject.getDay();
+							const weekDayNumber = (dayOfWeek + 6) % 7;
+							const mdc = document.querySelectorAll('.modify-day-checkbox');
+							mdc[weekDayNumber].checked = true;
+							document.querySelectorAll('[data-modify-div-name="by-day-price-option-item-box-div"]')[weekDayNumber].style.display = 'block';
+							byDayPriceOptionItemBoxDiv[weekDayNumber].innerHTML = "";
+
+						}
+					}
+					//삭제한 자리에 요일별 가격 세팅
+					for (let i = 0; i < data.addedPriceSetList.length; i++) {
+						if ( data.addedPriceSetList[i].priceSetType === "byDayPrice" ) {
+							const dateString = data.addedPriceSetList[i].priceSetDate
+							// 입력받은 날짜를 Date 객체로 변환
+							const dateObject = new Date(`${dateString.replace(/-/g, '/')}`);
+							//  입력받은 날짜의 요일을 가져옵니다. (0: 월요일, 1: 화요일, ..., 6: 일요일)
+							const dayOfWeek = dateObject.getDay();
+							const weekDayNumber = (dayOfWeek + 6) % 7;
+
+							let addPossibleFlag = true;
+							byDayPriceOptionItemBoxDiv[weekDayNumber].querySelectorAll('[data-box-name="option-item"]').forEach((item)=>{
+								if ( data.addedPriceSetList[i].priceOptionId == item.querySelector('[data-modify-option-type="priceOptionId"]').value ) {
+									addPossibleFlag = false;
+								}
+								else if ( data.addedPriceSetList[i].priceOptionId == item.querySelector('[data-modify-option-type="price"]').value ) {
+									addPossibleFlag = false;
+								}
+								else if ( data.addedPriceSetList[i].priceOptionId == item.querySelector('[data-modify-option-type="name"]').value ) {
+									addPossibleFlag = false;
+								}
+
+							})
+							if ( addPossibleFlag ) {
+								byDayPriceOptionItemBoxDiv[weekDayNumber]
+									.insertAdjacentHTML('beforeend', `<div data-box-name="option-item" >
+																		<div class="schedule-option-item-box">
+																			<div class="price-basic-option-title">
+																				<p class="schedule-p-text" data-modify-option-type="name" style="width: 100%;" readonly>${data.addedPriceSetList[i].optionName}</p>
+																				<input type="text" class="schedule-price-text" data-modify-option-type="price" onkeyup="checkInputNumValidation(event)" value="${insertSpecialCharReverse(data.addedPriceSetList[i].priceNormal, 3, ',')}" placeholder="가격을 입력해주세요.">
+																			</div>
+																		</div>
+																		<div style="display: none">
+																			<p class="schedule-p-text">최대수량</p>
+																			<input type="text" class="schedule-price-text" data-modify-option-type="maxQuantity" onkeyup="checkInputNumValidation(event)" value="${data.addedPriceSetList[i].maxQuantity}" />
+																		</div>
+																		<input type="hidden" data-modify-option-type="priceOptionId" value="${data.addedPriceSetList[i].priceOptionId}">
+																		<input type="hidden" data-modify-option-type="priceId" value="${data.addedPriceSetList[i].priceId}">
+																		<input type="hidden" data-modify-option-type="priceSetDate" value="${data.addedPriceSetList[i].priceSetDate}">
+																		<input type="hidden" data-modify-option-type="priceSequence" value="${data.addedPriceSetList[i].priceSequence}">
+																	  </div>`)
+							}
+
+
+						}
+					}
+					syncModifyDailyOptionInfoWithBasicOptionInfo();
+
+				}
+			})
+			startDate = new Date().toISOString().split('T')[0]
+			endDate = new Date().toISOString().split('T')[0]
+		}
+
+		function closeScheduleModifyModal() {
+			document.querySelector('.schedule-modify-modal-box').style.display = "none";
+			document.querySelector('.schedule-modify-modal-box').innerHTML = "";
+			postJson = {
+				basicPriceList: [],
+				priceSequence: '0',
+				dayList: {
+					0 : [], 1 : [], 2 : [], 3 : [], 4 : [], 5 : [], 6 : [],
+				}
+			};
+			startDate = new Date().toISOString().split('T')[0]
+			endDate = new Date().toISOString().split('T')[0]
+		}
+
+		function modifySchedule() {
+				const inputElements = document.getElementById('modifyScheduleAddModalScrollInnerBox').querySelectorAll("input:not([style='display:none;'])");
+				let firstEmptyInput = null;
+				if ( inputElements.length > 0 ) {
+					for (const element of inputElements) {
+						if ( element.offsetWidth !== 0 ) { //요소가 실제 보이는지 여부
+							if (element.value.trim() === '') {
+								firstEmptyInput = element;
+								break; // 첫 번째 빈 input 태그를 찾으면 반복문을 종료
+							}
+						}
+					}
+				}
+
+				const nameElements = document.getElementById('modifyScheduleAddModalScrollInnerBox').querySelectorAll("[data-modify-basic-option-type='name']");
+				let nameDup = false;
+				if ( nameElements.length > 0 ) {
+					nameDup = true;
+					let inputName = '';
+					for (const element of nameElements) {
+						if ( element.offsetWidth !== 0 ) { //요소가 실제 보이는지 여부
+							if ( inputName !== element.value.trim() ) {
+								inputName = element.value.trim();
+								nameDup = false;
+							}
+							else {
+								nameDup = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (nameDup) {
+					alert("중복된 항목이 존재합니다");
+				}
+				else if (document.querySelector('#modifyBasicPriceOptionBox').children.length === 0) {
+					alert("기본가격을 최소 1개 이상 등록해주세요");
+				}
+				else if (firstEmptyInput) {
+					alert("모든 항목을 입력해주세요");
+					firstEmptyInput.focus();
+				}
+				else {
+					let confirmFlag = true;
+					if ( modifyPriceTypeSelect.value === "samePrice" ) {
+						endDate = startDate;
+					}
+					else {
+						if ( new Date(endDate) < new Date(startDate) ) {
+							confirmFlag = false;
+							alert("종료일이 시작일보다 빠릅니다.");
+						}
+						else {
+							confirmFlag = true;
+						}
+					}
+
+					if ( confirmFlag === true ) {
+						const dayDuration = findDatesInRange(startDate, endDate);
+						for (const date of dayDuration) {
+							let dayIndex = new Date(date).getDay();
+							dayIndex = (dayIndex+6)%7; //월요일부터 시작하도록
+							let basicOptionBoxIndex = 0;
+							const basicOptionBox = document.querySelector('#modifyBasicPriceOptionBox');
+							for (const basicOptionChildren of basicOptionBox.children) {
+								const basicOptionName = basicOptionChildren.querySelector('[data-modify-basic-option-type="name"]').value;
+								const basicOptionPrice = basicOptionChildren.querySelector('[data-modify-basic-option-type="price"]').value.replaceAll(",", "");
+								const basicOptionMaxQuantity = basicOptionChildren.querySelector('[data-modify-basic-option-type="maxQuantity"]').value.replace(",", "");
+								const basicPriceOptionId = basicOptionChildren.querySelector('[data-modify-basic-option-type="priceOptionId"]').value;
+
+								if ( postJson.basicPriceList.length < basicOptionBox.children.length) {
+									const basicOptionItem = {
+										"optionSequence" : basicOptionBoxIndex+1
+										, "optionName" : basicOptionName
+										, "maxQuantity" : basicOptionMaxQuantity
+										, "priceOptionId" : basicPriceOptionId
+										, "productTourId" : document.getElementById("product-tour-id").value
+										, "optionGroupCode" : optionGroupCode
+									}
+									postJson.basicPriceList.push(basicOptionItem);
+								}
+								//기본가격 자식들 반복
+								//시작,종료기간안에 각 날짜별에 자식들 추가
+								const jsonItem = {
+									"priceSetDate" : date,
+									"optionName" : basicOptionName,
+									"priceNormal" : basicOptionPrice,
+									"maxQuantity" : basicOptionMaxQuantity,
+									"priceSequence" : priceSequenceValue,
+									"priceSetType" : modifyPriceTypeSelect.value === 'samePrice' ? 'samePrice' : 'periodSamePrice',
+									"aloneYn" : modifyPriceTypeSelect.value === 'samePrice' ? 'Y' : 'N',
+									"optionGroupCode" : optionGroupCode,
+									"deleteYn" : 'N'
+								}
+								//요일별 차등금액일시
+								const modifyByDayPriceOptionChildren = document.querySelector('#modifyByDayPriceOption').children;
+								const optionListDiv = modifyByDayPriceOptionChildren[dayIndex].querySelector('[data-modify-div-name="by-day-price-option-item-box-div"]')
+								if ( optionListDiv.style.display === 'block' ) {
+									const optionItem = optionListDiv.querySelectorAll('[data-box-name="option-item"]');
+									const name = optionItem[basicOptionBoxIndex].querySelector('[data-modify-option-type="name"]').textContent;
+									const price = optionItem[basicOptionBoxIndex].querySelector('[data-modify-option-type="price"]').value.replaceAll(",", "");
+									jsonItem.optionName = name;
+									jsonItem.priceNormal = price;
+									jsonItem.priceSetType = "byDayPrice";
+									jsonItem.productTourId = document.getElementById("product-tour-id").value;
+								}
+
+								//이미 등록된 날짜가 있다면 그걸로 대체.
+								addedPriceSetList.forEach((item)=>{
+									if ( date === item.priceSetDate
+										&& basicOptionChildren.querySelector('[data-modify-basic-option-type="priceOptionId"]').value == item.priceOptionId ) {
+										jsonItem.priceOptionId = item.priceOptionId
+										jsonItem.priceId = item.priceId
+									}
+								})
+
+								postJson.dayList[dayIndex].push(jsonItem);
+								basicOptionBoxIndex++;
+							}
+						}
+						copyPostJson = deepCopy(postJson);
+						$.ajax({
+							url : "/manage/product/add-product-schedule"
+							, type : "POST"
+							, contentType : "application/json"
+							, data : JSON.stringify(postJson)
+							, beforeSend: function (xhr) {
+								xhr.setRequestHeader(
+									[[${_csrf.headerName}]], [[${_csrf.token}]]
+								);
+							},
+							success : function(data) {
+								$.ajax({
+									url : "/manage/product/load-added-price-option-list"
+									, type : "POST"
+									, contentType : "application/json"
+									, data : JSON.stringify({
+										"startDate" : startDate
+										, "optionGroupCode" : optionGroupCode
+										, "priceIdList" : data.priceIdList
+									})
+									, beforeSend: function (xhr) {
+										xhr.setRequestHeader(
+											[[${_csrf.headerName}]], [[${_csrf.token}]]
+										);
+									}
+									, success : function(data) {
+										calendar.destroy();
+										const addedPriceOptionList = data.AddedPriceOptionList;
+										for (let i = 0; i < calendarJson.length; i++) {
+											if (calendarJson[i].childGroupId === addedPriceOptionList[0].priceSequence) {
+												calendarBarList.forEach((item,l)=>{
+													if ( item.groupId === calendarJson[i].childGroupId ) {
+														calendarBarList.splice(l,1);
+													}
+												})
+												calendarJson.splice(i, 1); // 해당 항목 삭제
+												i--; // 배열 크기가 줄어들었으므로 인덱스 조정
+											}
+										}
+										let calendarJsonItem =
+											{
+												title: '', start: '', end : '',
+												textColor : '', color : '', className : ''
+											}
+										let preValue = 0;
+										addedPriceOptionList.forEach( (item) => {
+											if ( preValue !== item.priceSequence ) {
+												preValue = item.priceSequence;
+											}
+											calendarJsonItem =
+												{
+													title: '', start: '', end : '', textColor : '#000000',
+													priceSequence : item.priceSequence, classNames: 'item-block'
+												}
+											calendarJsonItem.title = insertSpecialCharReverse(item.productPrice, 3, ',')+"~";
+											calendarJsonItem.start = item.priceSetDate;
+											// 하루를 추가 : FullCalendar의 end는 하루 줄어든채로 처리됨
+											let dateStr = item.priceSetDate;
+											let date = moment(dateStr, 'YYYY-MM-DD');
+											date.add(1, 'days');
+											calendarJsonItem.end = date.format('YYYY-MM-DD');
+											calendarJsonItem.childGroupId = preValue;
+
+											calendarJson.push(calendarJsonItem);
+										})
+
+										//캘린더 렌더 부분
+										const calendarEl = document.getElementById('calendar');
+										loadCalendar(calendarEl);
+
+										let dateStr = addedPriceOptionList[addedPriceOptionList.length - 1].priceSetDate;
+										let date = moment(dateStr, 'YYYY-MM-DD');
+										date.add(1, 'days');
+										// 막대 부분
+										calendarBarList.push({
+											title: '', start: addedPriceOptionList[0].priceSetDate, end : date.format('YYYY-MM-DD'),
+											barStartDate : addedPriceOptionList[0].priceSetDate, barEndDate : addedPriceOptionList[addedPriceOptionList.length-1].priceSetDate,
+											priceSequence : addedPriceOptionList[0].priceSequence, textColor : '#000000', color : color[preValue % 10], groupId : preValue
+										})
+										calendar.addEventSource({
+											events : calendarBarList
+										});
+										calendar.render();
+									}
+								})
+								closeScheduleModifyModal();
+							}
+						})
+					}
+				}
+			}
+
+			function deleteSchedule(priceSequence) {
+				if ( confirm("삭제하시겠습니까?") ) {
+					const basicPriceOptionIdList = [];
+
+					let addBasicOptionIdList = document.getElementById('add-basic-option-id');
+					const basicPriceOptionId = document.querySelectorAll('[data-modify-basic-option-type="priceOptionId"]');
+					for (const basicPriceOption of basicPriceOptionId) {
+						basicPriceOptionIdList.push(basicPriceOption.value);
+						addBasicOptionIdList.value = addBasicOptionIdList.value.replace(basicPriceOption.value+",", "");
+					}
+					$.ajax({
+						url : "/manage/product/remove-price-set"
+						, type : "POST"
+						, contentType: "application/json"
+						, beforeSend: function (xhr) {
+							xhr.setRequestHeader(
+								[[${_csrf.headerName}]], [[${_csrf.token}]]
+							);
+						}
+						, data : JSON.stringify({
+							"basicPriceOptionIdList" : basicPriceOptionIdList
+							, "priceSequence" : priceSequence
+							, "useYn" : "N"
+						})
+						, success : function (data) {
+							calendar.destroy();
+							const deletePriceOptionList = data.deletePriceOptionList;
+							if ( deletePriceOptionList.length > 0) {
+								for (let i = 0; i < calendarJson.length; i++) {
+									if (calendarJson[i].childGroupId === deletePriceOptionList[0].priceSequence) {
+										calendarBarList.forEach((item,l)=>{
+											if ( item.groupId === calendarJson[i].childGroupId ) {
+												calendarBarList.splice(l,1);
+											}
+										})
+										calendarJson.splice(i, 1); // 해당 항목 삭제
+										i--; // 배열 크기가 줄어들었으므로 인덱스 조정
+									}
+								}
+
+								let preValue = 0;
+								calendarJson.forEach( (item) => {
+									if (preValue !== item.priceSequence) {
+										preValue = item.priceSequence;
+									}
+								})
+
+								//캘린더 렌더 부분
+								const calendarEl = document.getElementById('calendar');
+								loadCalendar(calendarEl);
+
+								let dateStr = deletePriceOptionList[deletePriceOptionList.length - 1].priceSetDate;
+								let date = moment(dateStr, 'YYYY-MM-DD');
+								date.add(1, 'days');
+								calendar.addEventSource({
+									events : calendarBarList
+								});
+								calendar.render();
+							}
+
+							closeScheduleModifyModal();
+
+
+						}
+					})
+				}
+			}
+
+			function modifyCheckDayCheckBox(event) {
+				const checkbox = event.target;
+				const scheduleOptionItemBox = checkbox.closest(".by-day-price-option-item-box").querySelectorAll('[data-modify-div-name="by-day-price-option-item-box-div"]');
+				const displayStyle = checkbox.checked ? "block" : "none";
+
+
+				scheduleOptionItemBox.forEach(itemBox => {
+					itemBox.style.display = displayStyle;
+				});
+			}
+	</script>
+</body>
+</html>

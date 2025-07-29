@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+	  <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	  <nav th:replace="~{/manage/inc/manage-header-include :: header}" />
+	  <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	  <div class="content-wrapper">
+	    <div class="content-header">
+			<h1 class="m-0">게시글 <th:block th:text="${mode eq 'I' ? '등록' : '수정'}"></th:block></h1>
+	    </div>
+		  <div class="manage-content no-pd mt-4">
+			  <form id="saveForm" name="saveForm" enctype="multipart/form-data">
+			  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			  <input type="hidden" name="params" id="params" />
+			  <input type="hidden" name="mode" id="mode" th:value="${mode}" />
+			  <input type="hidden" name="id" id="id" th:value="${board.id}" />
+			  <input type="hidden" name="boardId" id="boardID" th:value="${setting.id}" />
+			  <input type="hidden" name="contentId" id="contentId" th:value="${board.id}" />
+			  <div class="input-box">
+				  <div class="row mb-3 form-inline">
+					  <div class="input-area-full">
+						  <label class="input-label">제목*</label>
+						  <input type="text" class="form-control inline-one" id="title" name="title" placeholder="글 제목을 입력해주세요." required="required" th:value="${board != null} ? ${board.title}" />
+					  </div>
+				  </div>
+				  <div class="row mb-3 form-inline">
+					  <div class="input-area-full">
+						  <label class="input-label">내용</label>
+						  <div class="inline-one-div">
+						  	<textarea id="content" name="content" placeholder="내용을 입력해주세요." th:text="${board != null} ? ${board.content}"></textarea>
+						  </div>
+					  </div>
+				  </div>
+				  <div class="row form-inline">
+					  <div class="input-area-third">
+						  <label class="input-label">시작일</label>
+						  <input type="text" class="form-control inline-one date-time" name="startDate" id="start-date" placeholder="노출 시작일시" readonly="readonly" autocomplete="off" th:value="${board != null} ? ${board.startDate}" />
+						  <div class="input-overlay">
+							  <button type="button" class="overlay-button" onclick="fnSetNullDatetime('start-date')"><img src="/images/icon/bell.svg" /></button>
+						  </div>
+					  </div>
+					  <div class="input-area-third">
+						  <label class="input-label">종료일</label>
+						  <input type="text" class="form-control inline-one date-time" name="expireDate" id="expire-date" placeholder="노출 종료일시" readonly="readonly" autocomplete="off" th:value="${board != null} ? ${board.expireDate}" />
+						  <div class="input-overlay">
+							  <button type="button" class="overlay-button" onclick="fnSetNullDatetime('expire-date')"><img src="/images/icon/bell.svg" /></button>
+						  </div>
+					  </div>
+					  <div class="input-area-third">
+						  <label class="input-label">등록일</label>
+						  <input type="text" class="form-control inline-one date-time" id="create-date" name="createDate" placeholder="등록일 미 입력시 현재날짜로 등록됩니다."  th:value="${board.createDate}">
+						  <div class="input-overlay">
+							  <button type="button" class="overlay-button" onclick="fnSetNullDatetime('create-date')"><img src="/images/icon/bell.svg" /></button>
+						  </div>
+					  </div>
+				  </div>
+				  <div class="mb-3">
+					  <label class="alt-input-label">시작일, 종료일 미지정시 상시 노출됩니다.</label>
+				  </div>
+				  <div class="row form-inline start">
+					  <div class="input-area-half" th:if="${setting.url == 'notice'}">
+						  <label class="input-label" for="attach-file-list">파일첨부</label>
+						  <div class="inline-one" style="display:inline-block;">
+							  <div class="btn-group">
+								  <button type="button" onClick="uploadFile('attach');"  class="fileUpload btn btn-primary"><span><i class="fa fa-plus"></i>&nbsp;첨부파일 추가</span></button>
+								  <button type="button" class="fileUpload btn btn-danger" onclick="removeFiles()"><span><i class="fa fa-minus"></i>&nbsp;전체삭제</span></button>
+								  <input type="file" id="attach" name="attach" style="display: none;" onchange="addFile(this);" multiple />
+							  </div>
+						  </div>
+						  <div class="row">
+							  <label class="input-label"></label>
+							  <ul id="attach-file-list"></ul>
+							  <div id="attach-hidden-files"></div>
+						  </div>
+					  </div>
+					  <div class="input-area-half">
+						  <div class="input-area-half">
+							  <label class="input-label">노출여부</label>
+							  <input class="form-control" type="checkbox" id="use-yn" name="useYn" data-toggle="toggle" data-onstyle="success" data-on="사용" data-off="미사용" data-width="calc(100% - 8rem)" value="Y" th:checked="${board.useYn eq 'Y'} ? 'checked' : ${board.useYn eq null ? 'checked' : ''}" />
+						  </div>
+						  <div class="input-area-half">
+							  <label class="input-label tri-second"></label>
+
+						  </div>
+					  </div>
+				  </div>
+			  </div>
+			  </form>
+		  </div>
+		<div class="manage-control">
+			<button type="button" class="btn btn-black"   onclick="preList()">취소하기</button>
+			<button type="button" class="btn btn-primary" onclick="save()">저장하기</button>
+			<button type="button" class="btn btn-danger"  onclick="goDelete()" th:if="${mode eq 'U'}">삭제하기</button>
+		</div>
+	</div>
+	  <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+	  <aside class="control-sidebar control-sidebar-dark"></aside>
+	</div>
+	<script src="/js/manage/adminlte.js"></script>
+	<script type="text/javascript" th:inline="javascript">
+	var attchFileSize;
+	let editor;
+
+	$(document).ready(function() {
+		initUploadFile('file');
+		initAttachFileSize();
+		$('#boardId').trigger('change');
+
+		if($("#mode").val() !== 'I') initAttachFileList();
+
+		fnMakeCkeditor($('#content')[0],  false).then(
+			makedEditor => {
+				editor = makedEditor;
+			});
+
+		$('.date-time').daterangepicker({
+			minDate:moment().add(-1, 'hour'),
+			autoUpdateInput: true,
+			singleDatePicker:true,
+			showDropdowns: true,
+			showCustomRangeLabel:false,
+			timePicker: true,
+			timePicker24Hour: true,
+			timePickerMinutes:true,
+			drops:"auto",
+			locale: {
+				format: 'YYYY-MM-DD HH:mm:ss',
+				applyLabel: "적용",
+				cancelLabel: "취소",
+				daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+				monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+				separator:separator
+			}
+		}, function(start, end, label){});
+
+		let item = [[${board}]];
+		if(item == null){
+			$('#start-date').val('');
+			$('#expire-date').val('');
+			$('#create-date').val('');
+		}else{
+			$('#start-date').val(item.startDate);
+			$('#expire-date').val(item.expireDate);
+			$('#create-date').val(item.createDate);
+		}
+	});
+
+	fnSetNullDatetime = function(target){
+		$('#'+target).val('');
+	}
+
+	function initAttachFileSize(){
+		var data = [[${listBoard}]];
+		var boardId = [[${board.boardId}]];
+
+		if(data != null){
+			for(var idx in data){
+				if( data[idx].id == boardId ){
+// 					console.log( data[idx].attachFileSize );
+					attchFileSize = data[idx].attachFileSize;
+
+					break;
+				}
+			}
+		}
+	}
+
+	function save() {
+		var form = document.saveForm;
+		editor.updateSourceElement();
+		var nowac = "";
+		if($.trim(form.boardId.value) == "") {
+			alert("게시판을 선택 해 주세요.");
+			form.boardId.focus();
+		} else if($.trim(form.title.value) == "") {
+			alert("글제목을 입력해 주세요.");
+			form.title.focus();
+		} else if($.trim(form.content.value) == "") {
+			alert("내용을 입력해 주세요.");
+			form.content.focus();
+		}else {
+			var url = "/manage/board/contents-save";
+
+			if($("#mode").val() == 'R'){
+				nowac = "저장";
+			}else if($("#mode").val() == 'I'){
+				nowac = "등록";
+			}
+			if(confirm(nowac+"하시겠습니까?")) {
+				form.attach.value='';
+				$("#content").text(editor.getData());
+
+				var formData = new FormData($('#saveForm')[0]);
+
+				 $('input[data-toggle="toggle"]').each(function(i,e){
+				    formData.set( $(e).attr('name'), $(e).is(':checked') ? 'Y' : 'N');
+				});
+
+				if( typeof(filesArr) !== 'undefined' ){
+					for (var i = 0; i < filesArr.length; i++) {
+				        // 삭제되지 않은 파일만 폼데이터에 담기
+				        if (!filesArr[i].isDelete) {
+				        	formData.append("attachs", filesArr[i]);
+
+				        } else {
+				        	formData.append("deletes", filesArr[i].fileId);
+				        }
+
+				        if(filesArr[i].isThumnail){
+				        	if(filesArr[i].uploadFilename !== undefined){
+				        		formData.append("thumnail", filesArr[i].uploadFilename);
+				        	} else {
+				        		formData.append("thumnail", filesArr[i]);
+				        	}
+				        }
+				    }
+				}
+				$.ajax({
+		            url: url,
+		            type : 'POST',
+		            enctype: 'multipart/form-data',
+					contentType : false,
+					processData : false,
+		            data : formData,
+		            dataType: 'JSON',
+		            success : function(data) {
+		                if (typeof data.result != "undefined" && data.result == "error") {
+		                    alert(data.message);
+		                    return;
+		                } else {
+		                    alert(data.message);
+		                    preList();
+		                }
+		            },
+		            error : function(xhr, code, errorMsg) { },
+		            beforeSend : function() { },
+		            complete : function() { }
+		        });
+			}
+		}
+	}
+
+	goDelete = function(){
+		if(confirm("삭제하시겠습니까?")){
+			$.ajax({
+				url : '/manage/board/contents-delete',
+				type : "POST",
+				data : {"id" : $('#id').val()},
+				dataType : "json",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+				},
+				success : function(res){
+					if("success" == res.result){
+						alert("삭제되었습니다.");
+						preList();
+					}else{
+						alert(res.message)
+					}
+				}
+			})
+		}
+	}
+
+	function preList(){
+		location.href = "/manage/board/contents/list?params="+parmas;
+	}
+
+	function initAttachFileList(){
+		let html = '';
+		let thumnail = [[${board.thumbnailUrl}]];
+
+		console.log(`thumnail : ${thumnail}`);
+
+		$.ajax({
+			url : '/manage/board/contents-attchlist',
+			type : "GET",
+			data : {"id" : [[${board.id}]]},
+			dataType : "json",
+			success : function(res) {
+				if ("success" == res.result) {
+					let files = res.listAttach;
+
+					if(files !== null){
+						console.log(_type)
+						switch (_type){
+							case "file":
+								for(let i=0; i<files.length; i++){
+									let file = files[i];
+									console.log(file);
+									filesArr.push(file);
+									filesArr[i].isDelete = false;
+									filesArr[i].isThumnail = false;
+									let htmlData = '';
+									htmlData += `<div id="file${i}" class="filebox mt-10">`;
+									htmlData += `   <span class="no">${i+1}.</span>`;
+									htmlData += `   <span class="name">`+file.originFilename+`</span>`;
+									htmlData += `   <span class="size"> (` + formatFileSize(file.fileSize) + `)</span>`;
+									htmlData += `   <a class="delete" onclick="deleteFile('${i}');"><i class="far fa-minus-square"></i></a>`;
+									htmlData += `</div>`;
+									$('#attach-file-list').append(htmlData);
+								}
+								break;
+							case "attach": default:
+								for(let i=0; i<files.length; i++){
+									let file = files[i];
+									console.log(file);
+									let _thumnailUrl = `/upload/images/${file.uploadFilename}`;
+									filesArr.push(file);
+									filesArr[i].isDelete = false;
+									if(thumnail === _thumnailUrl ){
+										filesArr[i].isThumnail = true;
+									} else {
+										filesArr[i].isThumnail = false;
+									}
+
+									let htmlData = '';
+									htmlData += `<div class="board_photo" id="file${i}">`;
+									htmlData += `<div><img src="${_thumnailUrl}"></div>`;
+									htmlData += `<button type="button" class="board_btn thumnail ${filesArr[i].isThumnail ? 'check' : ''} p-0" onclick="setThumnail('${i}');"><i class="way-nav-icon"></i></button>`;
+									htmlData += `<button type="button" class="board_btn delete p-0" onclick="deleteFile('${i}');"><i class="way-nav-icon wi-delete"></i></button>`;
+									htmlData += `</div>`;
+									$('#attach-file-list').prepend(htmlData);
+								}
+								break;
+						}
+						fileNo = files.length;
+					}
+				}else {
+					alert(res.message);
+				}
+			}
+		});
+	}
+
+	function delFileRow(target) {
+		var tTarget = $(target).parent().parent()[0];
+		var pTarget = $(target).parent()[0];
+		var pStatus = $(tTarget).children("input[name=acthFileIemStatus]");
+		var aTag = $(tTarget).children("A")[0];
+		var btnD = $(pTarget).children("#btnDel");
+		var btnC = $(pTarget).children("#btnCancel");
+		var status = pStatus.val();
+
+		if(status == ""){
+			btnD.hide();
+			btnC.show();
+			pStatus.val('Del');
+			$(aTag).removeClass('addActhFileIem');
+		} else {
+			btnD.show();
+			btnC.hide();
+			pStatus.val('');
+			$(aTag).addClass('addActhFileIem');
+		}
+	}
+
+
+	function delFileRow2(target) {
+		var tTarget = $(target).parent().parent().parent();
+		var pStatus = $("input[name=acthFileIemStatus]",tTarget);
+		var btnD = $("#btnDel", tTarget);
+		var btnC = $("#btnCancel", tTarget);
+		var td = $("td:eq(0)", tTarget);
+		var status = pStatus.val();
+
+		if(status == ""){
+			btnD.hide();
+			btnC.show();
+			pStatus.val('Del');
+			td.text('삭제예정');
+		} else {
+			btnD.show();
+			btnC.hide();
+			pStatus.val('');
+			td.text('등록됨');
+		}
+	}
+
+	function addCancel(line) {
+		$(line).parent().parent().remove();
+	}
+
+	function boardSeleted(obj){
+		console.log(obj);
+
+		console.log( $($(this), 'option:selected') );
+
+		let opt = $('#boardId option:selected');
+
+		if(opt !== 'undefined'){
+			$(opt).each(function() {
+				$.each(this.attributes, function() {
+					if(this.specified) {
+			 			console.log(this.name, this.value);
+			 			if(this.value == 'Y'){
+							 $(`#${this.name}`).show();
+						 } else {
+							 $(`#${this.name}`).hide();
+						}
+			 		}
+				});
+			});
+		}
+	}
+
+	removeFiles = function() {
+		for(let i = fileNo-1; i >= 0; i--){
+			deleteFile(i);
+		}
+	}
+	</script>
+	<style>
+	    #attach-file-list .filebox img {
+		    width: 70%;
+		    height: auto;
+		}
+
+		.ck-editor__editable { height: 400px; }
+
+		.board_photo{position: relative;width: 150px;height: 150px;display: flex;flex-wrap: nowrap;justify-content: center;border: 1px solid #e6e6e6;margin-right: 5px;}
+		.board_photo img{width: 100%; height: 100%;}
+		.board_photo.add{cursor: pointer;border: 1px dashed #e6e6e6;}
+
+		.board_btn{position: absolute;width: 25px;height: 25px; border: 1px solid #e6e6e6;}
+		.board_btn.thumnail {top: 5px;left: 5px;}
+		.board_btn.thumnail.check {background-color: greenyellow;}
+		.board_btn.delete {top: 5px;right: 5px;}
+	</style>
+	</body>
+</html>

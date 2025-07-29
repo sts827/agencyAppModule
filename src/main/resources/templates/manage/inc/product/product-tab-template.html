@@ -1,0 +1,1848 @@
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+	<div th:fragment="product-tab-template(strClass, strDataId)" th:class="${strClass}" th:id="${strDataId}">
+		<!--템플릿 html(s)-->
+		<div class="title-div">
+			<h3>상품정보*</h3>
+			<div class="info-toggle product">
+				<button class="arrow down" type="button" th:style="|background-image:url('@{/images/icons/arrow_down.svg}')|"></button>
+			</div>
+		</div>
+		<div class="product-info template-container">
+			<form id="product-template-form" enctype="multipart/form-data">
+				<input type="hidden" class="product-tour-id" name="productTourId" value="">
+				<input type="hidden" name="productStatus" value="">
+				<input type="hidden" id="template-html" name="templateHtml" value="">
+				<input type="hidden" id="template-Type" name="templateType">
+				<input type="hidden" id="template-title" name="templateTitle" value="">
+				<div id="template-thema">
+					<ul class="templates"></ul>
+				</div>
+				<!-- text-block,table-block,image-block, -->
+				<ul id="component-design">
+					<li class="edit-insert-ckedior"  data-type="editor">
+						<img src="./images/icon/template_icon.svg" alt=""><span>에디터 선택</span>
+					</li>
+					<li class="edit-insert-template" data-type="template">
+						<img src="./images/icon/template_icon.svg" alt=""><span>템플릿편집기 선택</span>
+					</li>
+				<!--/*
+					<li class="edit-insert-bgImage"><span>배경</span></li>
+					<li class="edit-insert-image"><span>이미지</span></li>
+					<li class="edit-insert-text active"><span>텍스트</span></li>
+				*/-->
+				<!--/*								<li class="edit-insert-table"><span>표</span></li>*/-->
+				</ul>
+				<div class="section-wrapper ck" data-type="editor" style="display: none;">
+					<textarea id="content" name="content" style="width: 100%; height: 100%;" placeholder="내용을 입력해주세요." th:utext="${productInfo.productDescriptionType eq 'editor' ? productInfo.productDescription : ''}" ></textarea>
+				</div>
+				<div class="section-wrapper" data-type="template" style="display: none;">
+					<section id="library-section">
+						<div class="library-wrapper">
+							<div class="library none active">
+								<h3>선택없음</h3>
+							</div>
+							<div class="library text">
+								<h3>텍스트</h3>
+								<ul id="font">
+								<!--/*
+									<li id="align-components">
+										<h4>정렬</h4>
+										<ul class="align-types">
+											<li class="left">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-left.svg})|"></div>
+												<div class="align-text">왼쪽</div>
+											</li>
+											<li class="right">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-right.svg})|"></div>
+												<div class="align-text">오른쪽</div>
+											</li>
+											<li class="top">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-top.svg})|"></div>
+												<div class="align-text">위</div>
+											</li>
+											<li class="bottom">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-bottom.svg})|"></div>
+												<div class="align-text">아래</div>
+											</li>
+											<li class="center">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-center.svg})|"></div>
+												<div class="align-text">중앙</div>
+											</li>
+										</ul>
+									</li>
+								*/-->
+									<li>
+										<h4>글꼴</h4>
+										<select name="" id="font-family">
+											<option value="none" disabled>글꼴 선택</option>
+											<option value="Pretendard-Regular">Pretendard</option>
+											<option value="NanumSquare">나눔스퀘어</option>
+											<option value="Gmarket-Sans">Gmarket-sans</option>
+										</select>
+									</li>
+									<li>
+										<h4>글꼴색상</h4>
+										<div class="input-wrapper">
+											<input type="color" id="font-color">
+										</div>
+										<div class="hex-value"></div>
+									</li>
+									<li>
+										<h4>글꼴 크기</h4>
+										<div class="input-wrapper">
+											<input id="font-size" type="number" min="0" value="" placeholder="(입력예) 12">
+										</div>
+									</li>
+									<li>
+										<h4>굵기</h4>
+										<div class="input-wrapper">
+											<input id="font-weight" type="number" min="0" value="" placeholder="(입력예) 300">
+										</div>
+									</li>
+								<!--/*
+									<li>
+										<h4>기울기</h4>
+										<p class="notification-icon">(-) 값은 왼쪽으로 회전, (+) 값은 오른쪽으로 회전</p>
+										<div class="input-wrapper">
+											<input id="text-rotate" type="number" value="" placeholder="">
+										</div>
+									</li>
+								*/-->
+								</ul>
+								<ul class="insert-button">
+									<li class="text-create" style="display: none;">
+										<button type=button>생성하기</button>
+									</li>
+									<li class="text-apply" style="display: none;">
+										<button type=button>적용하기</button>
+									</li>
+									<li class="text-cancel">
+										<button type=button>취소</button>
+									</li>
+								</ul>
+							</div>
+							<div class="library table">
+								<h3>테이블 설정</h3>
+							<!--/*
+								<ul id="table">
+									<li class="add">셀추가</li>
+									<li class="delete">셀삭제</li>
+								</ul>
+							*/-->
+								<ul class="insert-button">
+									<li class="table-create">
+										<button type=button>테이블 생성</button>
+									</li>
+									<li class="table-cancel">
+										<button type=button>취소</button>
+									</li>
+								</ul>
+							</div>
+							<div class="library image">
+								<h3>이미지 설정</h3>
+								<ul>
+									<li>
+										<h4 class="imageFunTitle">이미지 추가</h4>
+										<p class="notification-icon">업로드 후 미리보기 이미지를 선택해주세요</p>
+										<div class="upload-btn">
+											<label for="image-upload">
+												<div class="icon" th:style="|background-image:url('@{/images/icon/upload-icon.svg}')|">
+												</div>
+												<div>파일선택</div>
+											</label>
+											<input id="image-upload" name="editor-image-upload"class="input-wrapper" type="file" accept="image/*,.pdf">
+											<!--/* multiple="multiple"*/-->
+										</div>
+										<div id="image-preview" class="preview-container">
+											<ul class="image">
+											</ul>
+										</div>
+									</li>
+								<!--/*
+									<li id="align-components">
+										<h4>정렬</h4>
+										<ul class="align-types">
+											<li class="left">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-left.svg})|"></div>
+												<div class="align-text">왼쪽</div>
+											</li>
+											<li class="right">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-right.svg})|"></div>
+												<div class="align-text">오른쪽</div>
+											</li>
+											<li class="top">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-top.svg})|"></div>
+												<div class="align-text">위</div>
+											</li>
+											<li class="bottom">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-bottom.svg})|"></div>
+												<div class="align-text">아래</div>
+											</li>
+											<li class="center">
+												<div class="align-img" th:style="|background-image:url(@{/images/icons/align-center.svg})|"></div>
+												<div class="align-text">중앙</div>
+											</li>
+										</ul>
+									</li>
+								*/-->
+									<li>
+										<h4>너비</h4>
+										<div class="input-wrapper">
+											<input id="image-width" class="input-wrapper" type="number" min="0">
+										</div>
+										<h4>높이</h4>
+										<div class="input-wrapper">
+											<input id="image-height" class="input-wrapper" type="number" min="0">
+										</div>
+									<!--/*
+										<h4>회전</h4>
+										<div class="input-wrapper">
+											<input id="image-rotate" class="input-wrapper" type="number" min="-360" max="360">
+										</div>
+									*/-->
+									</li>
+								</ul>
+							<!--/*
+								<ul class="insert-button">
+									<li class="images-create"><button type=button>삽입</button></li>
+									<li class="images-cancel"><button type=button>취소</button></li>
+								</ul>
+							*/-->
+							</div>
+							<div class="library bgImage">
+								<h3>배경설정</h3>
+								<ul>
+									<li>
+										<h4>배경이미지</h4>
+										<p class="notification-icon">업로드 후 미리보기 이미지를 선택해주세요</p>
+										<div class="upload-btn">
+											<label for="bgImage-upload">
+												<div class="icon" th:style="|background-image:url('@{/images/icon/upload-icon.svg}')|">
+												</div>
+												<div>파일선택</div>
+											</label>
+											<input id="bgImage-upload" name="editor-bgImage-upload" type="file" accept="image/*,.pdf" multiple="multiple" hidden="hidden">
+										</div>
+										<div id="bgImage-preview" class="preview-container">
+											<ul class="image">
+											</ul>
+										</div>
+									</li>
+									<li>
+										<h4>배경색상</h4>
+										<div class="input-wrapper">
+											<input id="bg-color" type="color">
+										</div>
+										<h4>불투명도</h4>
+										<div class="range-wrapper">
+											<input id="bg-opacity" type="range" min="0" max="100">
+										</div>
+									</li>
+								</ul>
+							<!--
+								<ul class="insert-button">
+									<li class="bgImage-create">
+										<button type=button>삽입</button>
+									</li>
+									<li class="bgImage-cancel">
+										<button type=button>취소</button>
+									</li>
+								</ul>
+							-->
+							</div>
+						</div>
+					</section>
+					<section id="editor-section">
+						<header>
+							<div class="zoom-out">축소(-)</div>
+							<div class="scale-value">100%</div>
+							<div class="zoom-in">확대(+)</div>
+							<div class="slide-width-height">850x1000px</div>
+						</header>
+						<article id="container-wrapper">
+							<div id="content-container" class="editor">
+
+						<th:block th:if="${productInfo.productDescriptionType eq 'template'}">
+							<th:block th:if="${productInfo.productDescription != null}">
+								<ul class="slides" th:utext="${productInfo.productDescription}"></ul>
+							</th:block>
+							<th:block th:if="${ productInfo.productDescription eq null or #strings.length(productInfo.productDescription) eq 0}">
+								<ul class="slides">
+									<li class="slide current-slide"> </li>
+								</ul>
+							</th:block>
+						</th:block>
+								<div class="toolbox" style="display: none;">
+									<ul class="toolbox-items">
+										<li><button type="button"><i class="fa fa-arrows"></i></button></li>
+									</ul>
+								</div>
+							</div>
+						</article>
+
+						<ul id="util-buttons">
+						<!--/*
+							<li class="slide-add"> <img th:src="|@{/images/icon/plusBtn.svg}|" alt=""> </li>
+						*/-->
+							<li class="slide-remove">
+								<img th:src="|@{/images/icon/trash.svg}|" alt="">
+							</li>
+							<li class="slide-templete">
+								<i class="fa fa-list-alt"></i>
+							</li>
+							<li class="slide-text-item">
+								<img src="/images/icon/icon_text.png">
+							</li>
+						</ul>
+					</section>
+					<div class="clear-fix"></div>
+				</div>
+				<ul class="buttons flag" >
+					<li class="cancel" style="display: none;"><button type="button" onclick="resetProductInfo()">취소하기</button></li>
+					<li class="save" style="display: none;"><button type="button" onclick="saveProductInfo(this)">저장하기</button></li>
+				</ul>
+			</form>
+		</div>
+		<!--템플릿 html(e)-->
+		<!--/*템플릿 script(s)*/-->
+		<script th:inline="javascript">
+			let templetType = [[${productInfo.productDescriptionType}]];
+			let isToobar = false;
+
+			let dragElement = null;
+			let offsetX = 0;
+			let offsetY = 0;
+			let isDragging = false;
+			let initialScale = 1
+			let selectTemplateId=0;
+			let currentScale = 1;
+			let cntBlock=0;
+			let COPYcomponent;
+			let isMouseClick = false;
+			let isShiftPressed = false;
+			let COMPONETS_GROUP=[];
+			let templateLists=[];
+			let editor;
+
+			/****************** 현재는 안쓰이는것 *********************************
+			 *   let imageSrcFile = {"bgImage":[],"images":[]};
+			 *   const MODE = {"text-mode":[],"img-mode":[],"table-mode":[]}
+			 * *****************************************************************/
+
+			$(document).ready(function () {
+				console.log( [[${menu.menuSubType}]]);
+
+				fnMakeCkeditor($('#content')[0],  false).then(
+					makedEditor => {
+						editor = makedEditor;
+					});
+
+				/*이벤트 적용 문제러 이와 같이 적용*/
+				//================================= editor-controller ==========================================//
+				// 상품 정보 수정 상태
+				$("#component-design li").on("click",selectController);
+
+				// 수정중인 슬라이드 edit-style추가
+				// $("#editor-section").on("click", function (event) {
+				//	 // TODO 최적화 필요
+				//	 console.log("click-component: ",event.target.closest(".component-item"));
+				//	 console.log("click-slide: ",event.target.closest(".slides li"));
+				//
+				//
+				//	 // let selectComponent = document.querySelector(".component-item.edit-style");
+				//	 // let selectedSlide = document.querySelector(".slides li.edit-style");
+				//	 //
+				//	 // if (selectComponent != null) {
+				//	 //	 selectComponent.classList.remove("edit-style");
+				//	 // }
+				//	 // if(selectedSlide != null){
+				//	 //	 selectedSlide.classList.remove("edit-style");
+				//	 // }
+				// })
+
+				$(document)
+					.on("click",".insert-button li",handleComponentInsertButton)				// 버튼(삽입,취소)
+				//================================= component-item ==========================================//
+					.on("click","#content-container .component-item", styleLibrary)				// component-item 스타일 수정
+					.on("dblclick","#content-container .component-item",  editContent)			// component-item 내용 수정
+					.on("mousewheel", "#container-wrapper",handleMouseWheel)					// 에디터 영역 스케일 조정
+				//	.on("click",".align-types",alignComponentItem);//정렬
+					.on("mousedown", "#content-container .component-item", startDrag)			// drag
+					.on("focusout", "#content-container .component-item", handleFocusout)			// drag
+				//	.on("mouseup","#content-container .component-item",handleComponentGroup)	// grouping-component(미사용)
+				//================================= slide-item ==========================================//
+					.on('keydown',"#content-container .slides li.slide", handleSlideKeydown )
+					.on('keyup',  "#content-container .slides li.slide", handleSlideKeyup )
+				//	.on("click",  "#content-container .slides li.slide", selectSlide) 			// 슬라이드 수정
+				//	.on("click",  "#editor-section #util-buttons .slide-add",  addSlide)		// 슬라이드 추가
+					.on("click",  "#editor-section #util-buttons .slide-remove",    utilBtnRemoveSlide)	// 슬라이드 삭제
+					.on("click",  "#editor-section #util-buttons .slide-templete",  utilBtnTemplete)	// 템플릿 호출
+					.on("click",  "#editor-section #util-buttons .slide-text-item", utilBtnTextItem)	// 템플릿 호출
+				;
+				$("#editor-section header div.zoom-out").on("click", sectionZoomOut);			// 템플릿 scale 조정
+				$("#editor-section header div.zoom-in").on("click", sectionZoomIn);				// 템플릿 scale 조정
+				//================================= upload ==========================================//
+				$(".library-wrapper .upload-btn input").on("change",handleUploadEvent); 		// 이미지,배경이미지 업로드
+				// $(document).on("click",".library-wrapper .upload-btn bgImage-upload,.library-wrapper .upload-btn image-upload",handleUploadEvent);
+				//================================= 페이지 기본 기능 ==========================================//
+				// 해당 페이지 ctrl + scroll 이벤트 제한(스크롤 확대/축소 막기)
+				document.addEventListener("wheel",function(event){
+					if (event.ctrlKey) {
+						event.preventDefault(); // Ctrl 키와 마우스 휠 기본 동작 막음
+					}
+				}, { passive: false })
+			});
+
+			$(window).on('load',function(){
+				if(templetType !== undefined || templetType !== null  ){
+					$(`#component-design li[data-type="${templetType}"]`).click();
+				}
+			});
+
+			function handleSlideKeydown(event) {
+				// key event
+				if(event.key ==="Delete"){
+					let deleteComponent = event.target.querySelector(".component-item.edit-style");
+					//console.log("delete component: ",deleteComponent);
+					let container = document.querySelector("#content-container .slides .current-slide");
+					if (deleteComponent != null && confirm("해당 요소를 삭제 하시겠습니까?")){
+						container.removeChild(deleteComponent);
+					}
+				}
+				if(event.key==="Backspace"){
+					let deleteComponent = event.target.closest("div.edit-style");
+					//console.log("deleteComponent: ",deleteComponent);
+					let container = document.querySelector("#content-container .slides .current-slide");
+					if (deleteComponent != null){
+						let textContainer = deleteComponent.querySelector("p");
+						if (deleteComponent.childElementCount == 1 && textContainer.innerText.trim()==""&&confirm("해당 요소를 삭제하시겠습니까?")){
+							container.removeChild(deleteComponent);
+						}
+					}
+				}
+				if (event.key === 'c' && (event.ctrlKey || event.metaKey)) {
+					// Ctrl+C가 눌렸을 때 실행될 코드
+					// 선택한 태그의 내용을 복사하는 로직을 작성
+					console.log("target: ",event.target.querySelector(".component-item.edit-style"));
+					let clickedComponent = document.querySelector(".component-item.edit-style");
+
+					cntBlock+=1; //id값 1증가 data-type-{id}
+					COPYcomponent = clickedComponent.cloneNode(true);
+					let dataTypeId = COPYcomponent.getAttribute("data-type-id");
+					let stringType = dataTypeId.split('-')[0];
+					let StringId = dataTypeId.split('-')[1];
+					let numId = Number.parseInt(StringId);
+					numId+=1;
+					cntBlock = numId;
+					COPYcomponent.setAttribute("data-type-id",`${stringType}-${numId}`);
+					console.log("COPYcomponent: ",COPYcomponent);
+
+				}
+				if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
+					let currentSlide = document.querySelector("#content-container .slides li.current-slide");
+					console.log("currentSlide: ",currentSlide);
+					console.log("copiedComponent",COPYcomponent);
+					if (COPYcomponent != null && currentSlide != null){
+						COPYcomponent.style.top="50%";
+						COPYcomponent.style.left="50%";
+						currentSlide.appendChild(COPYcomponent);
+					}else{
+						console.log("복사실패")
+					}
+				}
+				if (event.key==="Shift"){
+					//isShiftPressed=true;
+				}
+				if(event.key=="Escape"){
+					let selectComponent = document.querySelectorAll(".component-item.edit-style");
+					let selectedSlide = document.querySelector(".slides li.edit-style");
+
+					if (selectComponent != null && selectComponent.length >=1) {
+						Array.from(selectComponent).forEach(function(item){
+							item.classList.remove("edit-style");
+						})
+					}
+					if(selectedSlide != null){
+						selectedSlide.classList.remove("edit-style");
+					}
+				}
+				event.stopImmediatePropagation();
+			}
+
+			function handleSlideKeyup(event){
+				if (event.key==="Shift"){
+					isShiftPressed=false;
+					//console.log("isShiftPress: ",isShiftPressed);
+				}
+				if (event.key ==="Delete"){
+					let delBgImage = event.target.querySelector(".slides li.edit-style");
+					if (delBgImage != null && confirm("해당 배경 이미지를 삭제 하시겠습니까?")){
+						delBgImage.style.backgroundImage = "";
+					}
+
+				}
+				event.stopImmediatePropagation();
+			}
+
+			function handleComponentGroup(event){
+				// TODO group-select 최적화 필요
+				console.log("grouping.....");
+				isMouseClick=true;
+
+				let component = event.target.closest(".component-item");
+
+				// COMPONETS_GROUP.length =0 // 배열 비우기
+				if ( isMouseClick && isShiftPressed){
+					component.classList.add("edit-style");
+					console.log("grouping....");
+					// let slide = document.querySelector("#content-container .slides li.current-slide");
+					let componentGroupList = document.querySelectorAll(".component-item.edit-style");
+					console.log("componentGroupList: ",componentGroupList);
+					Array.from(componentGroupList).forEach(function(item){
+						COMPONETS_GROUP.push(item);
+					});
+				}else{
+					event.stopPropagation();
+				}
+			}
+
+			function handleMouseWheel(event){
+				if(event.ctrlKey){
+					event.preventDefault();
+					if(event.deltaY>0){
+						currentScale += 0.1;
+						if (currentScale < 0.1) currentScale = 0.1;
+
+						let contentContainer = document.querySelector("#content-container");
+						let scaleValueElement = document.querySelector(".scale-value");
+						contentContainer.style.transform = `scale(${currentScale})`;
+						scaleValueElement.innerText = `${(currentScale * 100).toFixed(0)}%`;
+					}else{
+						currentScale -= 0.1;
+						if (currentScale < 0.1) currentScale = 0.1;
+						let contentContainer = document.querySelector("#content-container");
+						let scaleValueElement = document.querySelector(".scale-value");
+						contentContainer.style.transform = `scale(${currentScale})`;
+						scaleValueElement.innerText = `${(currentScale * 100).toFixed(0)}%`;
+
+					}
+				}
+			}
+
+			function sectionZoomIn(event) {
+				currentScale += 0.1;
+				if (currentScale > 2) currentScale = 2;
+				let contentContainer = document.querySelector("#content-container");
+				let scaleValueElement = document.querySelector(".scale-value");
+				contentContainer.style.transform = `scale(${currentScale})`;
+				scaleValueElement.innerText = `${(currentScale * 100).toFixed(0)}%`;
+				document.removeEventListener("#editor-section header div.zoom-in",sectionZoomIn);
+			}
+
+			function sectionZoomOut(event){
+				currentScale -= 0.1;
+				if (currentScale < 0.1) currentScale = 0.1;
+				let contentContainer = document.querySelector("#content-container");
+				let scaleValueElement = document.querySelector(".scale-value");
+				contentContainer.style.transform = `scale(${currentScale})`;
+				scaleValueElement.innerText = `${(currentScale * 100).toFixed(0)}%`;
+				document.removeEventListener("#editor-section header div.zoom-in",sectionZoomOut);
+			}
+
+			function handleComponentInsertButton(event){
+				//	console.log( 'handleComponentInsertButton', event );
+				// library의 버튼 타입 class로 파악 ex) class="text-create" or
+				let buttonClassArr = event.target.closest("li").classList[0].split('-'); //  -> ["text","create"],["text","cancel"]
+				//	console.log( buttonClassArr );
+
+				let button = buttonClassArr[1]; // -> ["create"],["cancel"]
+				let editType = buttonClassArr[0] // -> text? table? images? bgImage?
+				// cntBlock = 0;// ->block 생성개수 초기화
+				if(button =="create"){
+					// 컴포넌트 생성
+					cntBlock+=1;
+					renderComponentBlock(editType,cntBlock);
+				}else if(button =="cancel"){
+					// 컴포넌트 취소(삭제)
+					// selectComponentBlock
+					if(editType=="text"){
+						resetComponentStyle(editType);
+					}
+					if(editType=="bgImage"){
+						resetComponentStyle();
+					}
+
+					$('.library-wrapper .library.active').removeClass('active');
+					$('.library-wrapper .library.none').addClass('active');
+					removeAllEditStyle();
+				}
+			}
+
+			function resetComponentStyle(editType){
+				let library = document.querySelector("#library-section .library-wrapper div.active");
+
+				if (editType =="text"){
+					let inputValues = library.querySelectorAll("input");
+					let selectOptions = library.querySelector("select");
+					let options = selectOptions.querySelectorAll("option");
+					Array.from(inputValues).forEach(function(item){
+						item.value=""
+					})
+					selectOptions.value="";
+					Array.from(options).forEach(function(item){
+						item.selected =false;
+					});
+				}else if(editType =="bgImage") {
+				}else{
+				}
+			}
+
+			function renderComponentBlock(type,cnt){
+				// TODO.. cnt 부분 수정필요
+				// 확장 가능함... 선택한 type별로 element를 현재 slide에 추가
+				let currentSlide = document.querySelector("#content-container .slides li.current-slide");
+				switch(type){
+					case "text":
+						// element 생성
+						let div = document.createElement("div");
+						div.classList.add("component-item");
+						div.setAttribute("data-type",`${type}`);
+						div.setAttribute("data-type-id",`${type}-${cnt}`);
+						div.innerHTML=`<p data-protected="true">더블클릭하여 수정하세요</p>`;
+						div.style.position="absolute";
+						div.style.top="20%";
+						div.style.left="0";
+						let fontFamily=  document.querySelector("#font-family").value;
+						let fontSize = document.querySelector("#font-size").value;
+						let fontWeight = document.querySelector("#font-weight").value;
+						let fontColor = document.querySelector("#font-color").value;
+						let fontColorSample = document.querySelector(".hex-value").innerText;
+
+						div.style.fontFamily= (fontFamily != null && fontFamily != undefined) ? fontFamily : 'Pretendard-Regular';
+						div.style.fontSize = (fontSize != null && fontSize != undefined) ? fontSize+'px' : "16px";
+						div.style.fontWeight = (fontWeight != null && fontWeight != undefined) ? fontWeight : "400";
+						div.style.color = (fontColor != null && fontColor != undefined) ? fontColor : fontColorSample;
+
+						// current-slide 삽입
+						currentSlide.appendChild(div);
+						break;
+					case "table":
+						// element 생성
+						// element 생성
+						let block = document.createElement("div");
+						block.classList.add("component-item");
+						block.setAttribute("data-type-id", `${type}-${cnt}`);
+						let table = document.createElement("table");
+						table.innerHTML = `
+							<thead>
+								<tr>
+									<th>제목1</th>
+									<th>제목2</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>내용1</td>
+									<td>내용2</td>
+								</tr>
+							</tbody>
+							`;
+						block.appendChild(table);
+						block.style.position = "absolute";
+						block.style.top = "20%";
+						block.style.left = "30%";
+						currentSlide.appendChild(block);
+						break;
+					case "images":
+						// element 생성
+						selectUploadImage();
+						break;
+					case "bgImage":
+						// element 생성
+						styleForBackground();
+						break;
+					case "card":
+						// element 생성
+						styleForImages();
+						break;
+				}
+
+			}
+
+			function selectController(event){
+				let selected = event.target.closest("li");
+				let designType = selected.classList[0].split('-')[2];
+				let controllers = document.querySelectorAll("#component-design li");
+
+				Array.from(controllers).forEach(function(item){
+					item.classList.remove("active");
+				});
+				selected.classList.add("active");
+				let type = $(selected).data('type');
+
+				$('.section-wrapper').hide();
+				$(`.section-wrapper[data-type='${type}']`).show();
+
+				if( type == 'template' ){
+					let bgColor = document.querySelector("#bg-color");
+					let bgOpacity = document.querySelector("#bg-opacity");
+
+					if(bgColor != null && bgOpacity != null){
+						bgColor.removeAttribute("disabled");
+					}
+					if (bgOpacity != null){
+						bgOpacity.removeAttribute("disabled");
+					}
+				/*
+					if(designType != "template"){
+						showLibraryTab(designType);
+					}else{
+						// template은 ajax로 요청
+						if (templateLists.length>0){
+							showTemplateModal();
+							const templateSwiperWrapper = document.querySelector("#modal ul.template");
+							templateSwiperWrapper.innerHTML = "";
+							templateSwiperWrapper.classList.add("swiper-wrapper");
+							for (let i = 0; i < templateLists.length; i++) {
+								templateSwiperWrapper.appendChild(templateLists[i]);
+							}
+							templateSwiperWrapper.classList.add("swiper-wrapper");
+							templateSwiper();
+						}else{
+							getTemplateLists();
+						}
+					}
+				*/
+				}
+
+				$('.template-container .buttons li').show();
+			}
+
+			function utilBtnTemplete(){
+				// template은 ajax로 요청
+				if (templateLists.length>0){
+					showTemplateModal();
+					const templateSwiperWrapper = document.querySelector("#modal ul.template");
+					templateSwiperWrapper.innerHTML = "";
+					templateSwiperWrapper.classList.add("swiper-wrapper");
+					for (let i = 0; i < templateLists.length; i++) {
+						templateSwiperWrapper.appendChild(templateLists[i]);
+					}
+					templateSwiperWrapper.classList.add("swiper-wrapper");
+					templateSwiper();
+				}else{
+					getTemplateLists();
+				}
+			}
+
+			function utilBtnTextItem(){
+				removeAllEditStyle();
+				showLibraryTab("text");
+				styleForText(null, 'add');
+			}
+
+			function addSlide(event) {
+				let slideContainer = document.querySelector("#content-container .slides");
+				let li = document.createElement("li");
+				li.classList.add(`slide`);
+				slideContainer.appendChild(li);
+
+				// current-slide 클래스 제어
+				let slides = slideContainer.querySelectorAll(".current-slide");
+				Array.from(slides).forEach(function (item) {
+					item.classList.remove("current-slide");
+					item.classList.remove("edit-style");
+				});
+				slideContainer.lastElementChild.classList.add("current-slide");
+				slideContainer.lastElementChild.classList.add("edit-style");
+
+				// current-slide 위치로 이동
+				let container = document.querySelector("#content-container");
+				let currentSlide = container.querySelector(".current-slide");
+
+				if (currentSlide) {
+					currentSlide.scrollIntoView({ behavior: 'smooth' });
+				}
+
+
+				let cnt = slideContainer.childElementCount;
+				console.log("cnt: ",cnt);
+				let slideSize = document.querySelector("#editor-section header .slide-width-height");
+				slideSize.innerText = `850 X ${1000*cnt}`;
+			}
+
+			function selectSlide(event){
+				resetEditStyle();
+
+				let currentSlide = event.target.closest("li"); // 선택된 슬라이드
+				let components = currentSlide.querySelectorAll("div.edit-style");
+
+				if (!currentSlide.classList.contains("edit-style")) {
+					// edit-style추가
+					let slidesContainer = currentSlide.parentElement; // ul.slides
+					let slides = slidesContainer.querySelectorAll("li");
+					//slides > 선택된 li 클래스 동적 추가/제거
+					Array.from(slides).forEach(function (item) {
+						item.classList.remove("edit-style");
+						item.classList.remove("current-slide");
+					});
+
+					Array.from(components).forEach(function(item){
+						item.classList.remove("edit-style");
+					})
+
+					// 선택된 슬라이드 class명 추가 edit-style current-slide
+					currentSlide.classList.add("edit-style");
+					currentSlide.classList.add("current-slide");
+				}
+
+				showLibraryTab('bgImage');
+				styleForBackground()
+				removeEditStyleComponent();
+			}
+
+			function removeEditStyleComponent(){
+				let currentSlide = document.querySelector("#content-container .slides li.current-slide");
+				let editComponent = currentSlide.querySelector("div.edit-content");
+				if (editComponent != null){
+					editComponent.removeAttribute("contenteditable");
+					editComponent.classList.remove("edit-content");
+				}
+			}
+
+			function utilBtnRemoveSlide(event) {
+				let container = document.querySelector("#content-container");
+				let slidesContainer = container.querySelector(".slides");
+				let currentSlide = container.querySelector(".current-slide");
+				let lastSlide = slidesContainer.lastChild;
+
+				if (slidesContainer.childElementCount === 1) {
+					alert("슬라이드는 1개이상 필요합니다.");
+				} else {
+					if (confirm("현재 슬라이드를 삭제하시겠습니까?")) {
+						// 해당 슬라이드 제거
+						slidesContainer.removeChild(currentSlide);
+						let lastChild = document.querySelector(".slides li:last-child");
+						lastChild.classList.add("current-slide");
+
+						let cnt = slidesContainer.childElementCount;
+						console.log("cnt: ",cnt);
+						let slideSize = document.querySelector("#editor-section header .slide-width-height");
+						slideSize.innerText = `850 X ${1000*cnt}`;
+					}
+				}
+			}
+
+			function deleteComponent() {
+				let deleteComponent = document.querySelector(".component-item");
+				let container = document.querySelector(".slides li.current-slide");
+				container.removeChild(deleteComponent);
+			}
+
+			function getTemplateLists() {
+				showTemplateModal();
+				// ajax -> 함수 템플릿 가져오기
+				$.ajax({
+					url:"/manage/product/template-list",
+					success:function(data){
+						showTemplateModal();
+						const templateSwiperWrapper = document.querySelector("#modal ul.template");
+						templateSwiperWrapper.innerHTML = "";
+						templateSwiperWrapper.classList.add("swiper-wrapper");
+						for (let i = 0; i < data.templateList.length; i++) {
+							let li = document.createElement("li");
+							li.classList.add("item");
+							li.classList.add("swiper-slide");
+							li.innerHTML = `
+											<div class="template-thumbnail" onclick="selectTemplate(this,${data.templateList[i].templateId})">
+												<img src="/upload/product/${data.templateList[i].templateThumbnail}">
+											</div>
+											<div class="template-title">${data.templateList[i].title}</div>`;
+							templateSwiperWrapper.appendChild(li);
+							templateLists.push(li);
+						}
+						templateSwiperWrapper.classList.add("swiper-wrapper");
+						templateSwiper();
+					},
+					error:function(data){
+						console.log("error: ",data.result);
+					}
+				})
+			}
+
+			function uploadEditorImage(item) {
+				let id = item.getAttribute("id");
+				let type = id.split("-")[0];
+
+				let previewContainer = document.querySelector(`#${id}`).parentElement.nextElementSibling;
+				let formData = new FormData();
+
+				if(type != null){
+					// 미리보기
+					let imagePreview = document.querySelector("#"+`${type}-preview .image`);
+					imagePreview.innerHTML = "";
+
+					// image type별 formData 세팅
+					let imageFile = (type=="image") ? item.files : "";
+					let bgImageFile = (type=="bgImage") ? item.files : "";
+
+					if(imageFile != null && imageFile.length >0) {
+						Array.from(imageFile).forEach(function(item){
+							formData.append("editor-image-upload",item);
+						})
+					}else if(bgImageFile != null && bgImageFile.length > 0){
+						Array.from(bgImageFile).forEach(function(item){
+							formData.append("editor-bgImage-upload",item);
+						})
+					}
+
+					// data : new FormData($("#product-template-form")[0]);
+					$.ajax({
+						url:`/manage/product/upload-template-image`,
+						type:"POST",
+						enctype : 'multipart/form-data',
+						data: formData,
+						contentType : false,
+						processData : false,
+						beforeSend:function(xhr){
+							xhr.setRequestHeader(
+								[[${_csrf.headerName}]], [[${_csrf.token}]]
+							);
+						},
+						success:function(data){
+							if(typeof data.result != undefined && data.result=="error"){
+								alert(data.error)
+							}else{
+								let bgColor;
+								let bgOpacity;
+								switch(type){
+									case "bgImage":
+										for(let i=0;i<data.list.length;i++){
+											let li = document.createElement("li");
+											li.innerHTML = `<div class='preview-image'>
+																<img src="/upload/product/${data.list[i].uploadFilename}" class='product-image-preview'
+																onclick="selectUploadBgImage(this)">
+																<button type='button' class='product-image-delete-button' onclick='deleteEditorImage(this,${data.list[i].fileId})'>X</button>
+															</div>`;
+											imagePreview.appendChild(li);
+										}
+
+										// 배경색상- 투명도 조절제어
+										bgColor = document.querySelector("#bg-color");
+										bgOpacity = document.querySelector("#bg-opacity");
+
+										if(bgColor != null && bgOpacity != null){
+											bgColor.setAttribute("disabled","disabled");
+											bgOpacity.setAttribute("disabled","disabled");
+										}
+
+										break;
+									case "image":
+										for(let i=0;i<data.list.length; i++){
+											let li = document.createElement("li");
+											li.innerHTML =
+											`<div class='preview-image'>
+												<img src="/upload/product/${data.list[i].uploadFilename}" class='product-image-preview'>` +
+												`onclick="selectUploadImage(this, 'upd')"` +
+												`<button type='button' class='product-image-delete-button' onclick='deleteEditorImage(this,${data.list[i].fileId})'>X</button>
+											</div>`;
+											imagePreview.appendChild(li);
+
+											if(data.list.length == 1){
+												selectUploadImage(`/upload/product/${data.list[i].uploadFilename}`, 'direct');
+											}
+										}
+
+										bgColor = document.querySelector("#bg-color");
+										bgOpacity = document.querySelector("#bg-opacity");
+
+										if(bgColor != null && bgOpacity != null){
+											bgColor.setAttribute("disabled","disabled");
+											bgOpacity.setAttribute("disabled","disabled");
+										}
+										break;
+								}
+							}
+						},
+						error:function(){
+						},
+						complete:function(){
+						}
+					})
+				}
+			}
+
+			function selectUploadBgImage(item){
+				let src = item.getAttribute("src");
+				const originalWidth = item.naturalWidth;
+				const originalHeight = item.naturalHeight;
+				let currentSlide = document.querySelector("#content-container .slides li.current-slide");
+
+				let slideWidthHeight = document.querySelector(".slide-width-height");
+				slideWidthHeight.innerText=`${originalWidth} X ${originalHeight}`;
+
+				currentSlide.style.backgroundImage=`url(${src})`;
+				currentSlide.style.width=originalWidth +'px';
+				currentSlide.style.height=originalHeight +'px';
+			}
+
+			function selectUploadImage(item, imageType = 'add'){
+				console.log('selectUploadImage', item);
+
+				if(item !== undefined){
+					let currentSlide = document.querySelector("#content-container .slides li.current-slide");
+					if( imageType == 'add' ){
+						let src = item.getAttribute("src");
+						let div = document.createElement("div");
+						cntBlock +=1;
+						div.classList.add("component-item");
+						div.style.position="absolute";
+						div.classList.add("edit-style");
+						div.setAttribute("data-type-id",`image-${cntBlock}`);
+						div.innerHTML = `<img src="${src}" />`;
+						// div.innerHTML = `<div class="card-container">
+						//					 <div class='image-box' style="background-image:url('${src}')">
+						//					 </div>
+						//				 </div>`;
+						currentSlide.appendChild(div);
+					} else if( imageType == 'upd' ) {
+						let clickedComponent = currentSlide.querySelector("div.edit-style .image-box");
+						let src = item.getAttribute("src");
+						var bgurl = `url(${src})`;
+
+						console.log( $(clickedComponent).css('background-image') );
+						$(clickedComponent).css('background-image', bgurl);
+						//console.log( src );
+
+						//$(clickedComponent).attr('src', src);
+					} else if( imageType == 'direct' ) {
+						let clickedComponent = currentSlide.querySelector("div.edit-style .image-box");
+						var bgurl = `url(${item})`;
+
+						$(clickedComponent).css('background-image', bgurl);
+					}
+				}
+			}
+
+			function renderPreviewImages(){
+				let previewImageContainer = document.querySelector("#image-preview .image");
+				let imagesArr = imageSrcFile.images;
+				previewImageContainer.innerHTML ="";
+				Array.from(imagesArr).forEach(function(src,id){
+					// TODO...
+					// 추후 image의 id값은 ajax에서 image업로드시 처리
+					// 해당 id는 임시방편
+					let li = document.createElement("li");
+					li.innerHTML = `<div class='preview-image'>
+										<input id='${id}' type='checkbox' class='check'>
+										<label for='${id}'>
+											<img src='${src}'>
+										</label>
+									</div>`;
+					previewImageContainer.appendChild(li);
+				});
+
+			}
+
+			function createTextComponent(event) {
+				const container = document.querySelector(".editor.active");
+
+				if (container) {
+					const inputElement = document.createElement("input");
+					inputElement.style.position = "absolute";
+					inputElement.style.backgroundColor = "transparent";
+					inputElement.style.height = "20px";
+					inputElement.style.lineHeight = "25px";
+					inputElement.style.width = "fit-content";
+					inputElement.style.outline = "none";
+					inputElement.style.borderStyle = "none";
+
+					// coordintates
+					inputElement.style.left = event.clientX + "px";
+					inputElement.style.top = event.clientY + "px";
+					inputElement.addEventListener("keyup", function (event) {
+						if (event.key === "Enter") {
+							const text = inputElement.value;
+							if (text) {
+								const textElement = document.createElement("p");
+								const divElement = document.createElement("div");
+								divElement.classList.add("component-item");
+								divElement.setAttribute("draggable", isDragging);
+
+								textElement.innerText = text;
+								divElement.appendChild(textElement);
+								divElement.style.position = "absolute";
+								divElement.style.zIndex = "1000";
+								divElement.style.left = inputElement.style.left;
+								divElement.style.top = inputElement.style.top;
+
+								// divElement.addEventListener("mousedown", startDrag);
+								container.appendChild(divElement);
+
+							}
+							container.removeChild(inputElement);
+						}
+					});
+					container.appendChild(inputElement);
+					inputElement.focus();
+				}
+			}
+
+			function insertComponentBlock(dom) {
+				let cloneDOM = dom.cloneNode(true);
+				let container = document.querySelector("#content-container");
+				let currentSlide = container.querySelector(".current-slide");
+
+				// slide에 삽입
+				currentSlide.appendChild(cloneDOM);
+
+				let rect = cloneDOM.getBoundingClientRect();
+
+				let width = rect.width;
+				let height = rect.height;
+
+				cloneDOM.style.position = "absolute";
+				cloneDOM.style.top = "10%";
+				cloneDOM.style.left = "35%";
+				// dom.style.width="300px";
+				// dom.style.height="fit-content";
+
+				// cloneDOM.style.transform = "translate(-50%,-50%)";
+				//
+				// dom.addEventListener("mousedown", startDrag);
+
+			}
+
+			function createCardComponent(event) {
+				let container = document.querySelector("#content-container");
+				let ajaxComp = `
+					<div class='component-item-card'>
+						<span>
+							<div class='cardimage'>
+								<img src='./images/sample-background.jpg'>
+							</div>
+							<div class='cardText'>테스트 이미지</div>
+						</span>
+					</div>`;
+				let comElem = evnet.traget.closest(".component-item");
+			}
+
+			function getCheckItemType(element){
+				let dataTypeId = $(element).data("type-id");
+				return dataTypeId.split('-');
+			}
+
+			function getDataType(element){
+				let dataType = getCheckItemType(element);
+				return dataType[0];
+			}
+
+			function startDrag(event) {
+				dragElement = event.target.closest(".component-item");
+
+				//if($(dragElement).hasClass('.edit-style')){}
+
+				var dataType = getDataType( dragElement );
+				var isTarget = (dataType == 'text' && $(dragElement).hasClass('edit-style'));
+				//console.log(dataType, $(dragElement).hasClass('edit-style'));
+				if(dragElement != null && dragElement.classList.contains("component-item") && isTarget  ){
+
+					let container = document.querySelector("#content-container .slides li.current-slide");
+					// mouse-down시 클릭 시 dragElement의 좌표 calibration계산
+					offsetX = (event.clientX - dragElement.getBoundingClientRect().left);
+					offsetY = (event.clientY - dragElement.getBoundingClientRect().top);
+
+					// mouse-down과 mouse-move, mouseup, mouseleave 를 binding
+					container.addEventListener("mousemove", onMouseMove);
+					container.addEventListener("mouseup", stopDrag);
+				}
+				event.stopPropagation();
+			}
+
+			function handleFocusout(event){
+				selectedElement = event.target.closest(".component-item");
+				if( $(selectedElement).attr("contenteditable") ){
+					$(selectedElement).attr("contenteditable", null);
+				}
+				/*
+				if( $(dragElement).hasClass('edit-style') ){
+					$(dragElement).removeClass('edit-style');
+				}
+				*/
+			}
+
+			function onMouseMove(event) {
+				event.preventDefault();
+				isDragging = true; // drag 여부
+
+				let container = document.querySelector("#content-container .slides li.current-slide");
+				let rect = container.getBoundingClientRect();
+				let scaleRatio = currentScale / initialScale;
+
+				if (isDragging && dragElement != null) {
+					// 기존
+					dragElement.classList.add("dragging");
+					dragElement.style.left = (event.clientX - rect.left - offsetX )/scaleRatio + "px";
+					dragElement.style.top = (event.clientY - rect.top- offsetY )/scaleRatio + "px";
+				}else{
+					return;
+				}
+
+			}
+
+			function stopDrag(event) {
+				let component = document.querySelector(".edit-style");
+				let container = document.querySelector("#content-container .slides .slide");
+
+				isDragging = false;
+				if (dragElement != null){
+					dragElement.classList.remove("dragging");
+					dragElement = null;
+				}
+
+				// event fired 이벤트 삭제
+				container.removeEventListener("mousemove", onMouseMove);
+				container.removeEventListener("mouseup", stopDrag);
+				event.stopImmediatePropagation();
+			}
+
+			function convertPxToPercentage(DOM) {
+				const containerWidth = DOM.offsetWidth;
+				const containerHeight = DOM.offsetHeight;
+
+				// 마우스 클릭 이벤트 발생 시 클릭한 좌표
+				const clickX = event.clientX - DOM.getBoundingClientRect().left;
+				const clickY = event.clientY - DOM.getBoundingClientRect().top;
+
+				// 픽셀 좌표를 백분율로 변환
+				const clickPercentX = (clickX / containerWidth) * 100;
+				const clickPercentY = (clickY / containerHeight) * 100;
+
+				// 클릭한 좌표를 백분율로 표시
+				let x = clickPercentX;
+				let y = clickPercentY;
+				let coordinates = { "X": clickPercentX, "Y": clickPercentY };
+				return coordinates;
+			}
+
+			function editContent(event) {
+				//console.log(`editContent`);
+				// selectComponent
+				event.preventDefault();
+				let container = document.querySelector("#content-container .slides li.current-slide");
+				let component = event.target.closest(".component-item");
+				let editType = component.getAttribute("data-type-id").split("-")[0];
+
+				component.classList.toggle("edit-content");
+				component.setAttribute("contenteditable", "true");
+				// component.setAttribute("spellcheck", "true")
+				$(component).focus();
+
+				component.addEventListener("keydown", function (event) {
+					let item = event.target; // component
+
+					// let textContainer = item.closest("p");
+					let textContainer = item.querySelector("p");
+					let text = textContainer.innerText;
+
+					if (event.key == "Escape") {
+						let item = event.target;
+						let text = item.innerText;
+						if (text){
+							if (editType=="text"){
+								// component.innerHTML = `<p>${text}</p>`
+								component.setAttribute("contenteditable", "false");
+								component.setAttribute("spellcheck", "false");
+								component.classList.remove("edit-content");
+								component.classList.remove("edit-style");
+							} else if(editType=="table"){
+								let td = table.getElementsByTagName("td");
+								let th = table.getElementsByTagName("th");
+								Array.from(td).forEach(function(cell){
+									cell.innerHTML = cell.innerHTML.replace("/<br>/g",'');
+								})
+								Array.from(th).forEach(function(heads){
+									heads.innerHTML.replace("/<br>/g",'')
+								})
+								component.setAttribute("contenteditable", "false");
+								component.setAttribute("spellcheck", "false");
+								component.classList.remove("edit-content");
+							}
+							else if(editType=="image"){
+								component.setAttribute("contenteditable", "false");
+								component.setAttribute("spellcheck", "false");
+								component.classList.remove("edit-content");
+							}
+						}else{
+							container.removeChild(item);
+						}
+					}
+
+					if (event.key === 'Backspace') {
+
+						let selection = window.getSelection();
+						let range = selection.getRangeAt(0);
+						let startContainer = range.startContainer;
+
+						// 선택한 시작컨테이너가 특정 p태그이면서 그 p태그가 수정되면 안되는경우
+						if (startContainer === textContainer && textContainer.getAttribute('data-protected') === "true") {
+							event.preventDefault(); // 백스페이스 키의 기본 동작을 중단
+						}
+					}
+
+				});
+
+				event.stopImmediatePropagation();
+			}
+
+			function styleLibrary(event) {
+				//선택 li.slide의 선택 혀과 처리.
+				var _elLi = $(event.target).closest( 'li.slide' );
+				if( !$(_elLi).hasClass('current-slide')  ){
+					$('li.slide').removeClass('current-slide');
+					$(_elLi).addClass('current-slide');
+				}
+
+				resetEditStyle();
+
+				// 선택한 component의 타입별 library 탭 보이기
+				let clickedComponent = event.target.closest(".component-item");
+				let dataTypeId = clickedComponent.getAttribute("data-type-id");
+				let dataset = dataTypeId.split('-');
+				let dataType = dataset[0];
+
+				// let dataId = dataset[1];
+				let components = document.querySelectorAll(".component-item");
+				let currentSlide = clickedComponent.parentElement;
+				currentSlide.classList.remove("edit-style");
+
+				if(isToobar){
+					var offset1 = $('#content-container .slides').offset();
+					var offset2 = $(clickedComponent).offset();
+
+					$('.toolbox').css({top:(offset2.top - offset1.top - 20), left:(offset2.left - offset1.left)} ).show();
+				}
+				//console.log( clickedComponent );
+
+				if (clickedComponent != null) {
+					// component-item에 edit-style 클래스 동적 추가
+					if(isShiftPressed ==false){
+						console.log("non-grouping....");
+						Array.from(components).forEach(function (item) {
+							item.classList.remove("edit-style");
+						});
+						clickedComponent.classList.add("edit-style");
+					}else{
+						clickedComponent.classList.add("edit-style");
+					}
+					// component-item 클릭시 tab 보여주기
+					showLibraryTab(dataType);
+					switch (dataType){
+						case "bgImage":
+							styleForBackground();
+							break;
+						case "text":
+							styleForText(dataTypeId);
+							break;
+						case "table":
+							styleForTable(dataTypeId);
+							break;
+						case "image":
+							styleForImages(dataTypeId)
+							break;
+					}
+				}
+
+				if (isShiftPressed){
+					// isGroup?
+					console.log("grouping....");
+					// let slide = document.querySelector("#content-container .slides li.current-slide");
+					let componentGroupList = document.querySelectorAll("div.edit-style");
+
+					// 대상의style
+					let computedStyle = getComputedStyle(clickedComponent);
+
+					Array.from(componentGroupList).forEach(function(item){
+						COMPONETS_GROUP.push(item);
+					});
+					console.log("componentGroupList: ",componentGroupList);
+				}
+
+				event.stopImmediatePropagation();// selectSlide 이벤트 전파 방지
+			}
+
+			function showLibraryTab(className) {
+				// 클릭 대상의 style가져오기
+				let currentSlide = document.querySelector("#content-container .slides li.current-slide");
+				let clickedComponent = currentSlide.querySelector("div.edit-style");
+				//let currentSlide = $("#content-container .slides li.current-slide");
+				//let clickedComponent = $("div.edit-style", $(currentSlide));
+				//console.log(`showLibraryTab : ${className}`);
+				/*
+				console.log(currentSlide);
+				console.log( $("div.edit-style") );
+				console.log(clickedComponent);
+				*/
+
+				// tab보여주기
+				$('.library-wrapper .library.active').removeClass('active');
+				$(`.library-wrapper .library.${className}`).addClass('active');
+
+				if(clickedComponent != null){
+					//console.log('mode : mod');
+					let computedStyle = getComputedStyle(clickedComponent);
+					if (className=="text"){
+						initializeTextStyleInputValue(computedStyle);
+
+						$(`.library-wrapper .library.${className} .text-create`).hide();
+						$(`.library-wrapper .library.${className} .text-apply`).show();
+					}
+					if(className=="image"){
+						let innerBox = getComputedStyle(clickedComponent.querySelector('div.image-box'));
+						//initializeImageStyleInputValue(computedStyle);
+						initializeImageStyleInputValue(innerBox);
+					}
+				} else {
+					//console.log('mode : reg');
+					if (className=="text"){
+						$(`.library-wrapper .library.${className} .text-create`).show();
+						$(`.library-wrapper .library.${className} .text-apply`).hide();
+					}
+				}
+
+			}
+
+			function initializeImageStyleInputValue(computedStyle){
+				let newImageWidth = computedStyle.getPropertyValue("width").replace('px','');
+				let newImageHeight = computedStyle.getPropertyValue("height").replace('px','');
+				let previewImage = document.querySelector("#image-preview .image");
+				previewImage.innerHTML = "";
+
+				console.log("newImageWidth: ",newImageWidth);
+				console.log("newImageHeight: ",newImageHeight);
+
+				let targetImageWidth = document.querySelector("#image-width");
+				let targetImageHeight = document.querySelector("#image-height");
+
+				targetImageWidth.value = Number.parseInt(newImageWidth);
+				targetImageHeight.value = Number.parseInt(newImageHeight);
+			}
+
+			function initializeTextStyleInputValue(computedStyle){
+				let libraryTab = document.querySelector("#font");
+
+				// 선택한 요소의 style
+				let newFontFamily=computedStyle.getPropertyValue("font-family");
+				let newFontSize=Number.parseInt(computedStyle.getPropertyValue("font-size").replace('px',''));
+				let newFontWeight=Number.parseInt(computedStyle.getPropertyValue("font-weight"));
+				let newFontColor = rgbToHex(computedStyle.getPropertyValue("color"));
+
+				// 기존 style
+				let targetFontFamily=document.querySelector("#font-family");
+				let targetFontSize = document.querySelector("#font-size");
+				let targetFontWeight = document.querySelector("#font-weight");
+				let targetFontColor = document.querySelector("#font-color");
+				let targetFontHexColor = document.querySelector(".hex-value");
+
+				for (let i=0;i<targetFontFamily.options.length;i++){
+					let option = targetFontFamily.options[i];
+					if (option.value === newFontFamily){
+						option.selected = true;
+						break;
+					}
+				}
+
+				targetFontSize.value=newFontSize;
+				targetFontWeight.value=newFontWeight;
+				targetFontColor.value=newFontColor;
+				targetFontHexColor.innerText = newFontColor;
+
+			}
+
+			function rgbToHex(rgb) {
+				// RGB 값을 파싱하여 숫자 값으로 추출
+				let rgbValues = rgb.match(/\d+/g);
+
+				// 각각의 RGB 값들을 16진수(hex)로 변환하고 합치기
+				let hexValue = "#" + rgbValues.map(function (value) {
+					return ('0' + parseInt(value, 10).toString(16)).slice(-2);
+				}).join('');
+
+				return hexValue;
+			}
+
+			function handleUploadEvent(event){
+				let input = event.target.closest("input");
+				uploadEditorImage(input);
+				// input.addEventListener("change",uploadEditorImage(id));
+
+				// console.log("type: ",type);
+				// switch (type){
+				//	 case "bgImage":
+				//		 item = document.querySelector(`.${type} input[name='editor-upload']`);
+				//		 if(item != null && item != undefined){
+				//			 item.addEventListener("change",uploadEditorImage('bgImage'))
+				//		 }
+				//
+				//		 break;
+				//	 case "image":
+				//		 item = document.querySelector(`.${type} input[name='editor-upload']`);
+				//		 if(item != null && item != undefined){
+				//			 item.addEventListener("change",uploadEditorImage('image'))
+				//		 }
+				//		 break;
+				// }
+			}
+
+			function styleForText(dataTypeId, mode = 'mod') {
+				let styleEditor = document.querySelector(".library-wrapper div.active");
+				let fontFamily = styleEditor.querySelector("#font-family");
+				let fontSize = styleEditor.querySelector("#font-size");
+				let fontColor = styleEditor.querySelector("#font-color");
+				let fontWeight = styleEditor.querySelector("#font-weight");
+				// let textWidth = styleEditor.querySelector("#text-width");
+				// let textHeight = styleEditor.querySelector("#text-height");
+				let textPosition = styleEditor.querySelector("#text-position");
+
+				// let textBackgrond = styleEditor.querySelector("#background-color");
+				let textBackgroundOpacity = styleEditor.querySelector("#opacity");
+
+				fontFamily.addEventListener("change", function (event) {
+					let font = event.target.value;
+					let component = document.querySelector(`div.edit-style[data-type-id='${dataTypeId}']`);
+					if (component != null) {
+						component.style.fontFamily = font;
+					}
+				});
+
+				fontSize.addEventListener("change", function (event) {
+					let size = event.target.value;
+					let component = document.querySelector(`div.edit-style[data-type-id='${dataTypeId}']`);
+					if (component != null){
+						let component = document.querySelector(`div.edit-style[data-type-id='${dataTypeId}']`);
+						component.style.fontSize = size + 'px';
+					}
+				});
+
+				fontColor.addEventListener("change", function (event) {
+					let textColor = event.target.value;
+					let hexValue = document.querySelector(".hex-value");
+					let component = document.querySelector(`div.edit-style[data-type-id='${dataTypeId}']`);
+					if (component != null){
+						hexValue.innerText = textColor;
+						component.style.color=textColor;
+					}
+				});
+
+				fontWeight.addEventListener("change", function (event) {
+					let weight = event.target.value;
+					let component = document.querySelector(`div.edit-style[data-type-id='${dataTypeId}']`);
+					if(component != null){
+						component.style.fontWeight = weight;
+					}
+				});
+			}
+			function resetEditStyle(){
+				if( isShiftPressed == false){
+					if( $('#content-container .edit-style').length > 0 ){
+						removeAllEditStyle();
+					}
+				}
+			}
+
+			function removeAllEditStyle(){
+				$('#content-container .edit-style').removeClass('edit-style');
+			}
+
+			function styleForTable(component) {
+			}
+
+			function styleForImages(dataTypeId) {
+				$('.imageFunTitle').text('이미지 변경');
+
+				let imgWidth = document.querySelector("#image-width");
+				let imgHeight = document.querySelector("#image-height");
+				// let imgRotate = document.querySelector('#image-rotate');
+
+				imgWidth.addEventListener("change", function (event) {
+					let value = event.target.value;
+					let component = document.querySelector(`div.edit-style[data-type-id='${dataTypeId}'] .image-box`);
+					if (component != null){
+						// let cardContainer = component.querySelector(".card-container");
+						component.style.width = value + 'px';
+					}
+				})
+
+				imgHeight.addEventListener("change", function (event) {
+					let value = event.target.value;
+					let component = document.querySelector(`div.edit-style[data-type-id='${dataTypeId}'] .image-box`);
+					console.log("component: ",component);
+					if (component != null){
+						// let cardContainer = component.querySelector(".card-container");
+						// let card = cardContainer.querySelector(".image-box")
+						component.style.height = value + 'px';
+					}
+				})
+			}
+
+			function styleForBackground() {
+				let currentSlide = document.querySelector(".slides li.current-slide");
+				let bgColor = document.querySelector("#bg-color");
+				let bgWidth = document.querySelector("#bg-width");
+				let bgHeight = document.querySelector("#bg-height");
+				// let item = component.parentElement;
+				// component.style.zIndex="0";
+				let bgColorOpacity = document.querySelector("#bg-opacity");
+				let hexColor;
+
+				bgColor.addEventListener("change", function (event) {
+					hexColor = event.target.value;
+					let slide = document.querySelector(".slides li.current-slide");
+					slide.style.backgroundColor = `${hexColor}`;
+				});
+
+				bgColorOpacity.addEventListener("input", function (event) {
+					let opacity = event.target.value;
+					let rgba = hexToRGBA(hexColor, opacity);
+					let slide = document.querySelector(".slides li.current-slide");
+					slide.style.backgroundColor = `${rgba}`;
+				});
+
+				//TODO
+				// bgWidth.addEventListener("change",function(event){
+				//	 let value = event.target.value;
+				//	 component.style.width=value+'px';
+				// });
+
+				// bgHeight.addEventListener("change",function(event){
+				//	 let value = event.target.value;
+				//	 component.style.height=value+'px';
+				// });
+			}
+
+			function hexToRGBA(hex, opacity) {
+				const r = parseInt(hex.slice(1, 3), 16);
+				const g = parseInt(hex.slice(3, 5), 16);
+				const b = parseInt(hex.slice(5, 7), 16);
+				let a;
+				if (opacity != null) {
+					a = parseFloat(opacity * 0.01); // opacity
+				} else {
+					a = 1;
+				}
+				return `rgba(${r}, ${g}, ${b}, ${a})`;
+			}
+
+			function templateSwiper(){
+				const swiper = new Swiper('#modal div.data', {
+					slidesPerView:4.2,
+					speed: 400,
+					spaceBetween: 30,
+					slidesOffsetBefore:30,
+					slidesOffsetAfter:30,
+
+					// Navigation arrows
+					navigation: {
+						nextEl: '.swiper-button-next',
+						prevEl: '.swiper-button-prev',
+					},
+				});
+
+				$('.swiper-wrapper > li')
+					.off('dblclick')
+					.on('dblclick',function(){
+					    if(confirm( '선택된 템플릿을 적용 하시겠습니까?')){
+							renderTemplate();
+						}
+					});
+			}
+
+			function selectTemplate(obj,id){
+				let template = obj.parentElement;
+				let templateContainer = template.parentElement;
+				let templateLists = templateContainer.querySelectorAll("li");
+				Array.from(templateLists).forEach(function(item){
+					item.classList.remove("selected");
+				});
+				template.classList.add("selected");
+				selectTemplateId = id;
+			}
+
+			function deleteEditorImage(item,id){
+				// item=> clicked button
+				$.ajax({
+					url:'/manage/product/removeEditorImage',
+					type:"DELETE",
+					data:`file_id=${id}&template_id=${0}`,
+					beforeSend:function(xhr){
+						xhr.setRequestHeader(
+							[[${_csrf.headerName}]], [[${_csrf.token}]]
+						)
+					},
+					success : function(data) {
+						if (typeof data.result != "undefined" && data.result == "error") {
+							alert(data.error);
+							return;
+						} else {
+							$(item).parent().parent().remove();
+						}
+					},
+					error : function(xhr, code, errorMsg) { },
+					complete : function() { }
+
+				})
+
+			}
+
+			function saveTemplate() {
+				// 최적화 필요
+				html2canvas(document.querySelector("#content-container .slides")).then(function(canvas) {
+					let imageByte = canvas.toDataURL("image/png");
+					imageByte = imageByte.replace("data:image/png;base64,", "");
+					const templateContainer = document.querySelector('#content-container .slides');
+					const form = document.getElementById('product-template-form');
+					const postForm = new FormData(form);
+					let serializedData = '';
+
+					for (let formItem of postForm.entries()) {
+						if (serializedData !== '') {
+							serializedData += '&';
+						}
+						serializedData += encodeURIComponent(formItem[0]) + '=' + encodeURIComponent(formItem[1]);
+					}
+					serializedData += `&templateHtml=${templateContainer.innerHTML}`;
+					serializedData += `&imageByte=${imageByte}`;
+
+					$.ajax({
+						url : "/manage/product/addTemplate"
+						, type : "POST"
+						, data : serializedData
+						, beforeSend: function (xhr) {
+							xhr.setRequestHeader(
+								[[${_csrf.headerName}]], [[${_csrf.token}]]
+							);
+						},
+						success : function(data) {
+							alert(data.message);
+						},
+						error : function(a, b, c) {
+							alert("error");
+						}
+					});
+				});
+			}
+
+			function alignComponentItem(event){
+				// TODO..
+				let component = document.querySelector("div.edit-style");
+				console.log("align-component: ",component);
+				let isGroup = COMPONETS_GROUP.length > 1 ? true : false;
+				let eventType = event.target.closest("li").classList[0];
+				console.log("eventType: ",eventType);
+				let scaleRatio = currentScale / initialScale;
+				// computed style:
+				// let computedStyle = getComputedStyle(component);
+
+				switch (eventType){
+					case "left":
+						// 왼쪽 정렬
+						if(isGroup){
+							// 다중 정렬
+							console.log("group-align");
+							Array.from(COMPONETS_GROUP).forEach(function(item){
+								item.style.removeProperty("right");
+								let computedStyle = getComputedStyle(item);
+							});
+						}else{
+							// 단일 정려
+							component.style.removeProperty("right");
+							component.style.left="0px";
+						}
+						break;
+					case "right":
+						// 오른쪽 정렬
+						if(isGroup){
+							// 다중 정렬
+							console.log("group-align-right")
+
+						}else{
+							// 단일 정렬
+							component.style.removeProperty("left");
+							component.style.right="0";
+						}
+
+						break;
+					case "top":
+						// 위로 정렬
+						if(isGroup){
+							// 다중 정렬
+							console.log("group-align-top")
+
+						}else{
+							// 단일 정렬
+							component.style.removeProperty("bottom");
+							component.style.top="0";
+						}
+
+						break;
+					case "bottom":
+						// 아래로 정렬
+						if(isGroup){
+							// 다중 정렬
+							console.log("group-align-bottom")
+
+						}else{
+							// 단일 정렬
+							component.style.removeProperty("top");
+							component.style.bottom="0";
+						}
+
+						break;
+					case "center":
+						// 오른쪽 정렬
+						if(isGroup){
+							// 다중 정렬
+							console.log("group-align-right")
+
+						}else{
+							// 단일 정렬 -> slide 스케일이 변경 될경우 중앙값도 변경됨.....
+							component.style.removeProperty("top");
+							component.style.removeProperty("bottom");
+							component.style.removeProperty("left");
+							component.style.removeProperty("right");
+
+							// 요소 위치 재 계산
+							let currentSlide = document.querySelector("#content-container .slides li.current-slide");
+
+							let slideRect = currentSlide.getBoundingClientRect();
+							let itemRect = component.getBoundingClientRect();
+
+							let offsetX = slideRect.left + slideRect.width / 2 - (itemRect.left + itemRect.width / 2);
+							let offsetY = slideRect.top + slideRect.height / 2 - (itemRect.top + itemRect.height / 2);
+
+							component.style.top=`${offsetY/scaleRatio}px`;
+							component.style.left=`${offsetX/scaleRatio}px`;
+						}
+
+						break;
+					case "middle":
+						// 중앙 정렬
+						if(isGroup){
+							// 다중 정렬
+							console.log("group-align-center")
+
+						}else{
+							// 단일 정렬
+
+						}
+						break;
+				}
+			}
+
+		</script>
+		<!--/*템플릿 script(e)*/-->
+	</div>
+</body>
+</html>

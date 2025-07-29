@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${company != null} ? ${company.siteName}">#{여행사}</title>
+    <head th:replace="~{inc/common-header :: include}" />
+    <head th:replace="~{inc/header :: header-script}" />
+    <link rel="stylesheet" type="text/css" href="/css/front/member.css" th:href="@{/css/front/member.css}" />
+    <script type="text/javascript" th:inline="javascript">
+
+    </script>
+</head>
+<body>
+<header th:replace="~{inc/header :: header-nav}" />
+<section class="wrap">
+    <div class="contents">
+        <div class="subpage-category">
+            <form id="subpage-form">
+            <ul class="subpage-category-list">
+                <li class="subpage-category-item">마이페이지</li>
+                <li class="subpage-category-item">회원정보</li>
+                <li class="subpage-category-item">예약내역</li>
+                <li class="subpage-category-item">1:1문의</li>
+                <li class="subpage-category-item">견적내역</li>
+                <li class="subpage-category-item">리뷰/후기</li>
+            </ul>
+            </form>
+        </div>
+        <div class="subpage-contents" id="load-content">
+
+        </div>
+    </div>
+</section>
+<footer th:replace="~{inc/footer :: footer}" />
+</body>
+</html>

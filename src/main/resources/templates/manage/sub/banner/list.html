@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">배너관리</h1>
+            <input type="hidden" id="banner-type" value="MAIN" th:value="${bannerType}"/>
+            <input type="hidden" id="menu-id" />
+        </div>
+<!--/*
+*/-->
+        <div class="row mb-10">
+			<div class="col-md-12">
+				<div class="float-left">
+		            <button class="tab-btn" data-id="MAIN"        th:onclick="fnSetBannerList('MAIN')">메인</button>
+		            <button class="tab-btn" data-id="subBanner"  th:onclick="fnSetBannerList('subBanner')">sub베너</button>
+		        </div>
+			</div>
+        </div>
+        <div class="manage-content mb-4" th:if="${bannerList != null} and !${#arrays.isEmpty(bannerList)}">
+            <h3>미리보기</h3>
+            <div class="content-header mb-3">
+                <label class="alt-input-title">PC</label>
+                <label class="alt-input-label">이미지 추천 사이즈: 2000px * 600px </label>
+            </div>
+            <div class="main-banner-preview swiper" id="pc-preview">
+
+            </div>
+            <div class="content-header mb-3">
+                <label class="alt-input-title">Mobile</label>
+                <label class="alt-input-label">이미지 추천 사이즈: 800px * 400px </label>
+            </div>
+            <div class="main-banner-preview mobile swiper" id="mobile-preview">
+
+            </div>
+        </div>
+        <div class="manage-control middle">
+            <button type="button" class="btn btn-primary" onclick="fnWriteBanner()">신규등록</button>
+            <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#modal-banner-sort">순서변경</button>
+        </div>
+        <div class="manage-content table">
+            <table id="datatable" class="table table-hover manage-table">
+                <thead>
+                <tr>
+                    <th>순서</th>
+                    <th>썸네일(PC)</th>
+                    <th>썸네일(MO)</th>
+                    <th>등록일</th>
+                    <th>노출기간</th>
+                    <th>등록상태</th>
+                    <th>수정/삭제</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:if="${bannerList == null or #arrays.isEmpty(bannerList)}">
+                    <tr class="empty-row">
+                        <td colspan="7">등록된 배너가 없습니다.</td>
+                    </tr>
+                </th:block>
+                <th:block th:unless="${bannerList == null or #arrays.isEmpty(bannerList)}">
+                    <tr th:each="item, idx : ${bannerList}" th:class="${#strings.isEmpty(item.useYn) or #strings.equals(item.useYn, 'N')} ? 'tr-disable'">
+                        <td class="no" th:text="${((paging.currentPageNumber-1)*5)+idx.count}">순서</td>
+                        <td class="thumbnail">
+                            <img class="thumbnail-img pc-banner" th:src="@{/upload/{url}(url=${item.imageUrlPc})}" th:if="!${#strings.isEmpty(item.imageUrlPc)}" />
+                        </td>
+                        <td class="thumbnail">
+                            <img class="thumbnail-img mobile-banner" th:src="@{/upload/{url}(url=${item.imageUrlMobile})}" th:if="!${#strings.isEmpty(item.imageUrlMobile)}" />
+                        </td>
+                        <td class="date" th:text="${item.createDate}">등록일</td>
+                        <td class="period">
+                            <th:block th:if="${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                상시노출
+                            </th:block>
+                            <th:block th:unless="${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                <th:block th:if="!${#strings.isEmpty(item.startDate)} and ${#strings.isEmpty(item.expireDate)}">
+                                    <span th:text="|${item.startDate} ~|"></span>
+                                </th:block>
+                                <th:block th:if="${#strings.isEmpty(item.startDate)} and !${#strings.isEmpty(item.expireDate)}">
+                                    <span th:text="|~ ${item.expireDate}|"></span>
+                                </th:block>
+                                <th:block th:if="!${#strings.isEmpty(item.startDate)} and !${#strings.isEmpty(item.expireDate)}">
+                                    <span th:utext="|${item.startDate} <br /> ~ ${item.expireDate}|"></span>
+                                </th:block>
+                            </th:block>
+                        </td>
+                        <td class="control">
+                            <button type="button" class="btn btn-visible" th:classappend="${#strings.equals(item.visibleYnPc, 'Y')} ? 'active':'inactive'">PC</button>
+                            <button type="button" class="btn btn-visible" th:classappend="${#strings.equals(item.visibleYnMobile, 'Y')} ? 'active':'inactive'">Mobile</button>
+                        </td>
+                        <td class="control">
+                            <button type="button" class="btn btn-control btn-gray" th:onclick="fnModifyBanner([[${item.id}]])">수정</button>
+                            <button type="button" class="btn btn-control btn-dark" th:onclick="fnDeleteBanner([[${item.id}]])">삭제</button>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+        <div class="manage-pagination">
+            <div th:replace="~{/manage/inc/manage-pagination :: paging-page}" ></div>
+        </div>
+    </section>
+    <div class="modal fade manage-modal" id="modal-banner-sort" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="banner-sort" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-banner-item-title">배너 순서 변경</h5>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="banner-sort-form">
+                        <ul class="popup-sort-list">
+                            <li class="sort-item banner" th:each="item : ${bannerList}" th:if="${bannerList != null}">
+                                <input type="hidden" name="ids" th:value="${item.id}" />
+                                <div class="guide"></div>
+                                <div class="content">
+                                    <div class="preview">
+                                        <img class="thumbnail-img pc-banner" th:src="@{/upload/{url}(url=${item.imageUrlPc})}" th:if="!${#strings.isEmpty(item.imageUrlPc)}" />
+                                        <img class="thumbnail-img mobile-banner" th:src="@{/upload/{url}(url=${item.imageUrlMobile})}" th:if="!${#strings.isEmpty(item.imageUrlMobile)}" />
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" onclick="fnUpdateBannerOrder()">저장</button>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+	let bannerType = 'main';
+	let menuId;
+
+    fnWriteBanner = function(){
+		var banner_type = document.getElementById('banner-type').value;
+		var url;
+
+		if( searchParams.has('bannerType') && searchParams.get('bannerType') == 'menuBanner' ){
+			url=`/manage/menu/user/banner-add?type=${banner_type}&menuId=${searchParams.get('menuId')}`;
+		} else {
+			url=`/manage/banner/add?type=${banner_type}`;
+		}
+
+		location.href=url;
+    }
+
+    fnModifyBanner = function(id){
+		var banner_type = document.getElementById('banner-type').value;
+		var url;
+
+		if( searchParams.has('bannerType') && searchParams.get('bannerType') == 'menuBanner' ){
+			url=`/manage/menu/user/banner-modify?type=${banner_type}&id=${id}&menuId=${searchParams.get('menuId')}`;
+		} else {
+			url=`/manage/banner/modify?type=${banner_type}&id=${id}`;
+        }
+        location.href=url;
+    }
+
+    fnDeleteBanner = function(id){
+        if(confirm('삭제하면 되돌릴 수 없습니다.')){
+            $.ajax({
+                url : "/manage/banner/delete",
+                type : "DELETE",
+                data :  `id=${id}`,
+                dataType : "json",
+                success : function(data){
+                    if( data.result === "success" ){
+                        alert('삭제완료');
+                        location.reload();
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            });
+        }
+    }
+
+    fnUpdateBannerOrder = function(){
+        $.ajax({
+            url : "/manage/banner/orderly",
+            type : "PUT",
+            data :  $('#banner-sort-form').serialize(),
+            dataType : "json",
+            success : function(data){
+                if( data.result === "success" ){
+                    alert(data.message);
+                    location.reload();
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnInitBannerCategory = function(){
+		$('.tab-btn').removeClass('active');
+
+		if( searchParams.has('bannerType') ){
+			bannerType = searchParams.get('bannerType');
+			$('#banner-type').val(bannerType);
+		}
+		if( searchParams.has('menuId') ){
+			menuId = searchParams.get('menuId');
+			$('#menu-id').val(menuId);
+		}
+
+		$(`.tab-btn[data-id='${bannerType}']`).addClass('active');
+	}
+
+    fnSetBannerList = function(_bannerType){
+		location.href = `/manage/banner/list?bannerType=${_bannerType}`;
+	}
+
+    fnGetMainBannerPreview = function(){
+		var searchData = { 'bannerType':bannerType };
+
+		if(menuId !== undefined) searchData.menuId = menuId;
+
+        $.ajax({
+            url : "/manage/banner/preview/list",
+            type : "GET",
+            data : searchData,
+            dataType : "json",
+            success : function(data){
+                if( data.result === "success" ){
+                    console.log(data);
+                    if(data.pc !== undefined && data.pc !== null){
+                        $('#pc-preview').empty();
+                        if(data.pc.length === 0){
+                            let emptyRow = `<div class="empty"><span>등록된 배너가 없습니다.</span></div>`;
+                            $('#pc-preview').append(emptyRow);
+                        }else{
+                            let row = '<ul class="main-banner-list swiper-wrapper">';
+                                for(let i=0; i<data.pc.length; i++){
+                                    row += `<li class="main-banner-item swiper-slide">
+                                                <img class="main-banner-image" src="/upload/${data.pc[i].imageUrlPc}" />
+                                                <div class="main-banner-text">
+                                                    <div class="text-top" style="font-family:${data.pc[i].imageTextTopFont};color:${data.pc[i].imageTextTopColor};">${data.pc[i].imageTextTop}</div>
+                                                    <div class="text-mid" style="font-family:${data.pc[i].imageTextMidFont};color:${data.pc[i].imageTextMidColor};">${data.pc[i].imageTextMid}</div>
+                                                    <div class="text-bot" style="font-family:${data.pc[i].imageTextBotFont};color:${data.pc[i].imageTextBotColor};">${data.pc[i].imageTextBot}</div>
+                                                </div>
+                                            </li>`;
+                                }
+                                row += '</ul>';
+                            if(data.pc.length > 1){
+                                row += `<div class="main-banner-overlap">
+                                            <div class="main-banner-control">
+                                                <ul class="main-banner-indicator">
+                                                    <li class="guide-display">
+                                                        <img class="arrow main-banner-guide-left" src="/images/icon/left.svg" alt="이전" />
+                                                        <span class="guide-text current" id="main-banner-index-pc">1</span>
+                                                        <span class="guide-text bar">|</span>
+                                                        <span class="guide-text total">${data.pc.length}</span>
+                                                        <img class="arrow main-banner-guide-right" src="/images/icon/right.svg" alt="다음" />
+                                                    </li>
+                                                    <li class="guide-icon main-banner-pause">
+                                                        <img src="/images/icon/pause.svg" alt="정지" />
+                                                    </li>
+                                                    <li class="guide-icon main-banner-play">
+                                                        <img src="/images/icon/play.svg" alt="재생" />
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>`;
+                            }
+                            $('#pc-preview').append(row);
+
+                            const swiperPc = new Swiper('#pc-preview', {
+                                speed: 500,
+                                centerInsufficientSlides: true,
+                                rewind: true,
+                                effect:'fade',
+                                navigation: {
+                                    prevEl: '.main-banner-guide-left',
+                                    nextEl: '.main-banner-guide-right',
+                                },
+                                on: {
+                                    init: function(){
+                                        $('.main-banner-play').hide();
+                                    },
+                                    slideChange: function() {
+                                        $('#main-banner-index-pc').text(swiperPc.activeIndex+1);
+                                    }
+                                },
+                            });
+                        }
+                    }
+                    if(data.mobile !== undefined && data.mobile !== null){
+                        $('#mobile-preview').empty();
+                        if(data.mobile.length === 0){
+                            let emptyRow = `<div class="empty"><span>등록된 배너가 없습니다.</span></div>`;
+                            $('#mobile-preview').append(emptyRow);
+                        }else{
+                            let row = '<ul class="main-banner-list swiper-wrapper">';
+                                for(let i=0; i<data.mobile.length; i++){
+                                    row += `<li class="main-banner-item swiper-slide">
+                                                <img class="main-banner-image" src="/upload/${data.mobile[i].imageUrlMobile}" />
+                                                <div class="main-banner-text">
+                                                    <div class="text-top" style="font-family:${data.mobile[i].imageTextTopFont};color:${data.mobile[i].imageTextTopColor};">${data.mobile[i].imageTextTop}</div>
+                                                    <div class="text-mid" style="font-family:${data.mobile[i].imageTextMidFont};color:${data.mobile[i].imageTextMidColor};">${data.mobile[i].imageTextMid}</div>
+                                                    <div class="text-bot" style="font-family:${data.mobile[i].imageTextBotFont};color:${data.mobile[i].imageTextBotColor};">${data.mobile[i].imageTextBot}</div>
+                                                </div>
+                                            </li>`;
+                                }
+                                row += '</ul>';
+                            if(data.mobile.length > 1){
+                                row += `<div class="main-banner-overlap">
+                                            <div class="main-banner-control">
+                                                <ul class="main-banner-indicator">
+                                                    <li class="guide-display">
+                                                        <img class="arrow main-banner-guide-left" src="/images/icon/left.svg" alt="이전" />
+                                                        <span class="guide-text current" id="main-banner-index-mobile">1</span>
+                                                        <span class="guide-text bar">|</span>
+                                                        <span class="guide-text total">${data.mobile.length}</span>
+                                                        <img class="arrow main-banner-guide-right" src="/images/icon/right.svg" alt="다음" />
+                                                    </li>
+                                                    <li class="guide-icon main-banner-pause">
+                                                        <img src="/images/icon/pause.svg" alt="정지" />
+                                                    </li>
+                                                    <li class="guide-icon main-banner-play">
+                                                        <img src="/images/icon/play.svg" alt="재생" />
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>`;
+                            }
+                            $('#mobile-preview').append(row);
+
+                            const swiperMobile = new Swiper('#mobile-preview', {
+                                speed: 500,
+                                centerInsufficientSlides: true,
+                                rewind: true,
+                                effect:'fade',
+                                navigation: {
+                                    prevEl: '.main-banner-guide-left',
+                                    nextEl: '.main-banner-guide-right',
+                                },
+                                on: {
+                                    init: function(){
+                                        $('.main-banner-play').hide();
+                                    },
+                                    slideChange: function() {
+                                        $('#main-banner-index-mobile').text(swiperMobile.activeIndex+1);
+                                    }
+                                },
+                            });
+                        }
+                    }
+                }else{
+                    alert('오류가 발생했습니다.');
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    };
+
+    $(document).ready(function(){
+		fnInitBannerCategory();
+
+        const modalBannerSort = document.getElementById('modal-banner-sort');
+    	modalBannerSort.addEventListener('show.bs.modal', event => {});
+
+    	modalBannerSort.addEventListener('hide.bs.modal', event => {});
+
+        $('.popup-sort-list').sortable({
+            items: $('.sort-item')
+        })
+
+        fnGetMainBannerPreview();
+    });
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.BannerManageMapper">
+
+    <select id="selectMainBannerImageListCount" parameterType="HashMap" resultType="Integer">
+        SELECT count(*) FROM main_banner_image
+         WHERE banner_type = #{bannerType} AND delete_yn = 'N'
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+                    <if test="useYn != 'ALL'">
+                        AND use_yn = #{useYn}
+                    </if>
+                </if>
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerType)">AND banner_type = #{bannerType}</if>
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">AND menu_id = #{menuId}</if>
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+                    AND (   image_text_top LIKE CONCAT('%', #{searchKey}, '%')
+                            OR image_text_mid LIKE CONCAT('%', #{searchKey}, '%')
+                            OR image_text_bot LIKE CONCAT('%', #{searchKey}, '%')
+                        )
+                </if>
+    </select>
+
+    <select id="selectMainBannerImageList" resultType="MainBannerImage">
+        SELECT id, menu_id, banner_type,
+               image_id_pc, image_url_pc,
+               image_fit_pc, visible_yn_pc,
+               image_id_mobile, image_url_mobile,
+               image_fit_mobile, visible_yn_mobile,
+               image_text_top, image_text_top_font, image_text_top_color,
+               image_text_top_x, image_text_top_y,
+               image_text_mid, image_text_mid_font, image_text_mid_color,
+               image_text_mid_x, image_text_mid_y,
+               image_text_bot, image_text_bot_font, image_text_bot_color,
+               image_text_bot_x, image_text_bot_y,
+               link_url, link_target,
+               start_date, expire_date, use_yn,
+               order_number, create_id, create_date,
+               last_update_id, last_update_date
+          FROM main_banner_image
+        WHERE banner_type = #{bannerType} AND delete_yn = 'N'
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+                    <if test="useYn != 'ALL'">
+                        AND use_yn = #{useYn}
+                    </if>
+                </if>
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerType)">AND banner_type = #{bannerType}</if>
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">AND menu_id = #{menuId}</if>
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey)">
+                    AND (
+                            image_text_top LIKE CONCAT('%', #{searchKey}, '%')
+                            OR image_text_mid LIKE CONCAT('%', #{searchKey}, '%')
+                            OR image_text_bot LIKE CONCAT('%', #{searchKey}, '%')
+                        )
+                </if>
+         ORDER BY order_number, id DESC
+    </select>
+
+    <select id="selectMainBannerImage" parameterType="HashMap" resultType="MainBannerImage">
+        SELECT id, menu_id, banner_type,
+               image_id_pc, image_url_pc,
+               image_fit_pc, visible_yn_pc,
+               image_id_mobile, image_url_mobile,
+               image_fit_mobile, visible_yn_mobile,
+               image_text_top, image_text_top_font, image_text_top_color,
+               image_text_top_x, image_text_top_y,
+               image_text_mid, image_text_mid_font, image_text_mid_color,
+               image_text_mid_x, image_text_mid_y,
+               image_text_bot, image_text_bot_font, image_text_bot_color,
+               image_text_bot_x, image_text_bot_y,
+               link_url, link_target,
+               start_date, expire_date, use_yn,
+               order_number, create_id, create_date,
+               last_update_id, last_update_date
+          FROM main_banner_image
+         WHERE banner_type = #{bannerType} AND delete_yn = 'N'
+               AND id = #{id}
+    </select>
+
+    <insert id="insertMainBannerImage" parameterType="MainBannerImage">
+        INSERT INTO main_banner_image
+           SET banner_type = #{bannerType},
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">menu_id = #{menuId},</if>
+               image_id_pc = #{imageIdPc}, image_url_pc = #{imageUrlPc},
+               image_fit_pc = #{imageFitPc}, visible_yn_pc = #{visibleYnPc},
+               image_id_mobile = #{imageIdMobile}, image_url_mobile = #{imageUrlMobile},
+               image_fit_mobile = #{imageFitMobile}, visible_yn_mobile = #{visibleYnMobile},
+               image_text_top = #{imageTextTop},  image_text_top_font = #{imageTextTopFont}, image_text_top_color = #{imageTextTopColor},
+               image_text_top_x = #{imageTextTopX},  image_text_top_y = #{imageTextTopY},
+               image_text_mid = #{imageTextMid},  image_text_mid_font = #{imageTextMidFont}, image_text_mid_color = #{imageTextMidColor},
+               image_text_mid_x = #{imageTextMidX},  image_text_mid_y = #{imageTextMidY},
+               image_text_bot = #{imageTextBot}, image_text_bot_font = #{imageTextBotFont}, image_text_bot_color = #{imageTextBotColor},
+               image_text_bot_x = #{imageTextBotX}, image_text_bot_y = #{imageTextBotY},
+               link_url = #{linkUrl}, link_target = #{linkTarget},
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                    start_date = #{startDate},
+                </if>
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+                    expire_date = #{expireDate},
+                </if>
+                    order_number = #{orderNumber},
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+                    use_yn = #{useYn},
+                </if>
+                create_id = #{createId}, create_date = now()
+    </insert>
+
+    <update id="updateMainBannerImage" parameterType="MainBannerImage">
+        UPDATE main_banner_image
+           SET <if test="imageIdPc > 0">
+                   image_id_pc = #{imageIdPc},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(imageUrlPc)">
+                   image_url_pc = #{imageUrlPc},
+               </if>
+               image_fit_pc = #{imageFitPc},
+               visible_yn_pc = #{visibleYnPc},
+               <if test="imageIdMobile > 0">
+                   image_id_mobile = #{imageIdMobile},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(imageUrlMobile)">
+                   image_url_mobile = #{imageUrlMobile},
+               </if>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">menu_id = #{menuId},</if>
+               image_fit_mobile = #{imageFitMobile},
+               visible_yn_mobile = #{visibleYnMobile},
+               image_text_top = #{imageTextTop},  image_text_top_font = #{imageTextTopFont}, image_text_top_color = #{imageTextTopColor},
+               image_text_top_x = #{imageTextTopX},  image_text_top_y = #{imageTextTopY},
+               image_text_mid = #{imageTextMid},  image_text_mid_font = #{imageTextMidFont}, image_text_mid_color = #{imageTextMidColor},
+               image_text_mid_x = #{imageTextMidX},  image_text_mid_y = #{imageTextMidY},
+               image_text_bot = #{imageTextBot}, image_text_bot_font = #{imageTextBotFont}, image_text_bot_color = #{imageTextBotColor},
+               image_text_bot_x = #{imageTextBotX}, image_text_bot_y = #{imageTextBotY},
+               link_url = #{linkUrl}, link_target = #{linkTarget},
+               <choose>
+                   <when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(startDate)">
+                       start_date = #{startDate},
+                   </when>
+                   <otherwise>
+                       start_date = null,
+                   </otherwise>
+               </choose>
+               <choose>
+                   <when test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(expireDate)">
+                       expire_date = #{expireDate},
+                   </when>
+                   <otherwise>
+                       expire_date = null,
+                   </otherwise>
+               </choose>
+               <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">
+                   use_yn = #{useYn},
+               </if>
+               last_update_id = #{lastUpdateId}, last_update_date = now()
+         WHERE delete_yn = 'N' AND id = #{id}
+    </update>
+
+    <update id="updateMainBannerDelete" parameterType="HashMap">
+        UPDATE main_banner_image
+           SET delete_yn = 'Y', delete_id = #{deleteId}, delete_date = now()
+         WHERE id = #{id}
+    </update>
+
+
+    <update id="updateMainBannerOrder" parameterType="HashMap">
+        UPDATE main_banner_image
+           SET last_update_id = #{lastUpdateId}, last_update_date = now(),
+               order_number = #{orderNumber}
+         WHERE delete_yn = 'N' AND id = #{id}
+
+    </update>
+
+    <select id="selectMainBannerPreviewList" parameterType="HashMap" resultType="MainBannerImage">
+        SELECT id, menu_id, banner_type,
+               image_id_pc, image_url_pc,
+               image_fit_pc, visible_yn_pc,
+               image_id_mobile, image_url_mobile,
+               image_fit_mobile, visible_yn_mobile,
+               image_text_top, image_text_top_font, image_text_top_color,
+               image_text_top_x, image_text_top_y,
+               image_text_mid, image_text_mid_font, image_text_mid_color,
+               image_text_mid_x, image_text_mid_y,
+               image_text_bot, image_text_bot_font, image_text_bot_color,
+               image_text_bot_x, image_text_bot_y,
+               link_url, link_target,
+               start_date, expire_date, use_yn, order_number
+          FROM main_banner_image
+         WHERE delete_yn = 'N' AND use_yn = 'Y'
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(bannerType)">AND banner_type = #{bannerType}</if>
+                <if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(menuId)">AND menu_id = #{menuId}</if>
+               <choose>
+                   <when test="type == 'PC'">
+                    AND visible_yn_pc = 'Y' AND image_url_pc IS NOT NULL
+                   </when>
+                   <when test="type == 'MO'">
+                    AND visible_yn_mobile = 'Y' AND image_url_mobile IS NOT NULL
+                   </when>
+                   <otherwise>
+                    AND visible_yn_pc = 'Y' AND image_url_pc IS NOT NULL
+                    AND visible_yn_mobile = 'Y' AND image_url_mobile IS NOT NULL
+                   </otherwise>
+               </choose>
+
+               AND (start_date IS NULL OR start_date &lt; #{now})
+               AND (expire_date IS NULL OR expire_date &gt; #{now})
+         ORDER BY order_number, id DESC
+    </select>
+
+</mapper>

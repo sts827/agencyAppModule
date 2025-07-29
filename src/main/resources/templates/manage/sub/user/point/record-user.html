@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">사용자 포인트 조회</h1>
+        </div>
+        <div class="manage-content filter mb-4">
+            <form id="funcScheduleForm">
+                <div class="input-box">
+                    <div class="row mb-3 form-inline">
+                        <div class="input-area-third">
+                            <label class="input-label">회원선택</label>
+                            <input type="text" class="form-control inline-two" id="customerEmail" name="userEmail" placeholder="사용자 ID(E-mail)" readonly="readonly" onclick="fnPopupCustomerOpen()" th:value="${p != null} ? ${p.userEmail}" />
+                            <input type="text" class="form-control inline-two" id="customerName" name="userName" placeholder="사용자명" readonly="readonly" onclick="fnPopupCustomerOpen()" th:value="${p != null} ? ${p.userName}" />
+                        </div>
+                        <button type="button" class="btn btn-dark" onclick="fnSearchUserPoint()">검색</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="manage-content table mb-4">
+            <h3 class="table-title">종합포인트</h3>
+            <table class="table table-bordered manage-table">
+                <thead>
+                    <tr>
+                        <th>누적 포인트</th>
+                        <th>사용 포인트</th>
+                        <th>소멸 포인트</th>
+                        <th>잔여 포인트</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:if="${point != null}">
+                    <tr>
+                        <td class="number" th:text="${#numbers.formatInteger(point.pointAccrued, 1, 'COMMA')}"></td>
+                        <td class="number" th:text="${#numbers.formatInteger(point.pointUsed, 1, 'COMMA')}"></td>
+                        <td class="number" th:text="${#numbers.formatInteger(point.pointExpired, 1, 'COMMA')}"></td>
+                        <td class="number" th:text="${#numbers.formatInteger(point.pointRemain, 1, 'COMMA')}"></td>
+                    </tr>
+                    </th:block>
+                    <th:block th:unless="${point != null}">
+                    <tr class="empty-row">
+                        <td colspan="8">포인트 내역이 없습니다.</td>
+                    </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="manage-content table">
+            <h3 class="table-title">세부내역</h3>
+            <table id="datatable" class="table table-hover manage-table">
+                <thead>
+                    <tr>
+                        <th>발생일시</th>
+                        <th>아이디(회원명)</th>
+                        <th>발생 구분</th>
+                        <th>발생 포인트</th>
+                        <th>사용 포인트</th>
+                        <th>잔여 포인트</th>
+                        <th>소멸기한</th>
+                        <th>기능</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:if="${pointList == null or #arrays.isEmpty(pointList)}">
+                        <tr class="empty-row">
+                            <td colspan="8">포인트 내역이 없습니다.</td>
+                        </tr>
+                    </th:block>
+                    <th:block th:unless="${pointList == null or #arrays.isEmpty(pointList)}">
+                        <tr th:each="item, idx : ${pointList}">
+                            <td class="date" th:text="${item.accruedDate}"></td>
+                            <td class="userid" th:utext="|${item.userEmail} <br /> ${item.userName}|"></td>
+                            <td class="date" th:text="${item.accruedType}"></td>
+                            <td class="date" th:text="${#numbers.formatInteger(item.pointAccrued, 1, 'COMMA')}"></td>
+                            <td class="date" th:text="${#numbers.formatInteger(item.pointUsed, 1, 'COMMA')}"></td>
+                            <td class="date" th:text="${#numbers.formatInteger(item.pointRemain, 1, 'COMMA')}"></td>
+                            <td class="date" th:text="${item.expireDate}"></td>
+                            <td class="control">
+                                <button class="btn btn-danger" th:onclick="|fnCancelPoint(${item.id}, ${item.accruedId}, 'manager')|">취소</button>
+                            </td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+        <div class="manage-pagination">
+            <div th:replace="~{/manage/inc/manage-pagination :: paging-page}" ></div>
+        </div>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <div th:replace="~{/manage/inc/manage-popup :: modal-schedule}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    fnSearchUserPoint = function(){
+        let form = $('#funcScheduleForm');
+        if($(form).find('#customerEmail').val() === ''){
+            fnPopupCustomerOpen();
+        }else{
+            $(form).submit();
+        }
+    }
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

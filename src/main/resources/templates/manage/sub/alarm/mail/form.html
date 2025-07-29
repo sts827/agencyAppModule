@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}"/>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">알림설정</h1>
+        </div>
+        <div class="manage-content mb-5">
+            <form id="mail-server-form">
+            <input type="hidden" name="alarmType" value="inquiry" />
+            <input type="hidden" name="id" th:value="${setting.id}" th:if="${setting != null}" />
+            <div class="input-box">
+                <div class="title">
+                    메일서버 설정
+                </div>
+                <div class="row form-inline mb-3">
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-email">발신메일*</label>
+                        <input type="text" class="form-control inline-one" id="smtp-email" name="smtpEmail"
+                               placeholder="발신메일" required="required" th:value="${setting != null} ? ${setting.smtpEmail}" />
+                    </div>
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-username">발신자명*</label>
+                        <input type="text" class="form-control inline-one" id="smtp-username" name="smtpUsername"
+                               placeholder="발신자명" required="required" th:value="${setting != null} ? ${setting.smtpUsername}" />
+                    </div>
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-server">메일서버*</label>
+                        <input type="text" class="form-control inline-one" id="smtp-server" name="smtpServer"
+                               placeholder="발신서버(SMTP 서버)" required="required" th:value="${setting != null} ? ${setting.smtpServer}" />
+                    </div>
+                </div>
+                <div class="row form-inline mb-3">
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-login-id">메일서버ID</label>
+                        <input type="text" class="form-control inline-one" id="smtp-login-id" name="smtpLoginId"
+                               placeholder="SMTP 로그인 아이디" th:value="${setting != null} ? ${setting.smtpLoginId}" />
+                    </div>
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-login-pw">메일서버PW</label>
+                        <input type="text" class="form-control inline-one" id="smtp-login-pw" name="smtpLoginPw"
+                               placeholder="SMTP 로그인 비밀번호" th:value="${setting != null} ? ${setting.smtpLoginPw}" />
+                    </div>
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-server">메일서버Port*</label>
+                        <input type="number" class="form-control inline-one" id="smtp-server-port" name="smtpPort"
+                               placeholder="SMTP 서버 포트" th:value="${setting != null} ? ${setting.smtpPort}" />
+                    </div>
+                </div>
+                <div class="row form-inline">
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-authorize-required">보안인증</label>
+                        <select class="form-control inline-one" id="smtp-authorize-required" name="smtpAuthorizeRequired">
+                            <option value="Y" th:selected="${setting != null and #strings.equals(setting.smtpAuthorizeRequired, 'Y')} ? 'selected'">필요</option>
+                            <option value="N" th:selected="${setting != null and #strings.equals(setting.smtpAuthorizeRequired, 'N')} ? 'selected'">필요없음</option>
+                        </select>
+                    </div>
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-secure-type">보안인증유형</label>
+                        <select class="form-control inline-one" id="smtp-secure-type" name="smtpSecureType">
+                            <option value="TLS" th:selected="${setting != null and #strings.equals(setting.smtpSecureType, 'TLS')} ? 'selected'">TLS</option>
+                            <option value="SSL" th:selected="${setting != null and #strings.equals(setting.smtpSecureType, 'SSL')} ? 'selected'">SSL</option>
+                        </select>
+                    </div>
+                    <div class="input-area-third">
+                        <label class="input-label" for="smtp-use-yn">사용여부</label>
+                        <input class="form-control" type="checkbox" id="smtp-use-yn" name="smtpUseYn" data-toggle="toggle" data-onstyle="primary" data-on="메일발송 사용" data-off="메일발송 미사용" data-width="calc(100% - 8rem)" data-height="38px" value="Y" th:checked="${setting == null or setting.smtpUseYn == 'Y'} ? 'checked'" />
+                    </div>
+                </div>
+            </div>
+            <div class="manage-control mt-0">
+                <button type="button" class="btn btn-dark" onclick="location.reload()">취소하기</button>
+                <button type="button" class="btn btn-primary" th:onclick="${setting == null} ? 'fnSaveMailServer()':'fnUpdateMailServer()'">저장하기</button>
+            </div>
+            </form>
+        </div>
+        <div class="manage-content">
+            <div class="input-box">
+                <div class="title">
+                    메일 수신자 설정
+                </div>
+                <table id="datatable" class="table table-hover manage-table">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>E-mail</th>
+                        <th>수신자명</th>
+                        <th>사용기간</th>
+                        <th>사용상태</th>
+                        <th>수정/삭제</th>
+                    </tr>
+                    </thead>
+                    <tbody id="receiver-list">
+                    <th:block th:unless="${receiverList == null or #arrays.isEmpty(receiverList)}">
+                        <tr th:each="item, idx : ${receiverList}" th:class="${#strings.isEmpty(item.useYn) or #strings.equals(item.useYn, 'N')} ? 'tr-disable'">
+                            <td class="no" th:text="${idx.count}">
+                                순서
+                            </td>
+                            <td class="userid">
+                                <input type="hidden" name="id" th:value="${item.id}" />
+                                <input type="hidden" name="serverId" th:value="${item.serverId}" />
+                                <input type="text" class="form-control" name="email" th:value="${item.email}" />
+                            </td>
+                            <td class="name">
+                                <input type="text" class="form-control" name="username" th:value="${item.username}" />
+                            </td>
+                            <td class="period table-inline">
+                                <div class="input-area-full">
+                                    <input type="text" class="form-control datepicker" name="startDate"
+                                           placeholder="시작일" readonly="readonly" autocomplete="off"
+                                           th:attr="data-default=${item.startDate}"
+                                           th:value="${item.startDate}" />
+                                    <div class="input-overlay">
+                                        <button type="button" class="overlay-button" onclick="fnSetNull($(this).parent().parent().find('input'))"><img src="/images/icon/bell.svg" /></button>
+                                    </div>
+                                </div>
+                                <div class="input-area-full">
+                                    <input type="text" class="form-control datepicker" name="expireDate"
+                                           placeholder="만료일" readonly="readonly" autocomplete="off"
+                                           th:attr="data-default=${item.startDate}"
+                                           th:value="${item.expireDate}" />
+                                    <div class="input-overlay">
+                                        <button type="button" class="overlay-button" onclick="fnSetNull($(this).parent().parent().find('input'))"><img src="/images/icon/bell.svg" /></button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="control">
+                                <input class="form-control" type="checkbox" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-height="38px" value="Y" th:checked="${#strings.equals(item.useYn, 'Y')} ? 'checked'" />
+                            </td>
+                            <td class="control">
+                                <button type="button" class="btn btn-control btn-gray" onclick="fnModifyReceiveEmail(this)">수정</button>
+                                <button type="button" class="btn btn-control btn-dark" onclick="fnDeleteReceiveEmail(this)">삭제</button>
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                    <tbody id="receiver-add">
+                    <form id="mail-receiver-form">
+                    <tr>
+                        <input type="hidden" name="serverId" th:value="${setting != null} ? ${setting.id}"  />
+                        <td class="no">+</td>
+                        <td class="userid">
+                            <input type="text" class="form-control" name="email" id="receive-email" placeholder="수신자 이메일" />
+                        </td>
+                        <td class="date">
+                            <input type="text" class="form-control" name="username" id="receive-name" placeholder="수신자명" />
+                        </td>
+                        <td class="period table-inline">
+                            <div class="input-area-full">
+                                <input type="text" class="form-control datepicker" name="startDate" id="start-date" placeholder="시작일" readonly="readonly" autocomplete="off" />
+                                <div class="input-overlay">
+                                    <button type="button" class="overlay-button" onclick="fnSetNull($('#start-date'))"><img src="/images/icon/bell.svg" /></button>
+                                </div>
+                            </div>
+                            <div class="input-area-full">
+                                <input type="text" class="form-control datepicker" name="expireDate" id="expire-date" placeholder="만료일" readonly="readonly" autocomplete="off" />
+                                <div class="input-overlay">
+                                    <button type="button" class="overlay-button" onclick="fnSetNull($('#expire-date'))"><img src="/images/icon/bell.svg" /></button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="control">
+                            <input class="form-control" type="checkbox" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-height="38px" value="Y" />
+                        </td>
+                        <td class="control">
+                            <button type="button" class="btn btn-control btn-primary" th:onclick="fnAddReceiveEmail()">등록</button>
+                        </td>
+                    </tr>
+                    </form>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $('.datepicker').daterangepicker({
+            autoUpdateInput: true,
+            singleDatePicker:true,
+            showDropdowns: true,
+            showCustomRangeLabel:false,
+            timePicker: true,
+            timePicker24Hour: true,
+            timePickerMinutes:true,
+            drops:"auto",
+            locale: {
+                format: 'YYYY-MM-DD HH:mm:ss',
+                applyLabel: "적용",
+                cancelLabel: "취소",
+                daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                separator:separator
+            }
+        }, function(start, end, label){});
+        for(let i=0; i<$('.datepicker').length; i++){
+            if($('.datepicker').eq(i).attr('data-default') === undefined){
+                $('.datepicker').eq(i).val('')
+            }
+        }
+
+    });
+
+    fnSaveMailServer = function(){
+        let form = $('#mail-server-form');
+        if(!formValidCheck('#smtp-email', 'input', 'is-invalid', 'email')) return;
+        if(!formValidCheck('#smtp-username', 'input', 'is-invalid', 'text')) return;
+        if(!formValidCheck('#smtp-server', 'input', 'is-invalid', 'text')) return;
+
+        $.ajax({
+            url: '/manage/setting/alarm/mail-server',
+            type : "POST",
+            data : $(form).serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    if( data.result === "success" ){
+                        alert(data.message);
+                        location.reload();
+                    }else{
+                        alert(data.message);
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnUpdateMailServer = function(){
+        let form = $('#mail-server-form');
+        if(!formValidCheck('#smtp-email', 'input', 'is-invalid', 'email')) return;
+        if(!formValidCheck('#smtp-username', 'input', 'is-invalid', 'text')) return;
+        if(!formValidCheck('#smtp-server', 'input', 'is-invalid', 'text')) return;
+
+        $.ajax({
+            url: '/manage/setting/alarm/mail-server',
+            type : "PUT",
+            data : $(form).serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    if( data.result === "success" ){
+                        alert(data.message);
+                        location.reload();
+                    }else{
+                        alert(data.message);
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnAddReceiveEmail  = function(){
+        let form = $('#mail-receiver-form');
+        if(!formValidCheck('#receive-email', 'input', 'is-invalid', 'email')) return;
+        if(!formValidCheck('#receive-name', 'input', 'is-invalid', 'text')) return;
+        $.ajax({
+            url: '/manage/setting/alarm/mail-receiver',
+            type : "POST",
+            data : $(form).serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    alert(data.message);
+                    if( data.result === "success" ){
+                        location.reload();
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnModifyReceiveEmail = function(item){
+        let tr = $(item).parent().parent();
+        if(!formValidCheck($(tr).find('input[name=email]'), 'input', 'is-invalid', 'email')) return;
+        if(!formValidCheck($(tr).find('input[name=username]'), 'input', 'is-invalid', 'text')) return;
+
+        $.ajax({
+            url: '/manage/setting/alarm/mail-receiver',
+            type : "PUT",
+            data : $(tr).find('input').serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    alert(data.message);
+                    if( data.result === "success" ){
+                        location.reload();
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnDeleteReceiveEmail = function(item){
+        let tr = $(item).parent().parent();
+        if(confirm('정말 삭제하시겠습니까?')){
+            $.ajax({
+                url: '/manage/setting/alarm/mail-receiver',
+                type : "DELETE",
+                data : $(tr).find('input').serialize(),
+                success : function(data) {
+                    if (typeof data.result != "undefined" && data.result == "error") {
+                        alert(data.error);
+                        return;
+                    } else {
+                        alert(data.message);
+                        if( data.result === "success" ){
+                            $(tr).remove();
+                        }
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            });
+        }
+    }
+
+
+    fnSetNull = function(target){
+        $(target).val('');
+    }
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

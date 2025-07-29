@@ -1,0 +1,695 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.wayplus.travel.mapper.manage.PlaceManageMapper">
+	<!--################################### place_spot ###################################-->
+	<select id="selectCountPlaceSpot" parameterType="HashMap" resultType="Integer">
+		SELECT count(*)
+		  FROM place_spot
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+					  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='tsTitle')" >and ts_title LIKE CONCAT('%', #{searchKey}, '%')</if>
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and ts_title like concat('%',#{titleLike},'%')</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)">and ts_id=#{tsId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStnid)">and ts_stnid=#{tsStnid}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTitle)">and ts_title=#{tsTitle}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel1)">and ts_tel1=#{tsTel1}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsManager)">and ts_manager=#{tsManager}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel2)">and ts_tel2=#{tsTel2}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsZipcode)">and ts_zipcode=#{tsZipcode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRoad)">and ts_road=#{tsRoad}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsJibun)">and ts_jibun=#{tsJibun}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDetail)">and ts_detail=#{tsDetail}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExtra)">and ts_extra=#{tsExtra}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLocationCode)">and ts_location_code=#{tsLocationCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLatitude)">and ts_latitude=#{tsLatitude}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLongitude)">and ts_longitude=#{tsLongitude}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCompanynum)">and ts_companynum=#{tsCompanynum}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEmployee)">and ts_employee=#{tsEmployee}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHomepage)">and ts_homepage=#{tsHomepage}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInside)">and ts_inside=#{tsInside}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSummary)">and ts_summary=#{tsSummary}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHelp)">and ts_help=#{tsHelp}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsBirthday)">and ts_birthday=#{tsBirthday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHoliday)">and ts_holiday=#{tsHoliday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExiting)">and ts_exiting=#{tsExiting}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExitingInwon)">and ts_exiting_inwon=#{tsExitingInwon}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStart)">and ts_start=#{tsStart}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFinish)">and ts_finish=#{tsFinish}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPersonnel)">and ts_personnel=#{tsPersonnel}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUseday)">and ts_useday=#{tsUseday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUsetime)">and ts_usetime=#{tsUsetime}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInfo)">and ts_info=#{tsInfo}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsYoutubeCode)">and ts_youtube_code=#{tsYoutubeCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAppend)">and ts_append=#{tsAppend}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWriteId)">and ts_write_id=#{tsWriteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUdateId)">and ts_udate_id=#{tsUdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWritdate)">and ts_writdate=#{tsWritdate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsMale)">and ts_male=#{tsMale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFemale)">and ts_female=#{tsFemale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts10s)">and ts_10s=#{ts10s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts20s)">and ts_20s=#{ts20s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts30s)">and ts_30s=#{ts30s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts40s)">and ts_40s=#{ts40s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts50s)">and ts_50s=#{ts50s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts60s)">and ts_60s=#{ts60s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRecreation)">and ts_recreation=#{tsRecreation}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEpicurism)">and ts_epicurism=#{tsEpicurism}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExperience)">and ts_experience=#{tsExperience}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCulture)">and ts_culture=#{tsCulture}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLeports)">and ts_leports=#{tsLeports}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsOther)">and ts_other=#{tsOther}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAlone)">and ts_alone=#{tsAlone}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFriend)">and ts_friend=#{tsFriend}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCouple)">and ts_couple=#{tsCouple}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParents)">and ts_parents=#{tsParents}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsChild)">and ts_child=#{tsChild}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsGroup)">and ts_group=#{tsGroup}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory1)">and ts_category1=#{tsCategory1}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory2)">and ts_category2=#{tsCategory2}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory3)">and ts_category3=#{tsCategory3}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory4)">and ts_category4=#{tsCategory4}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory5)">and ts_category5=#{tsCategory5}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPets)">and ts_pets=#{tsPets}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParking)">and ts_parking=#{tsParking}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDisabled)">and ts_disabled=#{tsDisabled}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsNursing)">and ts_nursing=#{tsNursing}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStroller)">and ts_stroller=#{tsStroller}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCredit)">and ts_credit=#{tsCredit}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherRain)">and ts_weather_rain=#{tsWeatherRain}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherSnow)">and ts_weather_snow=#{tsWeatherSnow}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherFog)">and ts_weather_fog=#{tsWeatherFog}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherGale)">and ts_weather_gale=#{tsWeatherGale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSpring)">and ts_season_spring=#{tsSeasonSpring}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSummer)">and ts_season_summer=#{tsSeasonSummer}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonAutumn)">and ts_season_autumn=#{tsSeasonAutumn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonWinter)">and ts_season_winter=#{tsSeasonWinter}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEditdate)">and ts_editdate=#{tsEditdate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEnrolChk)">and ts_enrol_chk=#{tsEnrolChk}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(areaType)">and area_type=#{areaType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(placeType)">and place_type=#{placeType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">and use_yn=#{useYn}	</if>
+			and ts_delete_yn = 'N'
+		</where>
+	</select>
+
+	<select id="selectListPlaceSpot" parameterType="HashMap" resultType="PlaceSpot">
+	SELECT * FROM (
+		SELECT @rownum:=@rownum+1 AS rownum,
+		       ts_id, ts_stnid, ts_title, ts_tel1, ts_manager, ts_tel2, ts_zipcode, ts_road, ts_jibun,
+		       ts_writdate, ts_editdate, ts_delete_yn, ts_append, area_type, place_type, use_yn
+		  FROM place_spot
+		  join (SELECT @rownum:= 0) rnum
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType) and
+					  @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchKey) ">
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(searchType=='tsTitle')" >and ts_title LIKE CONCAT('%', #{searchKey}, '%')</if>
+			</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(titleLike)">and ts_title like concat('%',#{titleLike},'%')</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)">and ts_id=#{tsId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStnid)">and ts_stnid=#{tsStnid}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTitle)">and ts_title=#{tsTitle}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel1)">and ts_tel1=#{tsTel1}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsManager)">and ts_manager=#{tsManager}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel2)">and ts_tel2=#{tsTel2}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsZipcode)">and ts_zipcode=#{tsZipcode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRoad)">and ts_road=#{tsRoad}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsJibun)">and ts_jibun=#{tsJibun}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDetail)">and ts_detail=#{tsDetail}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExtra)">and ts_extra=#{tsExtra}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLocationCode)">and ts_location_code=#{tsLocationCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLatitude)">and ts_latitude=#{tsLatitude}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLongitude)">and ts_longitude=#{tsLongitude}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCompanynum)">and ts_companynum=#{tsCompanynum}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEmployee)">and ts_employee=#{tsEmployee}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHomepage)">and ts_homepage=#{tsHomepage}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInside)">and ts_inside=#{tsInside}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSummary)">and ts_summary=#{tsSummary}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHelp)">and ts_help=#{tsHelp}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsBirthday)">and ts_birthday=#{tsBirthday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHoliday)">and ts_holiday=#{tsHoliday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExiting)">and ts_exiting=#{tsExiting}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExitingInwon)">and ts_exiting_inwon=#{tsExitingInwon}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStart)">and ts_start=#{tsStart}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFinish)">and ts_finish=#{tsFinish}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPersonnel)">and ts_personnel=#{tsPersonnel}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUseday)">and ts_useday=#{tsUseday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUsetime)">and ts_usetime=#{tsUsetime}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInfo)">and ts_info=#{tsInfo}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsYoutubeCode)">and ts_youtube_code=#{tsYoutubeCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAppend)">and ts_append=#{tsAppend}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWriteId)">and ts_write_id=#{tsWriteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUdateId)">and ts_udate_id=#{tsUdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWritdate)">and ts_writdate=#{tsWritdate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsMale)">and ts_male=#{tsMale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFemale)">and ts_female=#{tsFemale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts10s)">and ts_10s=#{ts10s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts20s)">and ts_20s=#{ts20s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts30s)">and ts_30s=#{ts30s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts40s)">and ts_40s=#{ts40s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts50s)">and ts_50s=#{ts50s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts60s)">and ts_60s=#{ts60s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRecreation)">and ts_recreation=#{tsRecreation}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEpicurism)">and ts_epicurism=#{tsEpicurism}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExperience)">and ts_experience=#{tsExperience}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCulture)">and ts_culture=#{tsCulture}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLeports)">and ts_leports=#{tsLeports}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsOther)">and ts_other=#{tsOther}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAlone)">and ts_alone=#{tsAlone}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFriend)">and ts_friend=#{tsFriend}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCouple)">and ts_couple=#{tsCouple}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParents)">and ts_parents=#{tsParents}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsChild)">and ts_child=#{tsChild}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsGroup)">and ts_group=#{tsGroup}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory1)">and ts_category1=#{tsCategory1}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory2)">and ts_category2=#{tsCategory2}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory3)">and ts_category3=#{tsCategory3}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory4)">and ts_category4=#{tsCategory4}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory5)">and ts_category5=#{tsCategory5}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPets)">and ts_pets=#{tsPets}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParking)">and ts_parking=#{tsParking}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDisabled)">and ts_disabled=#{tsDisabled}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsNursing)">and ts_nursing=#{tsNursing}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStroller)">and ts_stroller=#{tsStroller}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCredit)">and ts_credit=#{tsCredit}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherRain)">and ts_weather_rain=#{tsWeatherRain}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherSnow)">and ts_weather_snow=#{tsWeatherSnow}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherFog)">and ts_weather_fog=#{tsWeatherFog}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherGale)">and ts_weather_gale=#{tsWeatherGale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSpring)">and ts_season_spring=#{tsSeasonSpring}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSummer)">and ts_season_summer=#{tsSeasonSummer}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonAutumn)">and ts_season_autumn=#{tsSeasonAutumn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonWinter)">and ts_season_winter=#{tsSeasonWinter}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEditdate)">and ts_editdate=#{tsEditdate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEnrolChk)">and ts_enrol_chk=#{tsEnrolChk}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(areaType)">and area_type=#{areaType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(placeType)">and place_type=#{placeType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">and use_yn=#{useYn}	</if>
+			and ts_delete_yn = 'N'
+		</where>
+		ORDER BY ts_id desc) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<select id="selectOnePlaceSpot" parameterType="HashMap" resultType="PlaceSpot">
+		SELECT ts_id, ts_stnid, ts_title, ts_tel1, ts_manager, ts_tel2, ts_zipcode, ts_road, ts_jibun,
+		       ts_detail, ts_extra, ts_location_code, ts_latitude, ts_longitude, ts_companynum, ts_employee,
+		       ts_homepage, ts_inside, ts_summary, ts_help, to_char(ts_birthday,'YYYY-MM-DD') str_ts_birthday, ts_holiday, ts_exiting, ts_exiting_inwon,
+		       to_char(ts_start,'HH24:MI:SS') str_ts_start, to_char(ts_finish,'HH24:MI:SS') str_ts_finish, ts_personnel, ts_useday, ts_usetime, ts_info, ts_youtube_code, ts_append,
+		       ts_write_id, ts_udate_id, ts_writdate, ts_male, ts_female, ts_10s, ts_20s, ts_30s, ts_40s, ts_50s, ts_60s,
+		       ts_recreation, ts_epicurism, ts_experience, ts_culture, ts_leports, ts_other, ts_alone, ts_friend, ts_couple,
+		       ts_parents, ts_child, ts_group, ts_category1, ts_category2, ts_category3, ts_category4, ts_category5, ts_pets,
+		       ts_parking, ts_disabled, ts_nursing, ts_stroller, ts_credit, ts_weather_rain, ts_weather_snow, ts_weather_fog,
+		       ts_weather_gale, ts_season_spring, ts_season_summer, ts_season_autumn, ts_season_winter, ts_editdate, ts_enrol_chk, ts_evid,
+		       area_type, amenities, golf_strokes, golf_level,ground_type,par,ground_length,play_hole, place_type, use_yn
+		  FROM place_spot
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)">and ts_id=#{tsId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStnid)">and ts_stnid=#{tsStnid}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTitle)">and ts_title=#{tsTitle}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel1)">and ts_tel1=#{tsTel1}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsManager)">and ts_manager=#{tsManager}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel2)">and ts_tel2=#{tsTel2}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsZipcode)">and ts_zipcode=#{tsZipcode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRoad)">and ts_road=#{tsRoad}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsJibun)">and ts_jibun=#{tsJibun}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDetail)">and ts_detail=#{tsDetail}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExtra)">and ts_extra=#{tsExtra}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLocationCode)">and ts_location_code=#{tsLocationCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLatitude)">and ts_latitude=#{tsLatitude}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLongitude)">and ts_longitude=#{tsLongitude}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCompanynum)">and ts_companynum=#{tsCompanynum}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEmployee)">and ts_employee=#{tsEmployee}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHomepage)">and ts_homepage=#{tsHomepage}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInside)">and ts_inside=#{tsInside}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSummary)">and ts_summary=#{tsSummary}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHelp)">and ts_help=#{tsHelp}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsBirthday)">and ts_birthday=#{tsBirthday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHoliday)">and ts_holiday=#{tsHoliday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExiting)">and ts_exiting=#{tsExiting}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExitingInwon)">and ts_exiting_inwon=#{tsExitingInwon}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStart)">and ts_start=#{tsStart}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFinish)">and ts_finish=#{tsFinish}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPersonnel)">and ts_personnel=#{tsPersonnel}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUseday)">and ts_useday=#{tsUseday}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUsetime)">and ts_usetime=#{tsUsetime}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInfo)">and ts_info=#{tsInfo}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsYoutubeCode)">and ts_youtube_code=#{tsYoutubeCode}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAppend)">and ts_append=#{tsAppend}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWriteId)">and ts_write_id=#{tsWriteId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUdateId)">and ts_udate_id=#{tsUdateId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWritdate)">and ts_writdate=#{tsWritdate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsMale)">and ts_male=#{tsMale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFemale)">and ts_female=#{tsFemale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts10s)">and ts_10s=#{ts10s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts20s)">and ts_20s=#{ts20s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts30s)">and ts_30s=#{ts30s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts40s)">and ts_40s=#{ts40s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts50s)">and ts_50s=#{ts50s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts60s)">and ts_60s=#{ts60s}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRecreation)">and ts_recreation=#{tsRecreation}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEpicurism)">and ts_epicurism=#{tsEpicurism}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExperience)">and ts_experience=#{tsExperience}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCulture)">and ts_culture=#{tsCulture}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLeports)">and ts_leports=#{tsLeports}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsOther)">and ts_other=#{tsOther}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAlone)">and ts_alone=#{tsAlone}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFriend)">and ts_friend=#{tsFriend}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCouple)">and ts_couple=#{tsCouple}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParents)">and ts_parents=#{tsParents}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsChild)">and ts_child=#{tsChild}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsGroup)">and ts_group=#{tsGroup}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory1)">and ts_category1=#{tsCategory1}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory2)">and ts_category2=#{tsCategory2}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory3)">and ts_category3=#{tsCategory3}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory4)">and ts_category4=#{tsCategory4}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory5)">and ts_category5=#{tsCategory5}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPets)">and ts_pets=#{tsPets}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParking)">and ts_parking=#{tsParking}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDisabled)">and ts_disabled=#{tsDisabled}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsNursing)">and ts_nursing=#{tsNursing}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStroller)">and ts_stroller=#{tsStroller}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCredit)">and ts_credit=#{tsCredit}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherRain)">and ts_weather_rain=#{tsWeatherRain}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherSnow)">and ts_weather_snow=#{tsWeatherSnow}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherFog)">and ts_weather_fog=#{tsWeatherFog}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherGale)">and ts_weather_gale=#{tsWeatherGale}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSpring)">and ts_season_spring=#{tsSeasonSpring}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSummer)">and ts_season_summer=#{tsSeasonSummer}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonAutumn)">and ts_season_autumn=#{tsSeasonAutumn}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonWinter)">and ts_season_winter=#{tsSeasonWinter}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEditdate)">and ts_editdate=#{tsEditdate}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEnrolChk)">and ts_enrol_chk=#{tsEnrolChk}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(areaType)">and area_type=#{areaType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(placeType)">and place_type=#{placeType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">and use_yn=#{useYn}	</if>
+		</where>
+	</select>
+
+	<insert id="insertPlaceSpot" parameterType="PlaceSpot" useGeneratedKeys="true" keyProperty="tsId">
+        INSERT INTO place_spot
+               (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStnid)" >	ts_stnid,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(amenities)">amenities, </if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(areaType)">	area_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(placeType)">	place_type,</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(golfStrokes)">	golf_strokes,</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(golfLevel)">	golf_level,</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groundType)">	ground_type,</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(par)">	par,</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groundLength)">	ground_length,</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(playHole)">	play_hole,</if>
+
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">	use_yn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTitle)" >	ts_title,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel1)" >	ts_tel1,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsManager)" >	ts_manager,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel2)" >	ts_tel2,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsZipcode)" >	ts_zipcode,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRoad)" >	ts_road,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsJibun)" >	ts_jibun,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDetail)" >	ts_detail,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExtra)" >	ts_extra,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLocationCode)" >	ts_location_code,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLatitude)" >	ts_latitude,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLongitude)" >	ts_longitude,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCompanynum)" >	ts_companynum,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEmployee)" >	ts_employee,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHomepage)" >	ts_homepage,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInside)" >	ts_inside,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSummary)" >	ts_summary,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHelp)" >	ts_help,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHoliday)" >	ts_holiday,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExiting)" >	ts_exiting,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExitingInwon)" >	ts_exiting_inwon,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPersonnel)" >	ts_personnel,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUseday)" >	ts_useday,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUsetime)" >	ts_usetime,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInfo)" >	ts_info,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsYoutubeCode)" >	ts_youtube_code,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAppend)" >	ts_append,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWriteId)" >	ts_write_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUdateId)" >	ts_udate_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsMale)" >	ts_male,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFemale)" >	ts_female,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts10s)" >	ts_10s,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts20s)" >	ts_20s,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts30s)" >	ts_30s,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts40s)" >	ts_40s,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts50s)" >	ts_50s,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts60s)" >	ts_60s,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRecreation)" >	ts_recreation,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEpicurism)" >	ts_epicurism,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExperience)" >	ts_experience,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCulture)" >	ts_culture,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLeports)" >	ts_leports,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsOther)" >	ts_other,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAlone)" >	ts_alone,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFriend)" >	ts_friend,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCouple)" >	ts_couple,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParents)" >	ts_parents,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsChild)" >	ts_child,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsGroup)" >	ts_group,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory1)" >	ts_category1,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory2)" >	ts_category2,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory3)" >	ts_category3,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory4)" >	ts_category4,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory5)" >	ts_category5,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPets)" >	ts_pets,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParking)" >	ts_parking,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDisabled)" >	ts_disabled,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsNursing)" >	ts_nursing,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStroller)" >	ts_stroller,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCredit)" >	ts_credit,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherRain)" >	ts_weather_rain,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherSnow)" >	ts_weather_snow,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherFog)" >	ts_weather_fog,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherGale)" >	ts_weather_gale,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSpring)" >	ts_season_spring,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSummer)" >	ts_season_summer,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonAutumn)" >	ts_season_autumn,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonWinter)" >	ts_season_winter,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEnrolChk)" >	ts_enrol_chk,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsBirthday)">ts_birthday,</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsStart)">ts_start,</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsFinish)">ts_finish,</if>
+                ts_writdate)
+        VALUES (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStnid)" >	#{tsStnid},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(amenities)">#{amenities}, </if>
+        		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(areaType)">	#{areaType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(placeType)">	#{placeType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(golfStrokes)">	#{golfStrokes},</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(golfLevel)">	#{golfLevel},</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groundType)">	#{groundType},</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(par)">	#{par},</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groundLength)">	#{groundLength},</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(playHole)">	#{playHole},</if>
+
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">	#{useYn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTitle)" >	#{tsTitle},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel1)" >	#{tsTel1},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsManager)" >	#{tsManager},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel2)" >	#{tsTel2},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsZipcode)" >	#{tsZipcode},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRoad)" >	#{tsRoad},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsJibun)" >	#{tsJibun},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDetail)" >	#{tsDetail},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExtra)" >	#{tsExtra},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLocationCode)" >	#{tsLocationCode},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLatitude)" >	#{tsLatitude},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLongitude)" >	#{tsLongitude},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCompanynum)" >	#{tsCompanynum},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEmployee)" >	#{tsEmployee},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHomepage)" >	#{tsHomepage},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInside)" >	#{tsInside},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSummary)" >	#{tsSummary},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHelp)" >	#{tsHelp},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHoliday)" >	#{tsHoliday},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExiting)" >	#{tsExiting},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExitingInwon)" >	#{tsExitingInwon},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPersonnel)" >	#{tsPersonnel},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUseday)" >	#{tsUseday},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUsetime)" >	#{tsUsetime},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInfo)" >	#{tsInfo},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsYoutubeCode)" >	#{tsYoutubeCode},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAppend)" >	#{tsAppend},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWriteId)" >	#{tsWriteId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUdateId)" >	#{tsUdateId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsMale)" >	#{tsMale},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFemale)" >	#{tsFemale},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts10s)" >	#{ts10s},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts20s)" >	#{ts20s},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts30s)" >	#{ts30s},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts40s)" >	#{ts40s},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts50s)" >	#{ts50s},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts60s)" >	#{ts60s},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRecreation)" >	#{tsRecreation},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEpicurism)" >	#{tsEpicurism},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExperience)" >	#{tsExperience},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCulture)" >	#{tsCulture},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLeports)" >	#{tsLeports},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsOther)" >	#{tsOther},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAlone)" >	#{tsAlone},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFriend)" >	#{tsFriend},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCouple)" >	#{tsCouple},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParents)" >	#{tsParents},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsChild)" >	#{tsChild},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsGroup)" >	#{tsGroup},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory1)" >	#{tsCategory1},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory2)" >	#{tsCategory2},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory3)" >	#{tsCategory3},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory4)" >	#{tsCategory4},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory5)" >	#{tsCategory5},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPets)" >	#{tsPets},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParking)" >	#{tsParking},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDisabled)" >	#{tsDisabled},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsNursing)" >	#{tsNursing},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStroller)" >	#{tsStroller},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCredit)" >	#{tsCredit},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherRain)" >	#{tsWeatherRain},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherSnow)" >	#{tsWeatherSnow},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherFog)" >	#{tsWeatherFog},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherGale)" >	#{tsWeatherGale},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSpring)" >	#{tsSeasonSpring},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSummer)" >	#{tsSeasonSummer},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonAutumn)" >	#{tsSeasonAutumn},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonWinter)" >	#{tsSeasonWinter},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEnrolChk)" >	#{tsEnrolChk},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsBirthday)">DATE(STR_TO_DATE(#{strTsBirthday},'%Y-%m-%d')),</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsStart)">TIME(STR_TO_DATE(#{strTsStart},'%H:%i:%S')),</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsFinish)">TIME(STR_TO_DATE(#{strTsFinish},'%H:%i:%S')),</if>
+                now())
+    </insert>
+
+	<update id="updatePlaceSpot" parameterType="PlaceSpot">
+        Update place_spot
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStnid)" >	ts_stnid=#{tsStnid},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTitle)" >	ts_title=#{tsTitle},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel1)" >	ts_tel1=#{tsTel1},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(areaType)">	area_type=#{areaType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(placeType)">	place_type=#{placeType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(golfStrokes)">	golf_strokes=#{golfStrokes},</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(golfLevel)">	golf_level=#{golfLevel},</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groundType)">	ground_type=#{groundType},</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(par)">	par=#{par},</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(groundLength)">	ground_length=#{groundLength},</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(playHole)">	play_hole=#{playHole},</if>
+
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(useYn)">	use_yn=#{useYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsManager)" >	ts_manager=#{tsManager},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsTel2)" >	ts_tel2=#{tsTel2},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsZipcode)" >	ts_zipcode=#{tsZipcode},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRoad)" >	ts_road=#{tsRoad},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsJibun)" >	ts_jibun=#{tsJibun},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDetail)" >	ts_detail=#{tsDetail},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExtra)" >	ts_extra=#{tsExtra},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLocationCode)" >	ts_location_code=#{tsLocationCode},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLatitude)" >	ts_latitude=#{tsLatitude},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLongitude)" >	ts_longitude=#{tsLongitude},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCompanynum)" >	ts_companynum=#{tsCompanynum},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEmployee)" >	ts_employee=#{tsEmployee},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHomepage)" >	ts_homepage=#{tsHomepage},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInside)" >	ts_inside=#{tsInside},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSummary)" >	ts_summary=#{tsSummary},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHelp)" >	ts_help=#{tsHelp},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsHoliday)" >	ts_holiday=#{tsHoliday},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExiting)" >	ts_exiting=#{tsExiting},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExitingInwon)" >	ts_exiting_inwon=#{tsExitingInwon},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPersonnel)" >	ts_personnel=#{tsPersonnel},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUseday)" >	ts_useday=#{tsUseday},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUsetime)" >	ts_usetime=#{tsUsetime},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsInfo)" >	ts_info=#{tsInfo},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsYoutubeCode)" >	ts_youtube_code=#{tsYoutubeCode},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAppend)" >	ts_append=#{tsAppend},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsUdateId)" >	ts_udate_id=#{tsUdateId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsMale)" >	ts_male=#{tsMale},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFemale)" >	ts_female=#{tsFemale},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts10s)" >	ts_10s=#{ts10s},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts20s)" >	ts_20s=#{ts20s},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts30s)" >	ts_30s=#{ts30s},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts40s)" >	ts_40s=#{ts40s},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts50s)" >	ts_50s=#{ts50s},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(ts60s)" >	ts_60s=#{ts60s},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsRecreation)" >	ts_recreation=#{tsRecreation},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEpicurism)" >	ts_epicurism=#{tsEpicurism},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsExperience)" >	ts_experience=#{tsExperience},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCulture)" >	ts_culture=#{tsCulture},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsLeports)" >	ts_leports=#{tsLeports},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsOther)" >	ts_other=#{tsOther},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsAlone)" >	ts_alone=#{tsAlone},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsFriend)" >	ts_friend=#{tsFriend},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCouple)" >	ts_couple=#{tsCouple},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParents)" >	ts_parents=#{tsParents},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsChild)" >	ts_child=#{tsChild},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsGroup)" >	ts_group=#{tsGroup},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory1)" >	ts_category1=#{tsCategory1},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory2)" >	ts_category2=#{tsCategory2},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory3)" >	ts_category3=#{tsCategory3},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory4)" >	ts_category4=#{tsCategory4},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCategory5)" >	ts_category5=#{tsCategory5},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsPets)" >	ts_pets=#{tsPets},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsParking)" >	ts_parking=#{tsParking},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDisabled)" >	ts_disabled=#{tsDisabled},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsNursing)" >	ts_nursing=#{tsNursing},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsStroller)" >	ts_stroller=#{tsStroller},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsCredit)" >	ts_credit=#{tsCredit},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherRain)" >	ts_weather_rain=#{tsWeatherRain},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherSnow)" >	ts_weather_snow=#{tsWeatherSnow},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherFog)" >	ts_weather_fog=#{tsWeatherFog},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsWeatherGale)" >	ts_weather_gale=#{tsWeatherGale},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSpring)" >	ts_season_spring=#{tsSeasonSpring},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonSummer)" >	ts_season_summer=#{tsSeasonSummer},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonAutumn)" >	ts_season_autumn=#{tsSeasonAutumn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsSeasonWinter)" >	ts_season_winter=#{tsSeasonWinter},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEnrolChk)" >	ts_enrol_chk=#{tsEnrolChk},	</if>
+<!-- 			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsEvid)" >	ts_evid=#{tsEvid},	</if> -->
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsDeleteYn)" >	ts_delete_yn=#{tsDeleteYn},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsBirthday)">ts_birthday=DATE(STR_TO_DATE(#{strTsBirthday},'%Y-%m-%d')),</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsStart)">ts_start=TIME(STR_TO_DATE(#{strTsStart},'%H:%i:%S')),</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(strTsFinish)">ts_finish=TIME(STR_TO_DATE(#{strTsFinish},'%H:%i:%S')),</if>
+			ts_editdate=now()
+        </set>
+        <where>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)">and ts_id=#{tsId}</if>
+        </where>
+    </update>
+
+	<update id="deletePlaceSpot" parameterType="PlaceSpot">
+        Update place_spot
+        <set>
+			ts_delete_yn = 'Y'
+        </set>
+        <where>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)">and ts_id=#{tsId}</if>
+        </where>
+    </update>
+
+    <!--################################### place_spot_image ###################################-->
+	<select id="selectCountPlaceSpotImage" parameterType="HashMap" resultType="Integer">
+		SELECT count(*)
+		  FROM place_spot_image
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	and file_id=#{fileId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)" >	and ts_id=#{tsId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	and service_type=#{serviceType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	and upload_path=#{uploadPath}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	and upload_filename=#{uploadFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	and file_extension=#{fileExtension}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	and file_size=#{fileSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	and file_mimetype=#{fileMimetype}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	and origin_filename=#{originFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	and upload_id=#{uploadId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadDate)" >	and upload_date=#{uploadDate}	</if>
+
+		</where>
+	</select>
+
+	<select id="selectListPlaceSpotImage" parameterType="HashMap" resultType="PlaceSpotImage">
+	SELECT * FROM (
+		SELECT @rownum:=@rownum+1 AS rownum,
+		       file_id, ts_id, service_type, upload_path, upload_filename, file_extension, file_size, file_mimetype, origin_filename, upload_id, upload_date, sort_order
+		  FROM place_spot_image
+		  join (SELECT @rownum:= 0) rnum
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	and file_id=#{fileId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)" >	and ts_id=#{tsId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	and service_type=#{serviceType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	and upload_path=#{uploadPath}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	and upload_filename=#{uploadFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	and file_extension=#{fileExtension}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	and file_size=#{fileSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	and file_mimetype=#{fileMimetype}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	and origin_filename=#{originFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	and upload_id=#{uploadId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadDate)" >	and upload_date=#{uploadDate}	</if>
+		</where>
+		ORDER BY sort_order asc) a
+		<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(itemStartPosition) and @kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(pagePerSize)">
+         LIMIT #{itemStartPosition}, #{pagePerSize}
+         </if>
+	</select>
+
+	<select id="selectOnePlaceSpotImage" parameterType="HashMap" resultType="PlaceSpotImage">
+		SELECT file_id, ts_id, service_type, upload_path, upload_filename, file_extension, file_size, file_mimetype, origin_filename, upload_id, upload_date
+		  FROM place_spot_image
+		<where>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	and file_id=#{fileId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)" >	and ts_id=#{tsId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	and service_type=#{serviceType}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	and upload_path=#{uploadPath}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	and upload_filename=#{uploadFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	and file_extension=#{fileExtension}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	and file_size=#{fileSize}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	and file_mimetype=#{fileMimetype}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	and origin_filename=#{originFilename}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	and upload_id=#{uploadId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadDate)" >	and upload_date=#{uploadDate}	</if>
+		</where>
+	</select>
+
+	<insert id="insertPlaceSpotImage" parameterType="PlaceSpotImage" useGeneratedKeys="true" keyProperty="fileId">
+        INSERT INTO place_spot_image
+               (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	file_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)" >	ts_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	service_type,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	upload_path,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	upload_filename,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	file_extension,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	file_size,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	file_mimetype,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	origin_filename,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	upload_id,	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)" >	sort_order,	</if>
+                upload_date)
+        VALUES (<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	#{fileId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)" >	#{tsId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	#{serviceType},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	#{uploadPath},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	#{uploadFilename},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	#{fileExtension},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	#{fileSize},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	#{fileMimetype},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	#{originFilename},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	#{uploadId},	</if>
+				<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)" >	#{sortOrder},	</if>
+                now())
+    </insert>
+
+	<update id="updatePlaceSpotImage" parameterType="PlaceSpotImage">
+        Update place_spot_image
+        <set>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(serviceType)" >	service_type=#{serviceType},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadPath)" >	upload_path=#{uploadPath},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadFilename)" >	upload_filename=#{uploadFilename},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileExtension)" >	file_extension=#{fileExtension},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileSize)" >	file_size=#{fileSize},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileMimetype)" >	file_mimetype=#{fileMimetype},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(originFilename)" >	origin_filename=#{originFilename},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(uploadId)" >	upload_id=#{uploadId},	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(sortOrder)" >	sort_order=#{sortOrder},	</if>
+			upload_date=now()
+        </set>
+        <where>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	and file_id=#{fileId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)" >	and ts_id=#{tsId}	</if>
+        </where>
+    </update>
+
+	<delete id="deletePlaceSpotImage" parameterType="PlaceSpotImage">
+        delete from place_spot_image
+        <where>
+        	<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(fileId)" >	and file_id=#{fileId}	</if>
+			<if test="@kr.co.wayplus.travel.util.MybatisUtil@isNotEmpty(tsId)" >	and ts_id=#{tsId}	</if>
+        </where>
+    </delete>
+
+
+</mapper>

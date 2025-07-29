@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}"/>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <section class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">메시지 알림 설정</h1>
+        </div>
+
+        <div class="manage-content mb-5">
+            <form id="message-setting-form">
+                <input type="hidden" name="alarmType" value="inquiry" />
+                <input type="hidden" name="id" th:value="${setting.id}" th:if="${setting != null}" />
+                <div class="input-box">
+                    <div class="title">
+                        메시지 설정
+                    </div>
+                    <div class="row form-inline mb-3" th:if="${setting != null}">
+                        <div class="input-area-third">
+                            <label class="input-label" for="api-use-time">사용시간</label>
+                            <input type="text" class="form-control inline-one" id="api-use-time" name="apiUseTime"
+                                   placeholder="사용시간(ex. 09:00-18:00)" th:value="${setting.apiUseTime}" />
+                        </div>
+                        <div class="input-area-third">
+                            <label class="input-label" for="api-queue-type">사용시간 외</label>
+                            <select class="form-control inline-one" id="api-queue-type" name="apiQueueType">
+                                <option value="no" th:selected="${#strings.equals(setting.apiQueueType, 'no')} ? 'selected'">발송안함</option>
+                                <option value="wait" th:selected="${#strings.equals(setting.apiQueueType, 'wait')} ? 'selected'">대기발송</option>
+                                <option value="summary" th:selected="${#strings.equals(setting.apiQueueType, 'summary')} ? 'selected'">요약발송</option>
+                            </select>
+                        </div>
+                        <div class="input-area-third">
+                            <label class="input-label" for="use-yn">사용여부</label>
+                            <input class="form-control" type="checkbox" id="use-yn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="메시지발송 사용" data-off="메시지발송 미사용" data-width="calc(100% - 8rem)" data-height="38px" value="Y" th:checked="${setting.useYn == 'Y'} ? 'checked'" />
+                        </div>
+                    </div>
+                </div>
+                <div class="manage-control mt-0">
+                    <button type="button" class="btn btn-primary" onclick="fnUpdateMessageStatus()">저장하기</button>
+                </div>
+            </form>
+        </div>
+        <div class="manage-content">
+            <div class="input-box">
+                <div class="title">
+                    메시지 수신자 설정
+                </div>
+                <table id="datatable" class="table table-hover manage-table">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>연락처</th>
+                        <th>수신자명</th>
+                        <th>사용기간</th>
+                        <th>사용상태</th>
+                        <th>수정/삭제</th>
+                    </tr>
+                    </thead>
+                    <tbody id="receiver-list">
+                    <th:block th:unless="${receiverList == null or #arrays.isEmpty(receiverList)}">
+                        <tr th:each="item, idx : ${receiverList}" th:class="${#strings.isEmpty(item.useYn) or #strings.equals(item.useYn, 'N')} ? 'tr-disable'">
+                            <td class="no" th:text="${idx.count}">
+                                순서
+                            </td>
+                            <td class="tel">
+                                <input type="hidden" name="id" th:value="${item.id}" />
+                                <input type="hidden" name="messageId" th:value="${item.messageId}" />
+                                <input type="text" class="form-control" name="mobile" th:value="${item.mobile}" />
+                            </td>
+                            <td class="name">
+                                <input type="text" class="form-control" name="username" th:value="${item.username}" />
+                            </td>
+                            <td class="period table-inline">
+                                <div class="input-area-full">
+                                    <input type="text" class="form-control datepicker" name="startDate"
+                                           placeholder="시작일" readonly="readonly" autocomplete="off"
+                                           th:attr="data-default=${item.startDate}"
+                                           th:value="${item.startDate}" />
+                                    <div class="input-overlay">
+                                        <button type="button" class="overlay-button" onclick="fnSetNull($(this).parent().parent().find('input'))"><img src="/images/icon/bell.svg" /></button>
+                                    </div>
+                                </div>
+                                <div class="input-area-full">
+                                    <input type="text" class="form-control datepicker" name="expireDate"
+                                           placeholder="만료일" readonly="readonly" autocomplete="off"
+                                           th:attr="data-default=${item.expireDate}"
+                                           th:value="${item.expireDate}" />
+                                    <div class="input-overlay">
+                                        <button type="button" class="overlay-button" onclick="fnSetNull($(this).parent().parent().find('input'))"><img src="/images/icon/bell.svg" /></button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="control">
+                                <input class="form-control" type="checkbox" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-height="38px" value="Y" th:checked="${#strings.equals(item.useYn, 'Y')} ? 'checked'" />
+                            </td>
+                            <td class="control">
+                                <button type="button" class="btn btn-control btn-gray" onclick="fnModifyReceiveMessage(this)">수정</button>
+                                <button type="button" class="btn btn-control btn-dark" onclick="fnDeleteReceiveMessage(this)">삭제</button>
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                    <tbody id="receiver-add">
+                    <form id="message-receiver-form">
+                    <tr>
+                        <input type="hidden" name="messageId" th:value="${setting != null} ? ${setting.id}"  />
+                        <td class="no">+</td>
+                        <td class="tel">
+                            <input type="text" class="form-control" name="mobile" id="receive-mobile" placeholder="수신자 연락처" />
+                        </td>
+                        <td class="date">
+                            <input type="text" class="form-control" name="username" id="receive-name" placeholder="수신자명" />
+                        </td>
+                        <td class="period table-inline">
+                            <div class="input-area-full">
+                                <input type="text" class="form-control datepicker" name="startDate" id="start-date" placeholder="시작일" readonly="readonly" autocomplete="off" />
+                                <div class="input-overlay">
+                                    <button type="button" class="overlay-button" onclick="fnSetNull($('#start-date'))"><img src="/images/icon/bell.svg" /></button>
+                                </div>
+                            </div>
+                            <div class="input-area-full">
+                                <input type="text" class="form-control datepicker" name="expireDate" id="expire-date" placeholder="만료일" readonly="readonly" autocomplete="off" />
+                                <div class="input-overlay">
+                                    <button type="button" class="overlay-button" onclick="fnSetNull($('#expire-date'))"><img src="/images/icon/bell.svg" /></button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="control">
+                            <input class="form-control" type="checkbox" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-height="38px" value="Y" />
+                        </td>
+                        <td class="control">
+                            <button type="button" class="btn btn-control btn-primary" th:onclick="fnAddReceiveMessage()">등록</button>
+                        </td>
+                    </tr>
+                    </form>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+    <aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $('.datepicker').daterangepicker({
+            autoUpdateInput: true,
+            singleDatePicker:true,
+            showDropdowns: true,
+            showCustomRangeLabel:false,
+            timePicker: true,
+            timePicker24Hour: true,
+            timePickerMinutes:true,
+            drops:"auto",
+            locale: {
+                format: 'YYYY-MM-DD HH:mm:ss',
+                applyLabel: "적용",
+                cancelLabel: "취소",
+                daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+                monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                separator:separator
+            }
+        }, function(start, end, label){});
+        for(let i=0; i<$('.datepicker').length; i++){
+            if($('.datepicker').eq(i).attr('data-default') === undefined){
+                $('.datepicker').eq(i).val('')
+            }
+        }
+
+    });
+
+    fnUpdateMessageStatus = function(){
+        let form = $('#message-setting-form');
+        $.ajax({
+            url: '/manage/setting/alarm/message',
+            type : "PUT",
+            data : $(form).serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    if( data.result === "success" ){
+                        alert(data.message);
+                    }else{
+                        alert(data.message);
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnAddReceiveMessage  = function(){
+        let form = $('#message-receiver-form');
+        if(!formValidCheck('#receive-mobile', 'input', 'is-invalid', 'mobile')) return;
+        if(!formValidCheck('#receive-name', 'input', 'is-invalid', 'text')) return;
+        $.ajax({
+            url: '/manage/setting/alarm/message-receiver',
+            type : "POST",
+            data : $(form).serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    alert(data.message);
+                    if( data.result === "success" ){
+                        location.reload();
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnModifyReceiveMessage = function(item){
+        let tr = $(item).parent().parent();
+        if(!formValidCheck($(tr).find('input[name=mobile]'), 'input', 'is-invalid', 'mobile')) return;
+        if(!formValidCheck($(tr).find('input[name=username]'), 'input', 'is-invalid', 'text')) return;
+
+        $.ajax({
+            url: '/manage/setting/alarm/message-receiver',
+            type : "PUT",
+            data : $(tr).find('input').serialize(),
+            success : function(data) {
+                if (typeof data.result != "undefined" && data.result == "error") {
+                    alert(data.error);
+                    return;
+                } else {
+                    alert(data.message);
+                    if( data.result === "success" ){
+                        location.reload();
+                    }
+                }
+            },
+            error : function(xhr, code, errorMsg) { },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(
+                    [[${_csrf.headerName}]], [[${_csrf.token}]]
+                );
+            },
+            complete : function() { }
+        });
+    }
+
+    fnDeleteReceiveMessage = function(item){
+        let tr = $(item).parent().parent();
+        if(confirm('정말 삭제하시겠습니까?')){
+            $.ajax({
+                url: '/manage/setting/alarm/message-receiver',
+                type : "DELETE",
+                data : $(tr).find('input').serialize(),
+                success : function(data) {
+                    if (typeof data.result != "undefined" && data.result == "error") {
+                        alert(data.error);
+                        return;
+                    } else {
+                        alert(data.message);
+                        if( data.result === "success" ){
+                            $(tr).remove();
+                        }
+                    }
+                },
+                error : function(xhr, code, errorMsg) { },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(
+                        [[${_csrf.headerName}]], [[${_csrf.token}]]
+                    );
+                },
+                complete : function() { }
+            });
+        }
+    }
+
+
+    fnSetNull = function(target){
+        $(target).val('');
+    }
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>

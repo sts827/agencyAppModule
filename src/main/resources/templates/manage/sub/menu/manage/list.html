@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}"/>
+<body class="hold-transition sidebar-mini layout-fixed">
+
+<div class="wrapper">
+    <div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+    <nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+    <aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+    <div class="content-wrapper">
+        <div class="content-header">
+            <h1 class="m-0">관리자메뉴 관리</h1>
+        </div>
+        <section class="manage-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class=" float-left">
+                            <button type="button" class="btn btn-black" onclick="expandAll()"><i
+                                    class="fa fa-expand"></i> 모두 펼치기
+                            </button>
+                            <button type="button" class="btn btn-black" onclick="collapseAll()"><i
+                                    class="fa  fa-compress"></i> 모두 접기
+                            </button>
+                        </div>
+                        <div class=" float-right">
+                            <button type="button" class="btn btn-primary" onclick="fnMenuAdd()"><i
+                                    class="fa fa-plus"></i>최상위 메뉴 추가
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="fnMenuOrderUpd()"><i
+                                    class="fa fa-arrows-alt-v"></i>순서 수정
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-md-12">
+                        <h3 class="title">메뉴목록</h3>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <table id="datatable" class="table table-menu">
+                                    <colgroup>
+                                        <col width="*">
+                                        <col width="190px">
+                                        <col width="95px">
+                                        <col width="240px">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">메뉴명</th>
+                                        <th class="text-center">URL</th>
+                                        <th class="text-center">사용여부</th>
+                                        <th class="text-center">기능</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="dd">
+                                        <ol class="dd-list"></ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- popup window -->
+    <div class="modal fade func-menu-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="func-menu-modal-title" class="menu-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="funcMenuForm" name="funcMenuForm" class="form-horizontal form-label-left">
+                        <input type="hidden" id="menuId" name="menuId"/>
+                        <input type="hidden" id="upperMenuId" name="upperMenuId"/>
+                        <input type="hidden" id="menuIcon" name="menuIcon" value="far fa-circle"/>
+                        <input type="hidden" id="menuSort" name="menuSort"/>
+
+                        <div class="form-group" id="menuType" style="display: none;">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12 req">메뉴 유형</label>
+                            <div class="col-md-12 col-sm-12 col-xs-12 form-inline">
+                                <div class="custom-control custom-radio mr-05">
+                                    <input class="custom-control-input custom-control-input-primary custom-control-input-outline"
+                                           type="radio"
+                                           id="menuType1" name="menuType" value="normal" checked="checked">
+                                    <label for="menuType1" class="custom-control-label">메뉴형</label>
+                                </div>
+                                <div class="custom-control custom-radio mr-05">
+                                    <input class="custom-control-input custom-control-input-danger custom-control-input-outline"
+                                           type="radio"
+                                           id="menuType2" name="menuType" value="header">
+                                    <label for="menuType2" class="custom-control-label">헤더형</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group upperMenu" id="upperMenuTxtDiv" style="display: none;">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">상위 메뉴</label>
+                            <div class="col-md-6 col-sm-6 col-xs-12 upperMenuName" id="upperMenuName"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12 req">메뉴명 </label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <input type="text" id="menuName" name="menuName"
+                                       class="form-control col-md-12 col-xs-12" placeholder="메뉴명 입력">
+                            </div>
+                        </div>
+                        <div class="form-group normal">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">메뉴URL <span
+                                    class="required">*</span></label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <input type="text" id="menuUrl" name="menuUrl" class="form-control col-md-12 col-xs-12"
+                                       placeholder="메뉴URL 입력">
+                            </div>
+                        </div>
+                        <div class="form-group normal">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">메뉴 설명</label>
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <textarea class="form-control" rows="3" id="menuDesc" name="menuDesc"
+                                          placeholder="메뉴설명 입력"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group normal">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12">아이콘</label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <a class="btn btn-app" onclick="showIconWindow()">
+                                    <i id="iconI" class="far fa-circle"></i> 변경
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="fnMenuSave()">확인</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{/manage/inc/manage-footer-include :: footer}"/>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+    $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- AdminLTE App -->
+<script src="/js/manage/adminlte.js"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    let _hsMap;
+    const limit_menu_depth = 3;
+
+    $(document).ready(function () {
+        select();
+
+        $(`.func-menu-modal input[name="menuType"]`)
+            .on('click', function (e) {
+                //console.log(123, $(this).val());
+
+                if ($(this).val() === 'normal')
+                    $(`.func-menu-modal .normal`).show();
+                else
+                    $(`.func-menu-modal .normal`).hide();
+            });
+
+    });
+
+    $(window).on('load', function () {
+
+    })
+
+    function expandAll() {
+        $('.dd').nestable('expandAll');
+    }
+
+    function collapseAll() {
+        $('.dd').nestable('collapseAll');
+    }
+
+    function select() {
+        $(".dd-list").html("");
+        $.ajax({
+            url: '/admin/menu/manage/list',
+            type: "GET",
+//			dataType : "json",
+            success: function (res) {
+                if ("success" == res.result) {
+                    _hsMap = new MapCustom();
+                    var html = "";
+                    for (idx in res.list) {
+                        var menu = res.list[idx];
+                        var menuId = menu.menuId;
+                        _hsMap.put(menuId, menu);
+                    }
+
+                    for (idx in res.data) {
+                        var menu = res.data[idx];
+
+                        html += makeTbody(menu, 0);
+                    }
+                    $(".dd-list").html(html);
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+        $('.dd').nestable({
+            maxDepth: limit_menu_depth   // this is important if you have the same case of the question
+            /*
+                        ,reject: [{
+                            rule: function () {
+                                // The this object refers to dragRootEl i.e. the dragged element.
+                                // The drag action is cancelled if this function returns true
+                                var ils = $(this).find('>ol.dd-list > li.dd-item');
+                                for (var i = 0; i < ils.length; i++) {
+                                    var datatype = $(ils[i]).data('type');
+                                    if (datatype === 'child')
+                                        return true;
+                                }
+                                return false;
+                            },
+                            action: function (nestable) {
+                                // This optional function defines what to do when such a rule applies. The this object still refers to the dragged element,
+                                // and nestable is, well, the nestable root element
+                                alert('Can not move this item to the root');
+                            }
+                        }]
+            */
+        }, fnInitBootstrapToggle);
+    }
+
+    fnInitBootstrapToggle = function () {
+        console.log('fnInitBootstrapToggle');
+        setTimeout(function () {
+            $('.manage-content input[data-toggle="toggle"]')
+                .bootstrapToggle()
+                .change(function (e) {
+                    selector = '';
+                    menuId = '';
+                    useYn = 'Y';
+
+                    $.each(this.attributes, function () {
+                        if (this.name == 'data-menu-id') {
+                            menuId = this.value;
+                            selector = `input[name=useYn][data-menu-id=${menuId}]`;
+                            if (!$(selector).prop('checked')) {
+                                useYn = 'N';
+                            }
+                        }
+                    });
+                    fnMenuUseYnUpdate(menuId, useYn);
+                });
+        }, 200);
+    }
+
+    function makeTbody(menu, depth) {
+        var html = "";
+        var realUrl = "";
+
+        if (menu.menuUrl != null) {
+            realUrl = menu.menuUrl;
+        }
+
+        html += "<li class='dd-item ";
+        if (depth == 0) html += "item-red";
+        else if (depth == 1) html += "item-orange";
+        else if (depth == 2) html += "item-green";
+        else if (depth == 3) html += "item-blue";
+        else if (depth == 4) html += "item-purple";
+        else if (depth == 5) html += "item-grey";
+
+        if (menu.menuType !== 'normal') html += ` dd-blockDepth `;
+
+        html += "' data-id='" + menu.menuId + "' >";
+        if (menu.listChildMenuL) {
+            html += `<button data-action="collapse" type="button">Collapse</button>`
+            html += `<button data-action="expand" type="button" style="display: none;">Expand</button>`
+        }
+        html += `<div class='dd-handle'>`;
+        html += menu.menuName;
+        html += "</div>";
+        /*
+                html += `<div class="dd-icons">`;
+                if(menu.listChildMenuL !== null){
+                    //html += `<i class="icon-custom-menu-open" data-action="expand" onclick="fnNestable(${menu.menuId})"></i>`;
+                    html += `<button data-action="collapse" type="button">Collapse</button>`
+                    html += `<button data-action="expand" type="button" style="display: none;">Expand</button>`
+                }
+                html += "</div>";
+        */
+
+        html += `<div class="dd-btns float-right">`;
+        //console.log(menu.menuType);
+        html += `<div style="margin-right:2%;width:200px;text-align:left;">`;
+        if (menu.menuType === 'normal') {
+            html += `${menu.menuUrl == null ? '' : menu.menuUrl}`;
+        }
+        html += `</div>`;
+
+        html += `<div style="margin-right:2%;width:80px;text-align:center;">`;
+        html += `<input class="form-control" type="checkbox" id="useYn" name="useYn" data-toggle="toggle" data-onstyle="primary" data-on="사용" data-off="미사용" data-width="100%" ${menu.useYn === 'Y' ? 'checked' : ''} data-menu-id='${menu.menuId}'>`;
+        html += `</div>`;
+
+        html += `<div style="margin-right:2%;width:220px;text-align:right;">`;
+        if (menu.menuType === 'normal') {
+            if (depth < (limit_menu_depth - 1))
+                html += `<button type="button" class="btn btn-primary" onclick="fnMenuWithUpperAdd(${menu.menuId})"><i class="fa fa-plus">추가</i></button>`; //
+            html += `<button type="button" class="btn btn-info" onclick="fnMenuUpd(${menu.menuId})"><i class="fa fa-pencil-alt">수정</i></button>`;//
+        }
+        html += `<button type="button" class="btn btn-danger" onclick="fnMenuDel(${menu.menuId})"><i class="fa fa-trash-alt">삭제</i></button>`;//
+        html += `</div>`;
+        /*
+        */
+        html += `</div>`;
+
+        if (menu.listChildMenuL != null) {
+            if (menu.listChildMenuL.length > 0) {
+                html += "<ol class='dd-list'>";
+                for (idx in menu.listChildMenuL) {
+                    var childMenu = menu.listChildMenuL[idx];
+                    html += makeTbody(childMenu, parseInt(depth) + 1);
+                }
+                html += "</ol>";
+            }
+        }
+        html += "</li>";
+        return html;
+    }
+
+    fnMnueInit = function () {
+        $('.func-menu-modal .upperMenu').hide();
+        $('.func-menu-modal .menu-title').html('');
+        $('.func-menu-modal #menuId').val('');
+        $('.func-menu-modal #upperMenuId').val('');
+        $('.func-menu-modal #menuName').val('');
+        $('.func-menu-modal #menuUrl').val('');
+        $('.func-menu-modal #menuDesc').val('');
+        $('.func-menu-modal #menuSort').val('');
+        $('.func-menu-modal #iconI').attr('class', '').attr('class', 'fa fa-circle');
+    }
+
+    fnMenuWithUpperAdd = function (upperId) {
+        fnMnueInit();
+
+        if (upperId !== undefined) {
+            var menu = _hsMap.get(upperId);
+            var menuSort = $(`li[data-id="${upperId}"] > .dd-list > .dd-item`).length;
+
+            $('.func-menu-modal .upperMenuName').html(`${menu.menuName}`);
+            $('.func-menu-modal #menuType').hide();
+            $('.func-menu-modal #upperMenuId').val(`${upperId}`);
+            $('.func-menu-modal #menuSort').val(menuSort);
+            $('.func-menu-modal .upperMenu').show();
+        }
+        $('.func-menu-modal .menu-title').html('하위 메뉴 추가');
+
+        $('.func-menu-modal').modal("show");
+    }
+
+    fnMenuAdd = function () {
+        fnMnueInit();
+        var menuSort = $('.dd > .dd-list > .dd-item').length;
+
+        $('.func-menu-modal .menu-title').html('최상위 메뉴 추가');
+        $('.func-menu-modal #menuType').show();
+        $('.func-menu-modal #menuSort').val(menuSort);
+
+
+        $('.func-menu-modal').modal("show");
+    }
+
+    fnMenuUpd = function (menuId) {
+        fnMnueInit();
+
+        var menu = _hsMap.get(menuId);
+
+        console.log(menu);
+
+        $('.func-menu-modal .menu-title').html('메뉴 수정');
+        $('.func-menu-modal #menuType').hide();
+
+        $('.func-menu-modal #menuId').val(menu.menuId);
+        $('.func-menu-modal #upperMenuId').val(menu.upperMenuId);
+        $('.func-menu-modal #menuName').val(menu.menuName);
+        $(`.func-menu-modal input[name="menuType"][value='${menu.menuType}']`).prop('checked', true);
+
+//		$('.func-menu-modal #menuType').val( menu.menuType);
+        $('.func-menu-modal #menuUrl').val(menu.menuUrl);
+        $('.func-menu-modal #menuDesc').val(menu.menuDesc);
+        $('.func-menu-modal #iconI').attr('class', '').attr('class', menu.menuIcon);
+        $('.func-menu-modal #menuIcon').val(menu.menuIcon);
+
+        $('.func-menu-modal').modal("show");
+    }
+
+    fnMenuSave = function () {
+        /*
+        var form = document.saveForm;
+        var nowac = "";
+        if($.trim(form.title.value) == "") {
+            alert("글제목을 입력해 주세요.");
+            form.title.focus();
+        }else if($.trim(form.url.value) == "") {
+            alert("url을 입력해 주세요.");
+            form.url.focus();
+        }else if($.trim(form.typeCode.value) == "") {
+            alert("유형을 선택해 주세요.");
+            form.typeCode.focus();
+        }else{}
+        */
+
+        if (confirm("저장하시겠습니까?")) {
+            $.ajax({
+                url: '/admin/menu/manage/save',
+                type: "POST",
+                data: $(funcMenuForm).serialize(),
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                },
+                success: function (res) {
+                    if ("success" == res.result) {
+                        $('.func-menu-modal').modal("hide");
+                        select();
+                        alert("처리 되었습니다");
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        }
+    }
+
+    fnMenuUseYnUpdate = function (_menuId, _useYn) {
+        console.log(_menuId + ' ' + _useYn);
+
+        $.ajax({
+            url: '/admin/menu/manage/save',
+            type: "POST",
+            data: {'menuId': _menuId, 'useYn': _useYn},
+            dataType: "json",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+            },
+            success: function (res) {
+                if ("success" == res.result) {
+
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    }
+
+    fnMenuOrderUpd = function () {
+        if (confirm("순서 수정하시겠습니까?")) {
+            var data = $('.dd').nestable('customMenuList');
+            $.ajax({
+                url: '/admin/menu/manage/order-save',
+                type: "POST",
+                data: {"order": data, "total": data.length},
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                },
+                success: function (res) {
+                    if ("success" == res.result) {
+                        select();
+                        alert("수정되었습니다");
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        }
+    }
+
+    fnMenuDel = function (menuId) {
+        if (confirm("삭제하시겠습니까?")) {
+            $.ajax({
+                url: '/admin/menu/manage/del',
+                type: "POST",
+                data: {menuId: menuId},
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader([[${_csrf.headerName}]], [[${_csrf.token}]]);
+                },
+                success: function (res) {
+                    if ("success" == res.result) {
+                        select();
+                        alert("처리 되었습니다");
+                    } else {
+                        alert(res.message);
+                    }
+                }
+            });
+        }
+    }
+
+    fnNestable = function (menuId) {
+        console.log(menuId + '-click!!!');
+
+        $(`li.dd-item[data-id="${menuId}"]`).nestable('collapseItem')
+    }
+    showIconWindow = function () {
+        window.open("/manage/icon", "Icons", "width=800px, height=800px, toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no");
+    }
+
+    setIcon = function (icon) {
+        var form = document.funcMenuForm;
+        form.menuIcon.value = icon;
+        $("#iconI").attr("class", icon);
+    }
+
+
+</script>
+
+</body>
+</html>

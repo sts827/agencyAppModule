@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${company != null} ? ${company.siteName}">웨이플러스</title>
+	<meta name="description" content="">
+    <meta property="og:title" content="웨이플러스">
+    <meta property="og:description" content="">
+    <head th:replace="~{inc/common-header :: include}" />
+    <head th:replace="~{inc/header :: header-script}" />
+</head>
+<body>
+<section th:replace="~{inc/header :: layer-popup}" />
+<section th:replace="~{inc/header :: bar-popup}" />
+<header th:replace="~{inc/header :: header-nav}" />
+<section class="wrap">
+
+
+</section>
+<footer th:replace="~{inc/footer :: footer}" />
+<script th:inline="javascript">
+</script>
+</body>
+</html>

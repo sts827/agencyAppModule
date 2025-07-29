@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/manage/inc/manage-common-include :: main-include}" />
+<head>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<div th:replace="~{/manage/inc/manage-common-include :: common-preloader-include}"></div>
+	<nav th:replace="~{/manage/inc/manage-header-include :: header}"/>
+	<aside th:replace="~{/manage/inc/manage-sidebar-include :: sidebar-menu-v1}"></aside>
+	<section class="content-wrapper">
+		<div class="content-header">
+			<h1 class="m-0">시스템 사용자 정보</h1>
+		</div>
+		<div class="manage-content mb-5">
+		<form id="user-form">
+			<input type="hidden" name="userTokenId" th:value="${user != null} ? ${user.userTokenId}" />
+			<input type="hidden" id="id-check" value="N" th:value="${user != null} ? 'Y':'N'" />
+			<input type="hidden" name="userPassword" />
+			<div class="container-fluid p-0 mb-3">
+				<div class="row form-inline mb-3">
+					<div class="input-area-third">
+						<label class="input-label">사용자ID*</label>
+						<input type="text" class="form-control" name="userEmail" id="user-email"
+							   th:classappend="${user != null} ? 'inline-one':'inline-short'"
+							   th:value="${user != null} ? ${user.userEmail}" th:readonly="${user != null} ? 'readonly'" required="required" placeholder="사용자ID" autocomplete="off" />
+						<button type="button" class="btn btn-danger input-extra-btn" onclick="fnCheckUserId()" th:if="${user == null}">중복확인</button>
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">사용자명*</label>
+						<input type="text" class="form-control inline-one" id="user-name" name="userName" th:value="${user != null} ? ${user.userName}" required="required" placeholder="사용자명" autocomplete="off" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">권한등급*</label>
+						<select class="form-control inline-one" name="userRole">
+							<option value="MANAGER" th:selected="${user != null and #strings.equals(user.userRole, 'MANAGER')} ? 'selected'">매니저</option>
+							<option value="ADMIN" th:selected="${user != null and #strings.equals(user.userRole, 'ADMIN')}? 'selected'">관리자</option>
+						</select>
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-third">
+						<label class="input-label">비밀번호</label>
+						<input type="password" class="form-control inline-one" id="user-password" required="required" placeholder="비밀번호를 입력해주세요." maxlength="16" onkeyup="fnCheckPassword()" autocomplete="off" />
+						<span class="info-text">8~16자 영문, 숫자, 특수문자 혼합 사용</span>
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">비밀번호확인</label>
+						<input type="password" class="form-control inline-one" id="user-password-check" placeholder="비밀번호를 다시 입력해주세요." maxlength="16" onkeyup="fnCheckPassword()" autocomplete="off" />
+						<span id="validate-user-password" class="validate-text">비밀번호를 입력해주세요.</span>
+					</div>
+					<div class="input-area-third">
+
+					</div>
+				</div>
+				<div class="row form-inline mb-3" th:if="${user != null}">
+					<div class="input-area-third">
+						<label class="input-label">등록일자</label>
+						<input type="text" class="form-control inline-one" th:value="${user != null} ? ${user.userJoinDate}" readonly="readonly" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">최종로그인</label>
+						<input type="text" class="form-control inline-one" th:value="${user != null} ? ${user.lastLoginDate}" readonly="readonly" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">비밀번호</label>
+						<input type="text" class="form-control inline-one" th:value="${user != null} ? ${user.lastPasswordDate}" readonly="readonly" />
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-third">
+						<label class="input-label">연락처</label>
+						<input type="text" class="form-control inline-one" id="user-mobile" name="userMobile" th:value="${user != null} ? ${user.userMobile}" placeholder="연락처" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">생년월일</label>
+						<input type="text" class="form-control inline-one" id="user-birthday" name="userBirthday" th:value="${user != null} ? ${user.userBirthday}" placeholder="생년월일" />
+					</div>
+					<div class="input-area-third">
+						<label class="input-label">성별</label>
+						<select class="form-control inline-one" name="userGender">
+							<option value="" th:selected="${user == null or #strings.isEmpty(user.userGender)} ? 'selected'">미입력</option>
+							<option value="M" th:selected="${user != null and #strings.equals(user.userGender, 'M')} ? 'selected'">남</option>
+							<option value="F" th:selected="${user != null and #strings.equals(user.userGender, 'F')}? 'selected'">여</option>
+						</select>
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-half">
+						<label class="input-label">주소</label>
+						<button type="button" class="btn btn-default input-extra-btn" onclick="addressOpen()">주소찾기</button>
+						<input type="text" class="form-control inline-extra-short" name="userAddrZipcode" id="user-addr-zipcode" th:value="${user != null} ? ${user.userAddrZipcode}" readonly="readonly" placeholder="우편번호" />
+						<input type="text" class="form-control inline-extra-short" name="userAddrExtra" id="user-addr-extra" th:value="${user != null} ? ${user.userAddrExtra}" readonly="readonly" placeholder="참고" />
+					</div>
+					<div class="input-area-half">
+						<label class="input-label">지번주소</label>
+						<input type="text" class="form-control inline-one" name="userAddrJibun" id="user-addr-jibun" th:value="${user != null} ? ${user.userAddrJibun}" readonly="readonly" placeholder="지번주소" />
+					</div>
+				</div>
+				<div class="row form-inline mb-3">
+					<div class="input-area-half">
+						<label class="input-label">도로명주소</label>
+						<input type="text" class="form-control inline-one" name="userAddrRoad" id="user-addr-road" th:value="${user != null} ? ${user.userAddrRoad}" readonly="readonly" placeholder="도로명주소" />
+
+					</div>
+					<div class="input-area-half">
+						<label class="input-label">세부주소</label>
+						<input type="text" class="form-control inline-one" name="userAddrDetail" id="user-addr-detail" th:value="${user != null} ? ${user.userAddrDetail}" placeholder="세부주소" />
+					</div>
+				</div>
+			</div>
+			<div class="container-fluid p-0">
+				<div class="manage-control">
+					<button type="button" class="btn btn-dark" onclick="history.back()">뒤로가기</button>
+					<button type="button"
+							class="btn btn-primary"
+							th:onclick="${user != null} ? 'fnUpdateAdministrator()':'fnCreateAdministrator()'">저장하기</button>
+				</div>
+			</div>
+		</form>
+		</div>
+	</section>
+	<footer th:replace="~{/manage/inc/manage-footer-include :: footer}" />
+	<aside class="control-sidebar control-sidebar-dark"></aside>
+</div>
+<script th:inline="javascript">
+	fnCheckUserId = function(){
+		if(!formValidCheck($('#user-email'), 'input', 'is-invalid', '')){
+			alert('아이디를 입력해주세요.');
+			return;
+		}
+
+		$.ajax({
+			url: '/user/check/'+($('#user-email').val()),
+			type : "GET",
+			data : {
+				[[${_csrf.parameterName}]]: [[${_csrf.token}]],
+			},
+			success : function(data) {
+				if (typeof data.result != "undefined" && data.result == "error") {
+					alert(data.error);
+					return;
+				} else {
+					if(data.duplicate){
+						alert('이미 가입된 아이디입니다.');
+						$('#id-check').val('N');
+						$('#user-email').addClass('is-invalid');
+					}else{
+						alert('사용가능한 아이디입니다.');
+						$('#id-check').val('Y');
+						$('#user-email').addClass('is-valid');
+					}
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend : function() { },
+			complete : function() { }
+		});
+	}
+
+	fnCheckPassword = function(){
+		if($('#user-password').val().trim() !== ''
+				&& $('#user-password-check').val().trim() !== ''){
+			if($('#user-password').val() === $('#user-password-check').val()){
+				if(formValidCheck($('#user-password'), 'input', 'is-invalid', 'medium-pass')){
+					$('#validate-user-password').text('비밀번호가 일치합니다.').addClass('is-valid').removeClass('is-invalid');
+				}else{
+					$('#validate-user-password').text('영문,숫자,특수문자를 사용하여 8~16자로 작성해주세요.').addClass('is-invalid').removeClass('is-valid');
+				}
+			} else{
+				$('#validate-user-password').text('비밀번호가 일치하지 않습니다.').addClass('is-invalid').removeClass('is-valid');
+			}
+		}else{
+			$('#validate-user-password').text('영문,숫자,특수문자를 사용하여 8~16자로 작성해주세요.').addClass('is-invalid').removeClass('is-valid');
+		}
+	}
+
+	addressOpen = function (){
+		new daum.Postcode({
+			oncomplete: function(data) {
+				console.log(data);
+				let roadAddr = data.roadAddress;
+				$('#user-addr-jibun').val(data.jibunAddress);
+				$('#user-addr-road').val(roadAddr);
+				$('#user-addr-zipcode').val(data.zonecode);
+				if(roadAddr !== ''){
+					let extraRoadAddr = '';
+					if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+						extraRoadAddr += data.bname;
+					}
+					if(data.buildingName !== '' && data.apartment === 'Y'){
+						extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+					}
+					if(extraRoadAddr !== ''){
+						extraRoadAddr = ' (' + extraRoadAddr + ')';
+					}
+					$('#user-addr-extra').val(extraRoadAddr);
+				}else{
+					$('#user-addr-extra').val('');
+				}
+			}
+		}).open();
+	}
+
+	fnCreateAdministrator = function(){
+		let form = $('#user-form');
+		if(!($(form).find('#id-check').val() === 'Y')){
+			alert('아이디 중복확인을 해주세요.');
+			return false;
+		}
+
+		formValidCheck($('#user-name'), 'input', 'is-invalid', null);
+		fnCheckPassword();
+
+		if($(form).find('.is-invalid').length > 0){
+			alert('사용자 정보를 정확히 입력해주세요.');
+			return false;
+		}
+
+		let password = $('#user-password').val();
+		const cipher = CryptoJS.AES.encrypt(password, CryptoJS.enc.Utf8.parse([[${session.encrypt}]]), {
+			iv: CryptoJS.enc.Utf8.parse([[${session.iv}]]),
+			padding: CryptoJS.pad.Pkcs7,
+			mode: CryptoJS.mode.CBC
+		});
+		$('input[name=userPassword]').val(cipher.toString());
+		$.ajax({
+			url: '/admin/administrator/create',
+			type : "POST",
+			data : $(form).serialize(),
+			success : function(data) {
+				if (typeof data.result != "undefined" && data.result == "error") {
+					alert(data.message);
+					return;
+				} else {
+					if(data.result == "success"){
+						alert('등록 완료');
+						setTimeout(() => location.replace('/admin/administrator/list'), 1000);
+					}else{
+						alert(data.message);
+						return false;
+					}
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		});
+	}
+
+	fnUpdateAdministrator = function(){
+		let form = $('#user-form');
+		formValidCheck($('#user-name'), 'input', 'is-invalid', null);
+		if($('#user-password').val().trim() !== '' || $('#user-password-check').val().trim() !== ''){
+			fnCheckPassword();
+		}
+
+		if($(form).find('.is-invalid').length > 0){
+			alert('사용자 정보를 정확히 입력해주세요.');
+			return false;
+		}
+
+		if($('#user-password').val().trim() !== '' && $('#user-password-check').val().trim() !== ''){
+			var password = $('#user-password');
+			const cipher = CryptoJS.AES.encrypt(password.val(), CryptoJS.enc.Utf8.parse([[${session.encrypt}]]), {
+				iv: CryptoJS.enc.Utf8.parse([[${session.iv}]]),
+				padding: CryptoJS.pad.Pkcs7,
+				mode: CryptoJS.mode.CBC
+			});
+			$('input[name=userPassword]').val(cipher.toString());
+		}else{
+			$('input[name=userPassword]').val('');
+		}
+
+		$.ajax({
+			url: '/admin/administrator/update',
+			type : "PUT",
+			data : $(form).serialize(),
+			success : function(data) {
+				if (typeof data.result != "undefined" && data.result == "error") {
+					alert(data.message);
+					return;
+				} else {
+					if(data.result == "success"){
+						alert('저장 완료');
+					}else{
+						alert(data.message);
+						return false;
+					}
+				}
+			},
+			error : function(xhr, code, errorMsg) { },
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+						[[${_csrf.headerName}]], [[${_csrf.token}]]
+				);
+			},
+			complete : function() { }
+		});
+	}
+
+	$(document).ready(function(){
+
+	});
+</script>
+<script src="/js/manage/adminlte.js"></script>
+</body>
+</html>
